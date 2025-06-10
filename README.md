@@ -22,7 +22,8 @@
 6. Add specifics to the command and generate new iterations  
 
 ```bash
-claude
+claude # start claude code 
+claude update # refreshes index of codebase 
 /project:infinite
 /project:infinite spec_file output_dir count # Infinite command takes three arguments 
 ```
@@ -30,10 +31,10 @@ claude
 ### Command Variants
 
 ```bash
-/project:infinite specs/invent_new_ui_v3.md src 1 # Single Generation of 1 iteration
-/project:infinite specs/invent_new_ui_v3.md src_new 5 # Deploy 5 agents in parallel; generate 5 UI
-/project:infinite specs/invent_new_ui_v3.md src_new 20 # 20 agents, groups of 5, optimal resource management, generate 20 UI
-/project:infinite specs/invent_new_ui_v3.md infinite_src_new/ infinite # Continuous generation, stops with context limits 
+/project:infinite specs/chat_ui_spec.md src_agent_1 1 # Generate a single result 
+/project:infinite specs/ios_ui_spec.md src_agent_2 5 # Deploy 5 agents in parallel; generate 5 UI
+/project:infinite specs/ui_component_spec.md src_agent_3 20 # 20 agents, groups of 5, optimal resource management, generate 20 UI
+/project:infinite specs/workflow_ios_spec.md src_agent_4 infinite # Continuous generation, stops with context limits 
 ```
 
 ### Project Structure
@@ -42,15 +43,19 @@ claude
 /Users/seanivore/Development/infinite-ui-gen/
 ├── .claude/
 │   ├── commands/
-│   │   ├── infinite.md     # ← Custom command (needs setup)
-│   │   └── prime.md        # ← Context priming
-│   └── settings.json       # ← Permissions config
-├── specs/
-│   └── ios_ui_spec.md # Themed iOS UI spec 
-├── src_agent_1/            # ← Output directory (empty, ready)
-├── src_agent_2/            # ← Output directory (empty, ready)
-├── src_agent_3/            # ← Output directory (empty, ready)
-└── src_agent_4/            # ← Output directory (empty, ready)
+│   │   ├── infinite.md        <-- Custom command setup automatically 
+│   │   └── prime.md           <-- Context priming for Agents 
+│   └── settings.json          <-- Claude Code Agent Permissions config
+├── ai_docs/                   <-- Claude Code Documentation 
+├── specs/                     <-- SPEC files defining best practices 
+│   ├── chat_ui_spec.md 
+│   ├── ios_ui_spec.md 
+│   ├── ui_component_spec.md 
+│   └── workflow_ios_spec.md 
+├── src_agent_1/               <-- Output directories for each spec workflow 
+├── src_agent_2/
+├── src_agent_3/
+└── src_agent_4/
 ```
 
 ## This Project 
@@ -68,3 +73,13 @@ claude
 5. **Wave Management**: For infinite mode, manages successive waves of agents
 
 ### Just use the command, define the spec, the output directory, and the number of iterations you want to generate. That's it. 
+
+## **PRO TIP:** 
+
+- When Claude Code Subscription Hits Rate Limit 
+
+  1. It will stop you mid-agentic-generation 
+  2. Enter the command `logout` 
+  3. Enter terminal command `claude --continue` 
+  4. This time choose to login with Anthropic API Console (still uses a pop-up window)
+  5. Simply send `continue please` to Claude Code and it will continue from where it left off 
