@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Neural Task Manager - iOS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --neural-dark: #0a0f1c;
+            --neural-blue: #1a2332;
+            --neural-electric: #00e5ff;
+            --neural-pink: #ff0084;
+            --neural-green: #00ff88;
+            --neural-purple: #8b5cf6;
+            --neural-gray: #2d3748;
+            --neural-light: #ffffff;
+            --synapse-glow: rgba(0, 229, 255, 0.6);
+            --focus-wave: rgba(139, 92, 246, 0.4);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--neural-dark) 0%, var(--neural-blue) 100%);
+            color: var(--neural-light);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Neural Background Network */
+        .neural-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .neural-node {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--neural-electric);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--synapse-glow);
+            animation: neuralPulse 3s infinite ease-in-out;
+        }
+
+        .neural-connection {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neural-electric), transparent);
+            opacity: 0.3;
+            animation: synapseFlow 4s infinite;
+        }
+
+        @keyframes neuralPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        @keyframes synapseFlow {
+            0% { opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { opacity: 0; }
+        }
+
+        /* Main App Container */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: rgba(10, 15, 28, 0.8);
+            backdrop-filter: blur(20px);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            background: rgba(26, 35, 50, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .status-left {
+            display: flex;
+            gap: 5px;
+        }
+
+        .signal-dot {
+            width: 4px;
+            height: 4px;
+            background: var(--neural-electric);
+            border-radius: 50%;
+            animation: neuralPulse 2s infinite;
+        }
+
+        /* Header */
+        .app-header {
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(26, 35, 50, 0.9) 0%, transparent 100%);
+        }
+
+        .app-title {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neural-electric), var(--neural-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .neural-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        /* Brain Focus Mode */
+        .focus-mode {
+            margin: 15px 20px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--neural-purple);
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brain-visual {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+        }
+
+        .brain-wave {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: var(--neural-purple);
+            border-radius: 1px;
+            animation: brainWave 2s infinite ease-in-out;
+        }
+
+        .brain-wave:nth-child(1) { top: 15px; animation-delay: 0s; }
+        .brain-wave:nth-child(2) { top: 25px; animation-delay: 0.2s; }
+        .brain-wave:nth-child(3) { top: 35px; animation-delay: 0.4s; }
+        .brain-wave:nth-child(4) { top: 45px; animation-delay: 0.6s; }
+
+        @keyframes brainWave {
+            0%, 100% { transform: scaleX(0.5); opacity: 0.3; }
+            50% { transform: scaleX(1); opacity: 1; }
+        }
+
+        .focus-info h3 {
+            font-size: 18px;
+            color: var(--neural-purple);
+            margin-bottom: 5px;
+        }
+
+        .focus-timer {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--neural-light);
+            font-family: 'SF Mono', monospace;
+        }
+
+        /* Neural Task Grid */
+        .task-container {
+            flex: 1;
+            padding: 0 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--neural-electric);
+            margin: 20px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cognitive-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--neural-green);
+            border-radius: 50%;
+            animation: neuralPulse 1.5s infinite;
+        }
+
+        .neural-grid {
+            display: grid;
+            gap: 15px;
+            position: relative;
+        }
+
+        .task-node {
+            background: rgba(26, 35, 50, 0.8);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 16px;
+            padding: 16px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .task-node:active {
+            transform: scale(0.96);
+            border-color: var(--neural-electric);
+            box-shadow: 0 0 20px var(--synapse-glow);
+        }
+
+        .task-node.completed {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: var(--neural-green);
+        }
+
+        .task-node.high-priority {
+            border-color: var(--neural-pink);
+            background: rgba(255, 0, 132, 0.1);
+        }
+
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--neural-electric);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .task-node.completed .task-checkbox {
+            background: var(--neural-green);
+            border-color: var(--neural-green);
+        }
+
+        .task-checkbox::after {
+            content: '✓';
+            color: var(--neural-dark);
+            font-weight: bold;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .task-node.completed .task-checkbox::after {
+            opacity: 1;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--neural-light);
+            margin-bottom: 4px;
+        }
+
+        .task-node.completed .task-title {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .task-meta {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            gap: 10px;
+        }
+
+        .neural-connection-line {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(180deg, var(--neural-electric), transparent);
+            left: 31px;
+            top: 100%;
+            height: 15px;
+            opacity: 0.3;
+        }
+
+        /* Memory Palace Section */
+        .memory-palace {
+            margin: 20px 0;
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .palace-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .palace-room {
+            aspect-ratio: 1;
+            background: rgba(26, 35, 50, 0.6);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .palace-room:active {
+            transform: scale(0.9);
+            background: rgba(0, 229, 255, 0.2);
+        }
+
+        .palace-room::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.4), transparent);
+            animation: roomScan 3s infinite;
+        }
+
+        @keyframes roomScan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Cognitive Load Monitor */
+        .cognitive-monitor {
+            margin: 15px 20px;
+            background: rgba(255, 0, 132, 0.1);
+            border: 1px solid var(--neural-pink);
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .load-meter {
+            display: flex;
+            gap: 4px;
+            margin-top: 10px;
+        }
+
+        .load-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 0, 132, 0.2);
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .load-bar.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--neural-pink);
+            animation: loadPulse 1s infinite ease-in-out;
+        }
+
+        @keyframes loadPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            height: 83px;
+            padding-bottom: 34px;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 229, 255, 0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 8px;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 44px;
+            min-height: 44px;
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        .tab-item:active {
+            transform: scale(0.9);
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .tab-item.active {
+            color: var(--neural-electric);
+        }
+
+        .tab-icon {
+            font-size: 24px;
+            margin-bottom: 2px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--neural-electric), var(--neural-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--neural-dark);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 25px rgba(0, 229, 255, 0.3);
+            z-index: 10;
+        }
+
+        .fab:active {
+            transform: scale(0.9);
+        }
+
+        .fab::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neural-electric), var(--neural-purple));
+            animation: fabPulse 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes fabPulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        /* Haptic Feedback Simulation */
+        .haptic-feedback {
+            animation: hapticBuzz 0.1s ease-in-out;
+        }
+
+        @keyframes hapticBuzz {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .neural-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .palace-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Dark mode optimizations */
+        @media (prefers-color-scheme: dark) {
+            .app-container {
+                background: rgba(5, 8, 15, 0.9);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Neural Background Network -->
+    <div class="neural-background" id="neuralBackground"></div>
+
+    <div class="app-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">
+                <div class="signal-dot"></div>
+                <div class="signal-dot"></div>
+                <div class="signal-dot"></div>
+                <span>Neural</span>
+            </div>
+            <div>9:41</div>
+            <div style="display: flex; gap: 2px;">
+                <span>100%</span>
+                <div style="width: 20px; height: 10px; border: 1px solid currentColor; border-radius: 2px; position: relative;">
+                    <div style="width: 90%; height: 100%; background: var(--neural-green); border-radius: 1px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Header -->
+        <div class="app-header">
+            <h1 class="app-title">Neural Task Manager</h1>
+            <p class="neural-subtitle">Synaptic productivity optimization</p>
+        </div>
+
+        <!-- Focus Mode -->
+        <div class="focus-mode" id="focusMode">
+            <div class="focus-info">
+                <h3>Deep Focus Active</h3>
+                <div class="focus-timer" id="focusTimer">25:00</div>
+            </div>
+            <div class="brain-visual">
+                <div class="brain-wave"></div>
+                <div class="brain-wave"></div>
+                <div class="brain-wave"></div>
+                <div class="brain-wave"></div>
+            </div>
+        </div>
+
+        <div class="task-container">
+            <!-- Active Tasks Section -->
+            <h2 class="section-title">
+                <div class="cognitive-indicator"></div>
+                Active Neural Pathways
+            </h2>
+            
+            <div class="neural-grid">
+                <div class="task-node high-priority" data-task="1">
+                    <div class="task-checkbox"></div>
+                    <div class="task-content">
+                        <div class="task-title">Complete neural network analysis</div>
+                        <div class="task-meta">
+                            <span>Priority: High</span>
+                            <span>Cognitive Load: 85%</span>
+                        </div>
+                    </div>
+                    <div class="neural-connection-line"></div>
+                </div>
+
+                <div class="task-node" data-task="2">
+                    <div class="task-checkbox"></div>
+                    <div class="task-content">
+                        <div class="task-title">Review synaptic connections</div>
+                        <div class="task-meta">
+                            <span>Priority: Medium</span>
+                            <span>Cognitive Load: 45%</span>
+                        </div>
+                    </div>
+                    <div class="neural-connection-line"></div>
+                </div>
+
+                <div class="task-node completed" data-task="3">
+                    <div class="task-checkbox"></div>
+                    <div class="task-content">
+                        <div class="task-title">Optimize memory pathways</div>
+                        <div class="task-meta">
+                            <span>Completed</span>
+                            <span>Efficiency: +23%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-node" data-task="4">
+                    <div class="task-checkbox"></div>
+                    <div class="task-content">
+                        <div class="task-title">Brain training session</div>
+                        <div class="task-meta">
+                            <span>Priority: Low</span>
+                            <span>Duration: 15min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Memory Palace -->
+            <h2 class="section-title">
+                <div class="cognitive-indicator"></div>
+                Memory Palace
+            </h2>
+            
+            <div class="memory-palace">
+                <div style="font-size: 14px; margin-bottom: 8px; color: rgba(255,255,255,0.8);">
+                    Spatial task organization
+                </div>
+                <div class="palace-grid">
+                    <div class="palace-room">🏠</div>
+                    <div class="palace-room">💼</div>
+                    <div class="palace-room">🧠</div>
+                    <div class="palace-room">⚡</div>
+                    <div class="palace-room">🎯</div>
+                    <div class="palace-room">📚</div>
+                </div>
+            </div>
+
+            <!-- Cognitive Load Monitor -->
+            <div class="cognitive-monitor">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 14px; font-weight: 500; color: var(--neural-pink);">
+                        Cognitive Load: 67%
+                    </span>
+                    <span style="font-size: 12px; color: rgba(255,255,255,0.6);">
+                        Optimal Range
+                    </span>
+                </div>
+                <div class="load-meter">
+                    <div class="load-bar active"></div>
+                    <div class="load-bar active"></div>
+                    <div class="load-bar active"></div>
+                    <div class="load-bar"></div>
+                    <div class="load-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <div class="tab-item active">
+                <div class="tab-icon">🧠</div>
+                <div class="tab-label">Neural</div>
+            </div>
+            <div class="tab-item">
+                <div class="tab-icon">⚡</div>
+                <div class="tab-label">Focus</div>
+            </div>
+            <div class="tab-item">
+                <div class="tab-icon">📊</div>
+                <div class="tab-label">Analytics</div>
+            </div>
+            <div class="tab-item">
+                <div class="tab-icon">🎯</div>
+                <div class="tab-label">Goals</div>
+            </div>
+        </div>
+
+        <!-- Floating Action Button -->
+        <div class="fab" id="fab">+</div>
+    </div>
+
+    <script>
+        // Neural Background Generation
+        function createNeuralBackground() {
+            const background = document.getElementById('neuralBackground');
+            const nodeCount = 20;
+            const connectionCount = 15;
+
+            // Create neural nodes
+            for (let i = 0; i < nodeCount; i++) {
+                const node = document.createElement('div');
+                node.className = 'neural-node';
+                node.style.left = Math.random() * 100 + '%';
+                node.style.top = Math.random() * 100 + '%';
+                node.style.animationDelay = Math.random() * 3 + 's';
+                background.appendChild(node);
+            }
+
+            // Create neural connections
+            for (let i = 0; i < connectionCount; i++) {
+                const connection = document.createElement('div');
+                connection.className = 'neural-connection';
+                connection.style.left = Math.random() * 100 + '%';
+                connection.style.top = Math.random() * 100 + '%';
+                connection.style.width = (Math.random() * 200 + 50) + 'px';
+                connection.style.transform = `rotate(${Math.random() * 360}deg)`;
+                connection.style.animationDelay = Math.random() * 4 + 's';
+                background.appendChild(connection);
+            }
+        }
+
+        // Task Management
+        function handleTaskToggle(taskElement) {
+            taskElement.classList.add('haptic-feedback');
+            setTimeout(() => taskElement.classList.remove('haptic-feedback'), 100);
+
+            if (taskElement.classList.contains('completed')) {
+                taskElement.classList.remove('completed');
+                createSynapticFire(taskElement, false);
+            } else {
+                taskElement.classList.add('completed');
+                createSynapticFire(taskElement, true);
+            }
+        }
+
+        // Synaptic Fire Effect
+        function createSynapticFire(element, isComplete) {
+            const rect = element.getBoundingClientRect();
+            const fire = document.createElement('div');
+            fire.style.position = 'fixed';
+            fire.style.left = rect.left + 12 + 'px';
+            fire.style.top = rect.top + 12 + 'px';
+            fire.style.width = '24px';
+            fire.style.height = '24px';
+            fire.style.borderRadius = '50%';
+            fire.style.background = isComplete ? 
+                'radial-gradient(circle, var(--neural-green), transparent)' :
+                'radial-gradient(circle, var(--neural-electric), transparent)';
+            fire.style.animation = 'synapticFire 0.8s ease-out forwards';
+            fire.style.pointerEvents = 'none';
+            fire.style.zIndex = '1000';
+
+            document.body.appendChild(fire);
+
+            // Add keyframe for synaptic fire animation
+            if (!document.querySelector('#synapticFireStyle')) {
+                const style = document.createElement('style');
+                style.id = 'synapticFireStyle';
+                style.textContent = `
+                    @keyframes synapticFire {
+                        0% { 
+                            transform: scale(1); 
+                            opacity: 1; 
+                        }
+                        100% { 
+                            transform: scale(4); 
+                            opacity: 0; 
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            setTimeout(() => fire.remove(), 800);
+        }
+
+        // Focus Timer
+        let focusTime = 25 * 60; // 25 minutes in seconds
+        let focusInterval;
+
+        function updateFocusTimer() {
+            const minutes = Math.floor(focusTime / 60);
+            const seconds = focusTime % 60;
+            document.getElementById('focusTimer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (focusTime > 0) {
+                focusTime--;
+            } else {
+                clearInterval(focusInterval);
+                // Focus session complete - could trigger celebration
+                createFocusCompleteEffect();
+            }
+        }
+
+        function startFocusTimer() {
+            if (focusInterval) clearInterval(focusInterval);
+            focusInterval = setInterval(updateFocusTimer, 1000);
+        }
+
+        function createFocusCompleteEffect() {
+            // Create burst of neural activity
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const burst = document.createElement('div');
+                    burst.className = 'neural-node';
+                    burst.style.position = 'fixed';
+                    burst.style.left = Math.random() * window.innerWidth + 'px';
+                    burst.style.top = Math.random() * window.innerHeight + 'px';
+                    burst.style.zIndex = '1000';
+                    document.body.appendChild(burst);
+                    setTimeout(() => burst.remove(), 3000);
+                }, i * 100);
+            }
+        }
+
+        // Touch and Gesture Handling
+        function addTouchHandlers() {
+            // Task nodes
+            document.querySelectorAll('.task-node').forEach(task => {
+                task.addEventListener('touchstart', (e) => {
+                    e.currentTarget.style.transform = 'scale(0.96)';
+                });
+
+                task.addEventListener('touchend', (e) => {
+                    e.currentTarget.style.transform = '';
+                    handleTaskToggle(e.currentTarget);
+                });
+
+                task.addEventListener('click', (e) => {
+                    handleTaskToggle(e.currentTarget);
+                });
+            });
+
+            // Tab items
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.addEventListener('touchstart', (e) => {
+                    e.currentTarget.style.transform = 'scale(0.9)';
+                });
+
+                tab.addEventListener('touchend', (e) => {
+                    e.currentTarget.style.transform = '';
+                    // Switch tab
+                    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                });
+            });
+
+            // FAB
+            document.getElementById('fab').addEventListener('touchstart', (e) => {
+                e.currentTarget.style.transform = 'scale(0.9)';
+            });
+
+            document.getElementById('fab').addEventListener('touchend', (e) => {
+                e.currentTarget.style.transform = '';
+                // Add new task functionality
+                addNewTask();
+            });
+
+            // Focus mode
+            document.getElementById('focusMode').addEventListener('touchend', () => {
+                startFocusTimer();
+            });
+
+            // Memory palace rooms
+            document.querySelectorAll('.palace-room').forEach(room => {
+                room.addEventListener('touchend', (e) => {
+                    e.currentTarget.style.background = 'rgba(0, 229, 255, 0.2)';
+                    setTimeout(() => {
+                        e.currentTarget.style.background = '';
+                    }, 200);
+                });
+            });
+        }
+
+        // Add New Task
+        function addNewTask() {
+            const taskGrid = document.querySelector('.neural-grid');
+            const taskCount = taskGrid.children.length + 1;
+            
+            const newTask = document.createElement('div');
+            newTask.className = 'task-node';
+            newTask.setAttribute('data-task', taskCount);
+            newTask.innerHTML = `
+                <div class="task-checkbox"></div>
+                <div class="task-content">
+                    <div class="task-title">New neural pathway</div>
+                    <div class="task-meta">
+                        <span>Priority: Medium</span>
+                        <span>Cognitive Load: 30%</span>
+                    </div>
+                </div>
+                <div class="neural-connection-line"></div>
+            `;
+
+            // Add entrance animation
+            newTask.style.opacity = '0';
+            newTask.style.transform = 'scale(0.8) translateY(20px)';
+            
+            taskGrid.appendChild(newTask);
+            
+            // Animate in
+            requestAnimationFrame(() => {
+                newTask.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                newTask.style.opacity = '1';
+                newTask.style.transform = 'scale(1) translateY(0)';
+            });
+
+            // Add event handlers
+            setTimeout(() => {
+                newTask.addEventListener('touchend', (e) => {
+                    handleTaskToggle(e.currentTarget);
+                });
+                newTask.addEventListener('click', (e) => {
+                    handleTaskToggle(e.currentTarget);
+                });
+            }, 100);
+        }
+
+        // Cognitive Load Simulation
+        function updateCognitiveLoad() {
+            const loadBars = document.querySelectorAll('.load-bar');
+            const completedTasks = document.querySelectorAll('.task-node.completed').length;
+            const totalTasks = document.querySelectorAll('.task-node').length;
+            const loadPercentage = Math.max(20, 100 - (completedTasks / totalTasks * 50));
+            
+            const activeBars = Math.ceil((loadPercentage / 100) * loadBars.length);
+            
+            loadBars.forEach((bar, index) => {
+                if (index < activeBars) {
+                    bar.classList.add('active');
+                } else {
+                    bar.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize App
+        function initApp() {
+            createNeuralBackground();
+            addTouchHandlers();
+            
+            // Update cognitive load initially and when tasks change
+            updateCognitiveLoad();
+            
+            // Observe task changes
+            const observer = new MutationObserver(updateCognitiveLoad);
+            observer.observe(document.querySelector('.neural-grid'), {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class']
+            });
+
+            // Add periodic neural activity
+            setInterval(() => {
+                const nodes = document.querySelectorAll('.neural-node');
+                const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+                if (randomNode) {
+                    randomNode.style.animation = 'none';
+                    requestAnimationFrame(() => {
+                        randomNode.style.animation = 'neuralPulse 3s infinite ease-in-out';
+                    });
+                }
+            }, 2000);
+        }
+
+        // Start the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Handle orientation changes
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                updateCognitiveLoad();
+            }, 100);
+        });
+
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>

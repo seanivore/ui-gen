@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BioConnect - Living Network</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a1a0a 0%, #1a3d1a 50%, #0f2a2a 100%);
+            overflow-x: hidden;
+            position: relative;
+            height: 100vh;
+            color: #e8f5e8;
+        }
+
+        /* Bioelectric Background Animation */
+        .bio-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.1;
+        }
+
+        .cell-pattern {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px solid #4ade80;
+            animation: pulse-cell 3s ease-in-out infinite;
+        }
+
+        .cell-pattern:nth-child(1) {
+            top: 10%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .cell-pattern:nth-child(2) {
+            top: 30%;
+            right: 15%;
+            animation-delay: 1s;
+        }
+
+        .cell-pattern:nth-child(3) {
+            bottom: 20%;
+            left: 10%;
+            animation-delay: 2s;
+        }
+
+        @keyframes pulse-cell {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.1;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.3;
+            }
+        }
+
+        /* Neural Network Lines */
+        .neural-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .neural-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #22d3ee, transparent);
+            animation: flow-energy 4s linear infinite;
+        }
+
+        @keyframes flow-energy {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100vw);
+            }
+        }
+
+        /* Main Container */
+        .app-container {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            max-width: 414px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #4ade80;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .energy-indicator {
+            width: 20px;
+            height: 10px;
+            border: 1px solid #4ade80;
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .energy-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 85%;
+            background: linear-gradient(90deg, #4ade80, #22d3ee);
+            animation: energy-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes energy-pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        /* Header */
+        .app-header {
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.1), rgba(34, 211, 238, 0.1));
+            border-bottom: 1px solid rgba(74, 222, 128, 0.2);
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4ade80;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+        }
+
+        .ecosystem-status {
+            font-size: 14px;
+            color: #22d3ee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .bio-pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22d3ee;
+            animation: bio-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bio-pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.7;
+            }
+        }
+
+        /* Network Visualization */
+        .network-container {
+            flex: 1;
+            position: relative;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .network-graph {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: radial-gradient(circle at center, rgba(74, 222, 128, 0.05), transparent);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .bio-node {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #4ade80, #22d3ee);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+            animation: organic-float 4s ease-in-out infinite;
+        }
+
+        .bio-node:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 30px rgba(74, 222, 128, 0.8);
+        }
+
+        .bio-node.active {
+            animation: mitosis 2s ease-in-out infinite;
+        }
+
+        @keyframes organic-float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+        }
+
+        @keyframes mitosis {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.3);
+                box-shadow: 0 0 40px rgba(74, 222, 128, 1);
+            }
+        }
+
+        .bio-node img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Position nodes */
+        .bio-node:nth-child(1) {
+            top: 20%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .bio-node:nth-child(2) {
+            top: 15%;
+            right: 25%;
+            animation-delay: 0.5s;
+        }
+
+        .bio-node:nth-child(3) {
+            top: 50%;
+            left: 10%;
+            animation-delay: 1s;
+        }
+
+        .bio-node:nth-child(4) {
+            top: 60%;
+            right: 15%;
+            animation-delay: 1.5s;
+        }
+
+        .bio-node:nth-child(5) {
+            bottom: 20%;
+            left: 30%;
+            animation-delay: 2s;
+        }
+
+        /* Connection Lines */
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4ade80, transparent);
+            transform-origin: left center;
+            animation: connection-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes connection-pulse {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .line-1 {
+            top: 30%;
+            left: 25%;
+            width: 120px;
+            transform: rotate(15deg);
+            animation-delay: 0s;
+        }
+
+        .line-2 {
+            top: 45%;
+            left: 35%;
+            width: 80px;
+            transform: rotate(-30deg);
+            animation-delay: 1s;
+        }
+
+        .line-3 {
+            top: 65%;
+            left: 20%;
+            width: 100px;
+            transform: rotate(45deg);
+            animation-delay: 2s;
+        }
+
+        /* Activity Feed */
+        .activity-feed {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .feed-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .feed-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #4ade80;
+        }
+
+        .energy-wave {
+            width: 30px;
+            height: 20px;
+            background: linear-gradient(45deg, #4ade80, #22d3ee);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .energy-wave::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: wave-flow 2s linear infinite;
+        }
+
+        @keyframes wave-flow {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(74, 222, 128, 0.1);
+        }
+
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #4ade80, #22d3ee);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: gentle-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes gentle-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 5px rgba(74, 222, 128, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 15px rgba(74, 222, 128, 0.6);
+            }
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: 14px;
+            color: #e8f5e8;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: #22d3ee;
+        }
+
+        .energy-badge {
+            background: linear-gradient(135deg, #4ade80, #22d3ee);
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .bio-button {
+            flex: 1;
+            height: 50px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #4ade80, #22d3ee);
+            color: #000;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .bio-button:active {
+            transform: scale(0.95);
+        }
+
+        .bio-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .bio-button:hover::before {
+            left: 100%;
+        }
+
+        .secondary-button {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+            border: 2px solid #4ade80;
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            height: 83px;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(74, 222, 128, 0.2);
+            padding-bottom: 20px;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px;
+            border-radius: 12px;
+            min-width: 44px;
+            min-height: 44px;
+        }
+
+        .tab-item.active {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            background: currentColor;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+
+        .tab-icon.network {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 12h14M12 5l7 7-7 7'/%3E%3C/svg%3E");
+        }
+
+        .tab-icon.energy {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13 10V3L4 14h7v7l9-11h-7z'/%3E%3C/svg%3E");
+        }
+
+        .tab-icon.discover {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E");
+        }
+
+        .tab-icon.profile {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'/%3E%3C/svg%3E");
+        }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        /* Notification Dot */
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: #ff4757;
+            border-radius: 50%;
+            animation: bioluminescent 2s ease-in-out infinite;
+        }
+
+        @keyframes bioluminescent {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.6;
+                transform: scale(1.3);
+            }
+        }
+
+        /* Touch Feedback */
+        .touch-feedback {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(74, 222, 128, 0.3), transparent);
+            pointer-events: none;
+            transform: scale(0);
+            animation: touch-ripple 0.6s ease-out;
+        }
+
+        @keyframes touch-ripple {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 375px) {
+            .app-container {
+                max-width: 100%;
+            }
+
+            .bio-node {
+                width: 50px;
+                height: 50px;
+            }
+
+            .bio-node img {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 768px;
+            }
+
+            .network-graph {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Bioelectric Background -->
+    <div class="bio-background">
+        <div class="cell-pattern"></div>
+        <div class="cell-pattern"></div>
+        <div class="cell-pattern"></div>
+        <div class="neural-lines">
+            <div class="neural-line" style="top: 20%; animation-delay: 0s;"></div>
+            <div class="neural-line" style="top: 40%; animation-delay: 2s;"></div>
+            <div class="neural-line" style="top: 60%; animation-delay: 4s;"></div>
+            <div class="neural-line" style="top: 80%; animation-delay: 6s;"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span>9:41</span>
+                <div class="energy-indicator">
+                    <div class="energy-fill"></div>
+                </div>
+            </div>
+            <div>BioConnect</div>
+            <div>⚡ 85%</div>
+        </div>
+
+        <!-- App Header -->
+        <div class="app-header">
+            <div class="app-title">Living Network</div>
+            <div class="ecosystem-status">
+                <div class="bio-pulse"></div>
+                <span>Ecosystem Thriving • 847 Active Connections</span>
+            </div>
+        </div>
+
+        <!-- Network Visualization -->
+        <div class="network-container">
+            <div class="network-graph">
+                <!-- Connection Lines -->
+                <div class="connection-line line-1"></div>
+                <div class="connection-line line-2"></div>
+                <div class="connection-line line-3"></div>
+
+                <!-- Bio Nodes -->
+                <div class="bio-node" data-user="alex">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, #4ade80, #22d3ee);"></div>
+                </div>
+                <div class="bio-node active" data-user="maya">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, #22d3ee, #4ade80);"></div>
+                </div>
+                <div class="bio-node" data-user="zoe">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, #4ade80, #fbbf24);"></div>
+                </div>
+                <div class="bio-node" data-user="kai">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, #22d3ee, #a855f7);"></div>
+                </div>
+                <div class="bio-node" data-user="sage">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, #4ade80, #22d3ee);"></div>
+                </div>
+            </div>
+
+            <!-- Activity Feed -->
+            <div class="activity-feed">
+                <div class="feed-header">
+                    <div class="feed-title">Bio-Energy Flow</div>
+                    <div class="energy-wave"></div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-avatar">🧬</div>
+                    <div class="activity-content">
+                        <div class="activity-text">Maya shared cellular energy with your network</div>
+                        <div class="activity-time">2 minutes ago</div>
+                    </div>
+                    <div class="energy-badge">+15 ⚡</div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-avatar">🌱</div>
+                    <div class="activity-content">
+                        <div class="activity-text">New dendrite connection formed with Zoe</div>
+                        <div class="activity-time">5 minutes ago</div>
+                    </div>
+                    <div class="energy-badge">+8 ⚡</div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-avatar">⚡</div>
+                    <div class="activity-content">
+                        <div class="activity-text">Ecosystem pulse detected - network expanding</div>
+                        <div class="activity-time">12 minutes ago</div>
+                    </div>
+                    <div class="energy-badge">+22 ⚡</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="bio-button" id="shareEnergyBtn">Share Energy</button>
+                <button class="bio-button secondary-button" id="growNetworkBtn">Grow Network</button>
+            </div>
+        </div>
+
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <div class="tab-item active">
+                <div class="tab-icon network"></div>
+                <div class="tab-label">Network</div>
+            </div>
+            <div class="tab-item">
+                <div class="tab-icon energy"></div>
+                <div class="tab-label">Energy</div>
+                <div class="notification-dot"></div>
+            </div>
+            <div class="tab-item">
+                <div class="tab-icon discover"></div>
+                <div class="tab-label">Discover</div>
+            </div>
+            <div class="tab-item">
+                <div class="tab-icon profile"></div>
+                <div class="tab-label">Profile</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Touch Feedback System
+        function createTouchFeedback(x, y) {
+            const feedback = document.createElement('div');
+            feedback.className = 'touch-feedback';
+            feedback.style.left = (x - 50) + 'px';
+            feedback.style.top = (y - 50) + 'px';
+            document.body.appendChild(feedback);
+
+            setTimeout(() => {
+                document.body.removeChild(feedback);
+            }, 600);
+        }
+
+        // Touch Events for All Interactive Elements
+        document.addEventListener('touchstart', function (e) {
+            const touch = e.touches[0];
+            createTouchFeedback(touch.clientX, touch.clientY);
+        });
+
+        // Bio Node Interactions
+        document.querySelectorAll('.bio-node').forEach(node => {
+            node.addEventListener('click', function () {
+                // Trigger mitosis effect
+                this.classList.add('active');
+
+                // Create connection animation
+                const connections = document.querySelectorAll('.connection-line');
+                connections.forEach(line => {
+                    line.style.animation = 'connection-pulse 1s ease-in-out';
+                });
+
+                // Reset after animation
+                setTimeout(() => {
+                    this.classList.remove('active');
+                }, 2000);
+
+                // Simulate energy exchange
+                addEnergyActivity(this.dataset.user);
+            });
+        });
+
+        // Energy Activity Simulation
+        function addEnergyActivity(userName) {
+            const activityFeed = document.querySelector('.activity-feed');
+            const newActivity = document.createElement('div');
+            newActivity.className = 'activity-item';
+            newActivity.style.opacity = '0';
+            newActivity.style.transform = 'translateY(-20px)';
+
+            const energyAmount = Math.floor(Math.random() * 20) + 5;
+
+            newActivity.innerHTML = `
+                <div class="activity-avatar">⚡</div>
+                <div class="activity-content">
+                    <div class="activity-text">Energy exchange with ${userName} completed</div>
+                    <div class="activity-time">Just now</div>
+                </div>
+                <div class="energy-badge">+${energyAmount} ⚡</div>
+            `;
+
+            activityFeed.insertBefore(newActivity, activityFeed.children[1]);
+
+            // Animate in
+            setTimeout(() => {
+                newActivity.style.transition = 'all 0.5s ease';
+                newActivity.style.opacity = '1';
+                newActivity.style.transform = 'translateY(0)';
+            }, 100);
+
+            // Remove oldest activity if more than 4
+            const activities = activityFeed.querySelectorAll('.activity-item');
+            if (activities.length > 4) {
+                activities[activities.length - 1].remove();
+            }
+        }
+
+        // Share Energy Button
+        document.getElementById('shareEnergyBtn').addEventListener('click', function () {
+            // Animate all bio nodes
+            document.querySelectorAll('.bio-node').forEach((node, index) => {
+                setTimeout(() => {
+                    node.classList.add('active');
+                    setTimeout(() => node.classList.remove('active'), 1000);
+                }, index * 200);
+            });
+
+            // Update ecosystem status
+            const status = document.querySelector('.ecosystem-status span');
+            const currentCount = parseInt(status.textContent.match(/\d+/)[0]);
+            status.textContent = `Ecosystem Thriving • ${currentCount + Math.floor(Math.random() * 10) + 1} Active Connections`;
+
+            // Add activity
+            addEnergyActivity('Network');
+        });
+
+        // Grow Network Button
+        document.getElementById('growNetworkBtn').addEventListener('click', function () {
+            // Create new bio node temporarily
+            const networkGraph = document.querySelector('.network-graph');
+            const newNode = document.createElement('div');
+            newNode.className = 'bio-node';
+            newNode.style.top = Math.random() * 60 + 20 + '%';
+            newNode.style.left = Math.random() * 60 + 20 + '%';
+            newNode.innerHTML = '<div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, #fbbf24, #4ade80);"></div>';
+
+            networkGraph.appendChild(newNode);
+
+            // Animate growth
+            newNode.style.transform = 'scale(0)';
+            setTimeout(() => {
+                newNode.style.transition = 'transform 0.8s ease';
+                newNode.style.transform = 'scale(1)';
+            }, 100);
+
+            // Remove after demonstration
+            setTimeout(() => {
+                newNode.style.transform = 'scale(0)';
+                setTimeout(() => networkGraph.removeChild(newNode), 800);
+            }, 3000);
+
+            addEnergyActivity('New Connection');
+        });
+
+        // Tab Navigation
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', function () {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+
+                // Add active class to clicked tab
+                this.classList.add('active');
+
+                // Simulate view change with subtle animation
+                const container = document.querySelector('.network-container');
+                container.style.opacity = '0.7';
+                setTimeout(() => {
+                    container.style.opacity = '1';
+                }, 200);
+            });
+        });
+
+        // Ecosystem Pulse Animation
+        setInterval(() => {
+            const bioNodes = document.querySelectorAll('.bio-node');
+            const randomNode = bioNodes[Math.floor(Math.random() * bioNodes.length)];
+            randomNode.classList.add('active');
+            setTimeout(() => randomNode.classList.remove('active'), 1500);
+        }, 5000);
+
+        // Background Neural Network Animation
+        function createNeuralPulse() {
+            const lines = document.querySelectorAll('.neural-line');
+            lines.forEach((line, index) => {
+                setTimeout(() => {
+                    line.style.background = 'linear-gradient(90deg, transparent, #22d3ee, #4ade80, transparent)';
+                    setTimeout(() => {
+                        line.style.background = 'linear-gradient(90deg, transparent, #4ade80, transparent)';
+                    }, 1000);
+                }, index * 500);
+            });
+        }
+
+        setInterval(createNeuralPulse, 8000);
+
+        // Energy Level Updates
+        function updateEnergyLevel() {
+            const energyFill = document.querySelector('.energy-fill');
+            const statusEnergy = document.querySelector('.status-bar div:last-child');
+
+            const currentLevel = parseInt(statusEnergy.textContent.match(/\d+/)[0]);
+            const newLevel = Math.max(75, Math.min(100, currentLevel + Math.floor(Math.random() * 6) - 2));
+
+            energyFill.style.width = newLevel + '%';
+            statusEnergy.textContent = `⚡ ${newLevel}%`;
+        }
+
+        setInterval(updateEnergyLevel, 10000);
+
+        // Initialize haptic feedback simulation
+        if ('vibrate' in navigator) {
+            document.querySelectorAll('.bio-button, .bio-node, .tab-item').forEach(element => {
+                element.addEventListener('click', () => {
+                    navigator.vibrate(50);
+                });
+            });
+        }
+
+        // Add organic movement to connection lines
+        function animateConnections() {
+            document.querySelectorAll('.connection-line').forEach((line, index) => {
+                const originalTransform = line.style.transform;
+                const angle = parseInt(originalTransform.match(/rotate\(([^)]+)\)/)?.[1] || '0');
+                const variation = Math.sin(Date.now() / 1000 + index) * 5;
+                line.style.transform = `${originalTransform} rotate(${variation}deg)`;
+            });
+        }
+
+        setInterval(animateConnections, 100);
+
+        console.log('🧬 BioConnect - Living Network initialized');
+        console.log('⚡ Bioelectric social network ready for organic connections');
+    </script>
+</body>
+
+</html>
