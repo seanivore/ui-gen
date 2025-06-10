@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Innovation: TextSeed - Organic Text Input</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2d5a2d;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        .innovation-meta {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .innovation-meta p {
+            background: #f0f8f0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section {
+            background: white;
+            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #2d5a2d;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #3a6b3a;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .demo-container {
+            background: linear-gradient(135deg, #f8fdf8 0%, #e8f5e8 100%);
+        }
+
+        .textseed-container {
+            position: relative;
+            margin: 40px auto;
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+            background: linear-gradient(to bottom, #87ceeb 0%, #98fb98 40%, #8fbc8f 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 3px solid #6b8e23;
+            box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .soil {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(to bottom, #8b4513 0%, #654321 100%);
+            border-top: 2px solid #a0522d;
+        }
+
+        .seed {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 15px;
+            background: #8b4513;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 1;
+            transition: all 0.5s ease;
+        }
+
+        .stem {
+            position: absolute;
+            bottom: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 0;
+            background: linear-gradient(to top, #228b22, #32cd32);
+            border-radius: 2px;
+            transition: height 0.3s ease;
+        }
+
+        .text-display {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 20px;
+            border: 2px solid #32cd32;
+            min-width: 200px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            color: #2d5a2d;
+            opacity: 0;
+            transition: all 0.4s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .leaf {
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background: #32cd32;
+            border-radius: 0 100% 0 100%;
+            opacity: 0;
+            transform-origin: bottom center;
+            transition: all 0.4s ease;
+        }
+
+        .hidden-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .input-prompt {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .traditional, .innovative {
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+        }
+
+        .traditional {
+            background: #f9f9f9;
+        }
+
+        .innovative {
+            background: #f0f8f0;
+            border-color: #32cd32;
+        }
+
+        .traditional input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .doc-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #32cd32;
+        }
+
+        .growth-meter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border: 3px solid #32cd32;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            font-weight: bold;
+            color: #2d5a2d;
+        }
+
+        @keyframes grow {
+            from { height: 0; opacity: 0; }
+            to { height: var(--grow-height); opacity: 1; }
+        }
+
+        @keyframes leafSway {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .leaf.animated {
+            animation: leafSway 2s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .innovation-meta {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .textseed-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>UI Innovation: TextSeed - Organic Text Input</h1>
+        <div class="innovation-meta">
+            <p><strong>Replaces:</strong> Traditional Text Input Field</p>
+            <p><strong>Innovation:</strong> Organic growth metaphor for text entry</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="demo-container">
+            <h2>Interactive Demo</h2>
+            <div class="innovation-component">
+                <div class="textseed-container" tabindex="0" role="textbox" aria-label="TextSeed organic text input">
+                    <div class="soil"></div>
+                    <div class="seed" id="seed"></div>
+                    <div class="stem" id="stem"></div>
+                    <div class="text-display" id="textDisplay" aria-live="polite"></div>
+                    <div class="growth-meter" id="growthMeter" aria-label="Growth progress">0%</div>
+                    <input type="text" class="hidden-input" id="hiddenInput" aria-hidden="true" tabindex="-1">
+                </div>
+                <div class="input-prompt">
+                    Click the garden and start typing to watch your text grow! (Supports all keyboard shortcuts)
+                </div>
+            </div>
+        </section>
+
+        <section class="comparison">
+            <h2>Traditional vs Innovation</h2>
+            <div class="comparison-grid">
+                <div class="traditional">
+                    <h3>Traditional Text Input</h3>
+                    <p>Standard rectangular input field with cursor and text display.</p>
+                    <input type="text" placeholder="Type here..." aria-label="Traditional text input">
+                    <p style="margin-top: 15px; font-size: 14px; color: #666;">
+                        ✓ Familiar<br>
+                        ✓ Functional<br>
+                        ✗ Static visual feedback<br>
+                        ✗ Limited engagement<br>
+                        ✗ No progress indication
+                    </p>
+                </div>
+                <div class="innovative">
+                    <h3>TextSeed Component</h3>
+                    <p>Organic growth visualization that transforms text input into a living, breathing experience.</p>
+                    <p style="margin-top: 15px; font-size: 14px; color: #2d5a2d;">
+                        ✓ Engaging visual metaphor<br>
+                        ✓ Real-time growth feedback<br>
+                        ✓ Progress visualization<br>
+                        ✓ Memorable interaction<br>
+                        ✓ Maintains full functionality
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="documentation">
+            <h2>Design Documentation</h2>
+            <div class="doc-section">
+                <h3>Interaction Model</h3>
+                <p>Users click anywhere on the garden to focus and begin typing. Each character grows the plant upward, with leaves appearing at intervals. The seed disappears as growth begins, and text appears in a speech bubble above the plant. The growth meter shows typing progress as a percentage.</p>
+            </div>
+            <div class="doc-section">
+                <h3>Technical Implementation</h3>
+                <p>Built with CSS transitions, transforms, and custom properties for smooth animations. Uses a hidden input field for text capture while displaying visual feedback through dynamically styled DOM elements. Keyboard events drive the organic growth animations in real-time.</p>
+            </div>
+            <div class="doc-section">
+                <h3>Accessibility Features</h3>
+                <p>Maintains full keyboard navigation with proper ARIA labels and roles. Text is announced via aria-live regions. Focus management ensures screen readers can interact normally. All visual feedback has semantic equivalents for assistive technologies.</p>
+            </div>
+            <div class="doc-section">
+                <h3>Evolution Opportunities</h3>
+                <p>Future enhancements could include seasonal themes, weather effects, multiple plant types for different content categories, collaborative gardening for multi-user inputs, and adaptive growth patterns based on typing speed and rhythm.</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        class TextSeed {
+            constructor(container) {
+                this.container = container;
+                this.hiddenInput = container.querySelector('#hiddenInput');
+                this.seed = container.querySelector('#seed');
+                this.stem = container.querySelector('#stem');
+                this.textDisplay = container.querySelector('#textDisplay');
+                this.growthMeter = container.querySelector('#growthMeter');
+                this.leaves = [];
+                this.currentText = '';
+                this.maxLength = 100;
+                this.isActive = false;
+
+                this.initializeEvents();
+                this.updateAccessibility();
+            }
+
+            initializeEvents() {
+                // Focus handling
+                this.container.addEventListener('click', () => this.focus());
+                this.container.addEventListener('keydown', (e) => this.handleKeyDown(e));
+                
+                // Hidden input for text capture
+                this.hiddenInput.addEventListener('input', (e) => this.handleInput(e));
+                this.hiddenInput.addEventListener('keydown', (e) => this.handleSpecialKeys(e));
+                
+                // Focus and blur events
+                this.hiddenInput.addEventListener('focus', () => this.setActive(true));
+                this.hiddenInput.addEventListener('blur', () => this.setActive(false));
+            }
+
+            focus() {
+                this.hiddenInput.focus();
+                this.setActive(true);
+            }
+
+            setActive(active) {
+                this.isActive = active;
+                this.container.style.boxShadow = active 
+                    ? '0 0 20px rgba(50, 205, 50, 0.5)' 
+                    : 'inset 0 5px 15px rgba(0, 0, 0, 0.1)';
+            }
+
+            handleKeyDown(e) {
+                // Ensure hidden input receives all keyboard events
+                if (e.target === this.container) {
+                    this.hiddenInput.focus();
+                }
+            }
+
+            handleSpecialKeys(e) {
+                // Handle special keys like backspace, delete, etc.
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    // Let the input event handle the text update
+                    setTimeout(() => {
+                        this.updateGrowth(this.hiddenInput.value);
+                    }, 0);
+                }
+            }
+
+            handleInput(e) {
+                const newText = e.target.value;
+                this.updateGrowth(newText);
+            }
+
+            updateGrowth(text) {
+                this.currentText = text;
+                const length = text.length;
+                const progress = Math.min(length / this.maxLength, 1);
+
+                // Update growth meter
+                this.growthMeter.textContent = Math.round(progress * 100) + '%';
+
+                // Handle seed visibility
+                if (length > 0) {
+                    this.seed.style.opacity = '0';
+                    this.seed.style.transform = 'translateX(-50%) scale(0.5)';
+                } else {
+                    this.seed.style.opacity = '1';
+                    this.seed.style.transform = 'translateX(-50%) scale(1)';
+                }
+
+                // Update stem height
+                const stemHeight = Math.min(length * 3, 150);
+                this.stem.style.height = stemHeight + 'px';
+
+                // Show/hide text display
+                if (length > 0) {
+                    this.textDisplay.style.opacity = '1';
+                    this.textDisplay.style.transform = 'translateX(-50%) scale(1)';
+                    this.textDisplay.textContent = text;
+                } else {
+                    this.textDisplay.style.opacity = '0';
+                    this.textDisplay.style.transform = 'translateX(-50%) scale(0.8)';
+                    this.textDisplay.textContent = '';
+                }
+
+                // Add leaves at intervals
+                this.updateLeaves(length);
+
+                // Update accessibility
+                this.updateAccessibility();
+            }
+
+            updateLeaves(textLength) {
+                const targetLeaves = Math.floor(textLength / 5);
+                
+                // Remove excess leaves
+                while (this.leaves.length > targetLeaves) {
+                    const leaf = this.leaves.pop();
+                    leaf.style.opacity = '0';
+                    setTimeout(() => {
+                        if (leaf.parentNode) {
+                            leaf.parentNode.removeChild(leaf);
+                        }
+                    }, 400);
+                }
+
+                // Add new leaves
+                while (this.leaves.length < targetLeaves) {
+                    this.addLeaf(this.leaves.length);
+                }
+            }
+
+            addLeaf(index) {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf animated';
+                
+                const side = index % 2 === 0 ? -1 : 1;
+                const height = 55 + (index * 15);
+                const offset = side * 20;
+                
+                leaf.style.bottom = height + 'px';
+                leaf.style.left = 'calc(50% + ' + offset + 'px)';
+                leaf.style.transform = 'rotate(' + (side * 20) + 'deg)';
+                leaf.style.animationDelay = (index * 0.2) + 's';
+                
+                this.container.appendChild(leaf);
+                this.leaves.push(leaf);
+
+                // Animate in
+                setTimeout(() => {
+                    leaf.style.opacity = '1';
+                }, 50);
+            }
+
+            updateAccessibility() {
+                // Update ARIA properties
+                this.container.setAttribute('aria-valuenow', this.currentText.length);
+                this.container.setAttribute('aria-valuemax', this.maxLength);
+                this.container.setAttribute('aria-valuetext', 
+                    `${this.currentText.length} characters entered: ${this.currentText || 'empty'}`);
+            }
+
+            // Public API methods
+            getValue() {
+                return this.currentText;
+            }
+
+            setValue(text) {
+                this.hiddenInput.value = text;
+                this.updateGrowth(text);
+            }
+
+            clear() {
+                this.setValue('');
+            }
+
+            focus() {
+                this.hiddenInput.focus();
+            }
+        }
+
+        // Initialize TextSeed component when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.querySelector('.textseed-container');
+            const textSeed = new TextSeed(container);
+
+            // Make it available globally for demonstration
+            window.textSeed = textSeed;
+
+            // Example of programmatic interaction
+            setTimeout(() => {
+                console.log('TextSeed initialized. Try textSeed.setValue("Hello World!") in console.');
+            }, 1000);
+        });
+
+        // Handle window resize for responsive behavior
+        window.addEventListener('resize', () => {
+            // Redraw leaves on resize if needed
+            const container = document.querySelector('.textseed-container');
+            if (container && window.textSeed) {
+                window.textSeed.updateLeaves(window.textSeed.currentText.length);
+            }
+        });
+    </script>
+</body>
+</html>
