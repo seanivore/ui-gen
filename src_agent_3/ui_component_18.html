@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChemLab Pro - Laboratory Science Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafb 0%, #e8f4f8 100%);
+            min-height: 100vh;
+            color: #1a2332;
+            overflow-x: hidden;
+        }
+        
+        .lab-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            min-height: 100vh;
+            grid-template-areas: 
+                "header header header"
+                "sidebar main results"
+                "footer footer footer";
+        }
+        
+        .lab-header {
+            grid-area: header;
+            background: linear-gradient(90deg, #2c5aa0 0%, #3d7c47 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(44, 90, 160, 0.3);
+        }
+        
+        .lab-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .lab-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .lab-status {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.active { background: #4ade80; }
+        .status-dot.warning { background: #fbbf24; }
+        .status-dot.critical { background: #ef4444; }
+        
+        .data-entry-panel {
+            grid-area: sidebar;
+            background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .panel-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .logbook-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-input {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .compound-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .element-btn {
+            padding: 8px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        
+        .element-btn:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .element-btn.selected {
+            background: #3b82f6;
+            color: white;
+            border-color: #1d4ed8;
+        }
+        
+        .main-workspace {
+            grid-area: main;
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .experiment-timeline {
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-track {
+            position: relative;
+            height: 60px;
+            background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 100%);
+            border-radius: 30px;
+            overflow: hidden;
+        }
+        
+        .timeline-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            border-radius: 30px;
+            width: 65%;
+            position: relative;
+            animation: progressPulse 3s ease-in-out infinite;
+        }
+        
+        .phase-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        
+        .phase-marker {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #10b981;
+            z-index: 2;
+        }
+        
+        .phase-marker.completed {
+            background: #10b981;
+        }
+        
+        .calculator-section {
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .molecular-display {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 2px solid #e5e7eb;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .molecular-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 40%, rgba(59, 130, 246, 0.1) 50%, transparent 60%);
+            animation: molecularScan 4s linear infinite;
+        }
+        
+        .calculation-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .calc-btn {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .calc-btn:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .calc-btn.operator {
+            background: #3b82f6;
+            color: white;
+            border-color: #1d4ed8;
+        }
+        
+        .results-panel {
+            grid-area: results;
+            background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        
+        .beaker-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .beaker {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+            border: 3px solid #cbd5e1;
+            border-radius: 0 0 40px 40px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .solution {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 70%;
+            background: linear-gradient(180deg, #3b82f6 0%, #1e40af 100%);
+            animation: bubbleReaction 4s ease-in-out infinite;
+            border-radius: 0 0 37px 37px;
+        }
+        
+        .solution.green {
+            background: linear-gradient(180deg, #10b981 0%, #047857 100%);
+        }
+        
+        .solution.red {
+            background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: bubble 3s infinite linear;
+        }
+        
+        .bubble:nth-child(1) {
+            width: 8px;
+            height: 8px;
+            left: 20%;
+            animation-delay: 0s;
+        }
+        
+        .bubble:nth-child(2) {
+            width: 12px;
+            height: 12px;
+            left: 50%;
+            animation-delay: 1s;
+        }
+        
+        .bubble:nth-child(3) {
+            width: 6px;
+            height: 6px;
+            left: 80%;
+            animation-delay: 2s;
+        }
+        
+        .result-data {
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .lab-footer {
+            grid-area: footer;
+            background: rgba(248, 250, 252, 0.9);
+            border-radius: 12px;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        
+        .safety-alerts {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .alert {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .alert.normal {
+            background: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+        }
+        
+        .alert.caution {
+            background: rgba(251, 191, 36, 0.1);
+            color: #92400e;
+        }
+        
+        .instrument-readings {
+            display: flex;
+            gap: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+        
+        .reading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .reading-value {
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .reading-unit {
+            color: #6b7280;
+            font-size: 10px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes progressPulse {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.05); }
+        }
+        
+        @keyframes bubbleReaction {
+            0%, 100% { height: 70%; }
+            50% { height: 75%; }
+        }
+        
+        @keyframes bubble {
+            0% { 
+                transform: translateY(0);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { 
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes molecularScan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        @media (max-width: 1200px) {
+            .lab-container {
+                grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "header"
+                    "main"
+                    "sidebar"
+                    "results"
+                    "footer";
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="lab-container">
+        <header class="lab-header">
+            <div class="lab-title">
+                <div class="lab-icon">⚗️</div>
+                <div>
+                    <h1>ChemLab Pro</h1>
+                    <p>Advanced Laboratory Science Interface</p>
+                </div>
+            </div>
+            <div class="lab-status">
+                <div class="status-indicator">
+                    <div class="status-dot active"></div>
+                    System Online
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot warning"></div>
+                    Reaction In Progress
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot normal"></div>
+                    Safety Normal
+                </div>
+            </div>
+        </header>
+        
+        <aside class="data-entry-panel">
+            <div class="panel-header">
+                <div class="panel-icon">📝</div>
+                <h3>Laboratory Logbook</h3>
+            </div>
+            
+            <form class="logbook-form">
+                <div class="form-group">
+                    <label class="form-label">
+                        🧪 Experiment ID
+                    </label>
+                    <input type="text" class="form-input" value="EXP-2024-0127" placeholder="Enter experiment ID">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        🌡️ Temperature (°C)
+                    </label>
+                    <input type="number" class="form-input" value="23.5" placeholder="Temperature">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        💧 Solution Volume (mL)
+                    </label>
+                    <input type="number" class="form-input" value="250.0" placeholder="Volume">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        ⚡ pH Level
+                    </label>
+                    <input type="number" class="form-input" value="7.2" step="0.1" placeholder="pH">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        🔬 Compound Selection
+                    </label>
+                    <div class="compound-selector">
+                        <button type="button" class="element-btn">H</button>
+                        <button type="button" class="element-btn selected">O</button>
+                        <button type="button" class="element-btn">C</button>
+                        <button type="button" class="element-btn">N</button>
+                        <button type="button" class="element-btn">Ca</button>
+                        <button type="button" class="element-btn">Na</button>
+                        <button type="button" class="element-btn">Cl</button>
+                        <button type="button" class="element-btn">K</button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    Record Data Entry
+                </button>
+            </form>
+        </aside>
+        
+        <main class="main-workspace">
+            <div class="experiment-timeline">
+                <div class="timeline-header">
+                    <h3>🔬 Experiment Progress</h3>
+                    <span style="font-family: 'JetBrains Mono', monospace; color: #6b7280;">65% Complete</span>
+                </div>
+                <div class="timeline-track">
+                    <div class="timeline-progress"></div>
+                    <div class="phase-markers">
+                        <div class="phase-marker completed" title="Preparation"></div>
+                        <div class="phase-marker completed" title="Mixing"></div>
+                        <div class="phase-marker completed" title="Heating"></div>
+                        <div class="phase-marker" title="Reaction"></div>
+                        <div class="phase-marker" title="Analysis"></div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: #6b7280;">
+                    <span>Prep</span>
+                    <span>Mix</span>
+                    <span>Heat</span>
+                    <span>React</span>
+                    <span>Analyze</span>
+                </div>
+            </div>
+            
+            <div class="calculator-section">
+                <div class="panel-header">
+                    <div class="panel-icon">🧮</div>
+                    <h3>Molecular Formula Calculator</h3>
+                </div>
+                
+                <div class="molecular-display" id="molecularDisplay">
+                    H₂O + NaCl → H₂O·NaCl
+                </div>
+                
+                <div class="calculation-grid">
+                    <button class="calc-btn">H</button>
+                    <button class="calc-btn">O</button>
+                    <button class="calc-btn">C</button>
+                    <button class="calc-btn operator">+</button>
+                    <button class="calc-btn">N</button>
+                    <button class="calc-btn">Na</button>
+                    <button class="calc-btn">Cl</button>
+                    <button class="calc-btn operator">→</button>
+                    <button class="calc-btn">Ca</button>
+                    <button class="calc-btn">K</button>
+                    <button class="calc-btn">S</button>
+                    <button class="calc-btn operator">⚖️</button>
+                    <button class="calc-btn">₁</button>
+                    <button class="calc-btn">₂</button>
+                    <button class="calc-btn">₃</button>
+                    <button class="calc-btn operator">Clear</button>
+                </div>
+            </div>
+        </main>
+        
+        <aside class="results-panel">
+            <div class="panel-header">
+                <div class="panel-icon">🧪</div>
+                <h3>Analysis Results</h3>
+            </div>
+            
+            <div class="beaker-container">
+                <div class="beaker">
+                    <div class="solution blue">
+                        <div class="bubbles">
+                            <div class="bubble"></div>
+                            <div class="bubble"></div>
+                            <div class="bubble"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="beaker">
+                    <div class="solution green">
+                        <div class="bubbles">
+                            <div class="bubble"></div>
+                            <div class="bubble"></div>
+                            <div class="bubble"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="beaker">
+                    <div class="solution red">
+                        <div class="bubbles">
+                            <div class="bubble"></div>
+                            <div class="bubble"></div>
+                            <div class="bubble"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-data">
+                <div class="data-row">
+                    <span>Concentration:</span>
+                    <span>0.245 M</span>
+                </div>
+                <div class="data-row">
+                    <span>Yield:</span>
+                    <span>87.3%</span>
+                </div>
+                <div class="data-row">
+                    <span>Purity:</span>
+                    <span>99.1%</span>
+                </div>
+                <div class="data-row">
+                    <span>Reaction Time:</span>
+                    <span>14.2 min</span>
+                </div>
+                <div class="data-row">
+                    <span>Energy Released:</span>
+                    <span>-127.4 kJ/mol</span>
+                </div>
+                <div class="data-row">
+                    <span>Product Mass:</span>
+                    <span>23.7 g</span>
+                </div>
+            </div>
+        </aside>
+        
+        <footer class="lab-footer">
+            <div class="safety-alerts">
+                <div class="alert normal">
+                    ✅ Ventilation: Normal
+                </div>
+                <div class="alert normal">
+                    🛡️ PPE: Compliant
+                </div>
+                <div class="alert caution">
+                    ⚠️ Heat Source: Active
+                </div>
+            </div>
+            
+            <div class="instrument-readings">
+                <div class="reading">
+                    <div class="reading-value">23.5°</div>
+                    <div class="reading-unit">TEMP</div>
+                </div>
+                <div class="reading">
+                    <div class="reading-value">1013</div>
+                    <div class="reading-unit">hPa</div>
+                </div>
+                <div class="reading">
+                    <div class="reading-value">45.2</div>
+                    <div class="reading-unit">%RH</div>
+                </div>
+                <div class="reading">
+                    <div class="reading-value">7.2</div>
+                    <div class="reading-unit">pH</div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        // Interactive functionality for the laboratory interface
+        document.addEventListener('DOMContentLoaded', function() {
+            // Element selector functionality
+            const elementButtons = document.querySelectorAll('.element-btn');
+            elementButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    elementButtons.forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Calculator functionality
+            const calcButtons = document.querySelectorAll('.calc-btn');
+            const molecularDisplay = document.getElementById('molecularDisplay');
+            let currentFormula = '';
+            
+            calcButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const value = this.textContent;
+                    
+                    if (value === 'Clear') {
+                        currentFormula = '';
+                        molecularDisplay.textContent = 'Enter molecular formula...';
+                    } else if (value === '⚖️') {
+                        // Balance equation simulation
+                        molecularDisplay.textContent = 'Balancing equation...';
+                        setTimeout(() => {
+                            molecularDisplay.textContent = '2H₂ + O₂ → 2H₂O';
+                        }, 1000);
+                    } else {
+                        currentFormula += value;
+                        molecularDisplay.textContent = currentFormula || 'Enter molecular formula...';
+                    }
+                    
+                    // Visual feedback
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+            
+            // Form submission
+            const logbookForm = document.querySelector('.logbook-form');
+            logbookForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Simulate data recording
+                const submitBtn = this.querySelector('.btn-primary');
+                const originalText = submitBtn.textContent;
+                
+                submitBtn.textContent = 'Recording...';
+                submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    submitBtn.textContent = '✅ Data Recorded';
+                    setTimeout(() => {
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                    }, 2000);
+                }, 1500);
+            });
+            
+            // Dynamic solution color changes
+            const solutions = document.querySelectorAll('.solution');
+            setInterval(() => {
+                solutions.forEach((solution, index) => {
+                    const colors = ['blue', 'green', 'red'];
+                    const currentColor = colors[Math.floor(Math.random() * colors.length)];
+                    solution.className = `solution ${currentColor}`;
+                });
+            }, 8000);
+            
+            // Update instrument readings
+            function updateReadings() {
+                const readings = document.querySelectorAll('.reading-value');
+                const baseValues = [23.5, 1013, 45.2, 7.2];
+                
+                readings.forEach((reading, index) => {
+                    const variance = (Math.random() - 0.5) * 2;
+                    const newValue = (baseValues[index] + variance).toFixed(1);
+                    reading.textContent = newValue + (index === 0 ? '°' : '');
+                });
+            }
+            
+            setInterval(updateReadings, 5000);
+            
+            // Timeline progress animation
+            let progress = 65;
+            const progressBar = document.querySelector('.timeline-progress');
+            
+            setInterval(() => {
+                progress += Math.random() * 2 - 1;
+                progress = Math.max(0, Math.min(100, progress));
+                progressBar.style.width = progress + '%';
+                
+                const percentText = document.querySelector('.timeline-header span');
+                percentText.textContent = Math.round(progress) + '% Complete';
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

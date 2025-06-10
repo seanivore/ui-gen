@@ -117,13 +117,13 @@ Code through hierarchical settings:
 
 `settings.json` supports a number of options:
 
-| Key                   | Description                                                                                                                                                                                                    | Example                               |
-| :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------ |
-| `apiKeyHelper`        | Custom script, to be executed in `/bin/sh`, to generate an auth value. This value will generally be sent as `X-Api-Key`, `Authorization: Bearer`, and `Proxy-Authorization: Bearer` headers for model requests | `/bin/generate_temp_api_key.sh`       |
-| `cleanupPeriodDays`   | How long to locally retain chat transcripts (default: 30 days)                                                                                                                                                 | `20`                                  |
-| `env`                 | Environment variables that will be applied to every session                                                                                                                                                    | `{"FOO": "bar"}`                      |
-| `includeCoAuthoredBy` | Whether to include the `co-authored-by Claude` byline in git commits and pull requests (default: `true`)                                                                                                       | `false`                               |
-| `permissions`         | `allow` and `deny` keys are a list of [permission rules](#permissions)                                                                                                                                         | `{"allow": [ "Bash(npm run lint)" ]}` |
+| Key                   | Description                                                                              | Example                               |
+| :-------------------- | :--------------------------------------------------------------------------------------- | :------------------------------------ |
+| `apiKeyHelper`        | `/bin/sh` execution, `X-Api-Key`, `Authorization: Bearer`, `Proxy-Authorization: Bearer` | `/bin/generate_temp_api_key.sh`       |
+| `cleanupPeriodDays`   | How long to locally retain chat transcripts (default: 30 days)                           | `20`                                  |
+| `env`                 | Environment variables that will be applied to every session                              | `{"FOO": "bar"}`                      |
+| `includeCoAuthoredBy` | Include `co-authored-by Claude` git byline (default: `true`)                             | `false`                               |
+| `permissions`         | `allow` and `deny` keys are a list of permission rules                                   | `{"allow": [ "Bash(npm run lint)" ]}` |
 
 ### Settings precedence
 

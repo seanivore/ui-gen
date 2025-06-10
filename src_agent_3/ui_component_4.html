@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glass Morphism Gallery Modal - Multi-Functional UI Component</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glass Base Styles */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-subtle {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Container */
+        .container {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Gallery Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .gallery-card {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            overflow: hidden;
+            height: 250px;
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .gallery-card:hover::before {
+            opacity: 1;
+        }
+
+        .gallery-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .gallery-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+        }
+
+        .gallery-card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0 0 20px 20px;
+            color: white;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-card:hover .gallery-card-overlay {
+            transform: translateY(0);
+        }
+
+        .gallery-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .gallery-card-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Modal Container */
+        .modal-container {
+            position: relative;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8) translateY(50px);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Modal Header */
+        .modal-header {
+            padding: 25px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .glass-button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 8px 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .close-button {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+        }
+
+        .close-button:hover {
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        /* Modal Content */
+        .modal-content {
+            display: flex;
+            height: calc(90vh - 120px);
+            min-height: 500px;
+        }
+
+        /* Image Section */
+        .image-section {
+            flex: 2;
+            position: relative;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .main-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        .main-image.zoomed {
+            transform: scale(2);
+            cursor: zoom-out;
+        }
+
+        /* Zoom Lens Effect */
+        .zoom-lens {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+
+        .zoom-lens.active {
+            opacity: 1;
+        }
+
+        /* Navigation Arrows */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-arrow.prev {
+            left: 20px;
+        }
+
+        .nav-arrow.next {
+            right: 20px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Image Info */
+        .image-info {
+            padding: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .image-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .image-description {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .image-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        /* Sharing Section */
+        .sharing-section {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .share-button {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 8px 15px;
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .share-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Comments Section */
+        .comments-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 25px;
+            overflow: hidden;
+        }
+
+        .comments-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
+
+        .comments-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .comments-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .comments-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .comment {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .comment-text {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            opacity: 0.8;
+        }
+
+        .comment-time {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            margin-top: 5px;
+        }
+
+        /* Comment Input */
+        .comment-input-area {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .comment-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            resize: none;
+            min-height: 20px;
+            max-height: 60px;
+        }
+
+        .comment-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .send-button {
+            background: rgba(100, 200, 255, 0.2);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .send-button:hover {
+            background: rgba(100, 200, 255, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .modal-container {
+                width: 95%;
+                max-height: 95vh;
+            }
+
+            .modal-content {
+                flex-direction: column;
+                height: auto;
+                min-height: auto;
+            }
+
+            .image-section {
+                height: 300px;
+                flex: none;
+            }
+
+            .sidebar {
+                flex: none;
+                border-left: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                max-height: 400px;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Light Refraction Effects */
+        @keyframes lightRefraction {
+            0% { transform: translateX(-100%) skewX(-15deg); }
+            100% { transform: translateX(100%) skewX(-15deg); }
+        }
+
+        .glass::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%) skewX(-15deg);
+            transition: transform 0.6s;
+            pointer-events: none;
+        }
+
+        .glass:hover::after {
+            animation: lightRefraction 0.6s ease-out;
+        }
+
+        /* Floating Glass Bubbles for Features */
+        .feature-bubble {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-bubble:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .feature-bubble.top-right {
+            top: 100px;
+            right: 30px;
+        }
+
+        .feature-bubble.bottom-right {
+            bottom: 100px;
+            right: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Glass Feature Bubbles -->
+    <div class="feature-bubble top-right" onclick="showInfo('This Glass Morphism component combines 5+ UI functions seamlessly!')" title="Info">
+        ℹ️
+    </div>
+    <div class="feature-bubble bottom-right" onclick="showInfo('Features: Modal + Gallery + Zoom + Comments + Sharing + Glass Effects!')" title="Features">
+        ✨
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Glass Gallery</h1>
+            <p>Multi-functional glass morphism UI component with modal, zoom, comments & sharing</p>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="gallery-grid">
+            <div class="gallery-card glass" onclick="openModal(0)">
+                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop" alt="Mountain Lake">
+                <div class="gallery-card-overlay">
+                    <div class="gallery-card-title">Serene Mountain Lake</div>
+                    <div class="gallery-card-subtitle">Nature Photography</div>
+                </div>
+            </div>
+            
+            <div class="gallery-card glass" onclick="openModal(1)">
+                <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&h=400&fit=crop" alt="Desert Sunset">
+                <div class="gallery-card-overlay">
+                    <div class="gallery-card-title">Desert Sunset</div>
+                    <div class="gallery-card-subtitle">Landscape Collection</div>
+                </div>
+            </div>
+            
+            <div class="gallery-card glass" onclick="openModal(2)">
+                <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400&fit=crop" alt="Forest Path">
+                <div class="gallery-card-overlay">
+                    <div class="gallery-card-title">Mystical Forest</div>
+                    <div class="gallery-card-subtitle">Adventure Series</div>
+                </div>
+            </div>
+            
+            <div class="gallery-card glass" onclick="openModal(3)">
+                <img src="https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=600&h=400&fit=crop" alt="Ocean Waves">
+                <div class="gallery-card-overlay">
+                    <div class="gallery-card-title">Ocean Dreams</div>
+                    <div class="gallery-card-subtitle">Coastal Vibes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal-container glass-strong" onclick="event.stopPropagation()">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Image Gallery</h2>
+                <div class="modal-actions">
+                    <button class="glass-button" onclick="toggleZoom()">
+                        <span id="zoomIcon">🔍</span> Zoom
+                    </button>
+                    <button class="glass-button" onclick="downloadImage()">
+                        📥 Download
+                    </button>
+                    <button class="glass-button close-button" onclick="closeModal()">
+                        ✕ Close
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="modal-content">
+                <!-- Image Section -->
+                <div class="image-section">
+                    <img class="main-image" id="mainImage" src="" alt="" onclick="toggleZoom()">
+                    <div class="zoom-lens" id="zoomLens"></div>
+                    <div class="nav-arrow prev" onclick="prevImage()">‹</div>
+                    <div class="nav-arrow next" onclick="nextImage()">›</div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <!-- Image Info -->
+                    <div class="image-info">
+                        <h3 class="image-title" id="imageTitle">Title</h3>
+                        <p class="image-description" id="imageDescription">Description</p>
+                        <div class="image-meta">
+                            <span id="imageDate">Date</span>
+                            <span id="imageSize">Size</span>
+                            <span id="imageViews">Views</span>
+                        </div>
+                    </div>
+
+                    <!-- Sharing Section -->
+                    <div class="sharing-section">
+                        <h4 class="section-title">Share</h4>
+                        <div class="share-buttons">
+                            <button class="share-button glass-subtle" onclick="shareImage('twitter')">
+                                🐦 Twitter
+                            </button>
+                            <button class="share-button glass-subtle" onclick="shareImage('facebook')">
+                                📘 Facebook
+                            </button>
+                            <button class="share-button glass-subtle" onclick="shareImage('pinterest')">
+                                📌 Pinterest
+                            </button>
+                            <button class="share-button glass-subtle" onclick="copyLink()">
+                                🔗 Copy Link
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div class="comments-section">
+                        <h4 class="section-title">Comments</h4>
+                        <div class="comments-list" id="commentsList">
+                            <!-- Comments will be populated by JavaScript -->
+                        </div>
+                        <div class="comment-input-area glass-subtle">
+                            <textarea class="comment-input" id="commentInput" placeholder="Add a comment..." rows="1"></textarea>
+                            <button class="send-button" onclick="addComment()">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Image data
+        const images = [
+            {
+                src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop",
+                title: "Serene Mountain Lake",
+                description: "A breathtaking view of crystal-clear mountain lake surrounded by towering peaks and pristine wilderness.",
+                date: "Nov 15, 2024",
+                size: "2.3 MB",
+                views: "1,234"
+            },
+            {
+                src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop",
+                title: "Desert Sunset",
+                description: "Golden hour captures the vast desert landscape with warm tones painting the endless horizon.",
+                date: "Nov 12, 2024",
+                size: "1.8 MB",
+                views: "856"
+            },
+            {
+                src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop",
+                title: "Mystical Forest",
+                description: "Sunbeams filter through ancient trees creating a magical atmosphere in this enchanted woodland.",
+                date: "Nov 10, 2024",
+                size: "3.1 MB",
+                views: "2,107"
+            },
+            {
+                src: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800&h=600&fit=crop",
+                title: "Ocean Dreams",
+                description: "Powerful waves crash against rocky shores under a dramatic sky filled with possibilities.",
+                date: "Nov 8, 2024",
+                size: "2.7 MB",
+                views: "1,543"
+            }
+        ];
+
+        // Sample comments data
+        const commentsData = [
+            [
+                { author: "Sarah M.", text: "Absolutely stunning capture! The clarity is incredible.", time: "2 hours ago" },
+                { author: "Mike R.", text: "This place looks so peaceful. Where was this taken?", time: "4 hours ago" },
+                { author: "Emma L.", text: "Perfect composition and lighting! 📸", time: "1 day ago" }
+            ],
+            [
+                { author: "David K.", text: "Desert photography at its finest!", time: "3 hours ago" },
+                { author: "Lisa P.", text: "The colors are mesmerizing ✨", time: "6 hours ago" }
+            ],
+            [
+                { author: "Alex T.", text: "Feels like stepping into a fairy tale!", time: "1 hour ago" },
+                { author: "Maria S.", text: "The light rays are magical 🌟", time: "5 hours ago" },
+                { author: "John D.", text: "Nature's own cathedral. Beautiful work!", time: "8 hours ago" }
+            ],
+            [
+                { author: "Nina W.", text: "The power of the ocean captured perfectly!", time: "2 hours ago" },
+                { author: "Tom B.", text: "Makes me want to visit the coast right now", time: "7 hours ago" }
+            ]
+        ];
+
+        let currentImageIndex = 0;
+        let isZoomed = false;
+
+        // Modal functions
+        function openModal(index) {
+            currentImageIndex = index;
+            const modal = document.getElementById('modalOverlay');
+            updateModalContent();
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            const modal = document.getElementById('modalOverlay');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            // Reset zoom
+            const mainImage = document.getElementById('mainImage');
+            mainImage.classList.remove('zoomed');
+            isZoomed = false;
+            updateZoomIcon();
+        }
+
+        function updateModalContent() {
+            const image = images[currentImageIndex];
+            
+            // Update image and info
+            document.getElementById('mainImage').src = image.src;
+            document.getElementById('modalTitle').textContent = image.title;
+            document.getElementById('imageTitle').textContent = image.title;
+            document.getElementById('imageDescription').textContent = image.description;
+            document.getElementById('imageDate').textContent = image.date;
+            document.getElementById('imageSize').textContent = image.size;
+            document.getElementById('imageViews').textContent = image.views + ' views';
+            
+            // Update comments
+            updateComments();
+        }
+
+        function updateComments() {
+            const commentsList = document.getElementById('commentsList');
+            const comments = commentsData[currentImageIndex] || [];
+            
+            commentsList.innerHTML = comments.map(comment => `
+                <div class="comment glass-subtle">
+                    <div class="comment-author">${comment.author}</div>
+                    <div class="comment-text">${comment.text}</div>
+                    <div class="comment-time">${comment.time}</div>
+                </div>
+            `).join('');
+        }
+
+        // Navigation functions
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            updateModalContent();
+            resetZoom();
+        }
+
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+            updateModalContent();
+            resetZoom();
+        }
+
+        // Zoom functions
+        function toggleZoom() {
+            const mainImage = document.getElementById('mainImage');
+            isZoomed = !isZoomed;
+            
+            if (isZoomed) {
+                mainImage.classList.add('zoomed');
+            } else {
+                mainImage.classList.remove('zoomed');
+            }
+            
+            updateZoomIcon();
+        }
+
+        function resetZoom() {
+            const mainImage = document.getElementById('mainImage');
+            mainImage.classList.remove('zoomed');
+            isZoomed = false;
+            updateZoomIcon();
+        }
+
+        function updateZoomIcon() {
+            const zoomIcon = document.getElementById('zoomIcon');
+            zoomIcon.textContent = isZoomed ? '🔍-' : '🔍+';
+        }
+
+        // Zoom lens effect
+        document.addEventListener('mousemove', function(e) {
+            const imageSection = document.querySelector('.image-section');
+            const zoomLens = document.getElementById('zoomLens');
+            
+            if (imageSection && !isZoomed) {
+                const rect = imageSection.getBoundingClientRect();
+                if (e.clientX >= rect.left && e.clientX <= rect.right && 
+                    e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                    
+                    zoomLens.classList.add('active');
+                    zoomLens.style.left = (e.clientX - rect.left - 75) + 'px';
+                    zoomLens.style.top = (e.clientY - rect.top - 75) + 'px';
+                } else {
+                    zoomLens.classList.remove('active');
+                }
+            } else {
+                zoomLens.classList.remove('active');
+            }
+        });
+
+        // Sharing functions
+        function shareImage(platform) {
+            const image = images[currentImageIndex];
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent(`Check out this amazing photo: ${image.title}`);
+            
+            let shareUrl = '';
+            switch(platform) {
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+                    break;
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                    break;
+                case 'pinterest':
+                    shareUrl = `https://pinterest.com/pin/create/button/?url=${url}&description=${text}`;
+                    break;
+            }
+            
+            if (shareUrl) {
+                window.open(shareUrl, '_blank', 'width=600,height=400');
+            }
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                showInfo('Link copied to clipboard!');
+            });
+        }
+
+        function downloadImage() {
+            const image = images[currentImageIndex];
+            const link = document.createElement('a');
+            link.href = image.src;
+            link.download = image.title.replace(/\s+/g, '_').toLowerCase() + '.jpg';
+            link.click();
+        }
+
+        // Comment functions
+        function addComment() {
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                // Add to comments data
+                if (!commentsData[currentImageIndex]) {
+                    commentsData[currentImageIndex] = [];
+                }
+                
+                commentsData[currentImageIndex].unshift({
+                    author: "You",
+                    text: text,
+                    time: "Just now"
+                });
+                
+                // Update display
+                updateComments();
+                input.value = '';
+                
+                showInfo('Comment added successfully!');
+            }
+        }
+
+        // Auto-resize textarea
+        document.getElementById('commentInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 60) + 'px';
+        });
+
+        // Utility functions
+        function showInfo(message) {
+            // Create temporary notification
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 15px;
+                padding: 15px 20px;
+                color: white;
+                z-index: 2000;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('modalOverlay');
+            if (modal.classList.contains('active')) {
+                switch(e.key) {
+                    case 'Escape':
+                        closeModal();
+                        break;
+                    case 'ArrowLeft':
+                        prevImage();
+                        break;
+                    case 'ArrowRight':
+                        nextImage();
+                        break;
+                    case ' ':
+                        e.preventDefault();
+                        toggleZoom();
+                        break;
+                }
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            showInfo('Glass Morphism Gallery loaded! Click any image to explore all features.');
+        });
+    </script>
+</body>
+</html>

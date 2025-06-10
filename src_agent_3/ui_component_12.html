@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Underwater Ocean Command Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #001122 0%, #003366 30%, #004488 60%, #001122 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            color: #87CEEB;
+        }
+
+        /* Underwater particle effect */
+        .ocean-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(135, 206, 235, 0.3);
+            border-radius: 50%;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        .bubble {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(135,206,235,0.4) 70%, transparent 100%);
+            border-radius: 50%;
+            animation: bubble-rise 6s infinite linear;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.7; }
+            25% { transform: translateY(-20px) translateX(10px); opacity: 1; }
+            50% { transform: translateY(-10px) translateX(-15px); opacity: 0.8; }
+            75% { transform: translateY(-25px) translateX(5px); opacity: 1; }
+        }
+
+        @keyframes bubble-rise {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
+        }
+
+        /* Caustic light effect */
+        .caustic-light {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 800px 600px at 20% 30%, rgba(64, 224, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse 600px 400px at 80% 70%, rgba(135, 206, 235, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 400px 300px at 60% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            animation: caustic-wave 12s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @keyframes caustic-wave {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+
+        /* Main container */
+        .ocean-command-center {
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Panel base styles */
+        .ocean-panel {
+            background: linear-gradient(135deg, 
+                rgba(0, 51, 102, 0.9) 0%,
+                rgba(0, 68, 136, 0.8) 50%,
+                rgba(0, 34, 68, 0.9) 100%);
+            border: 2px solid rgba(64, 224, 255, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0 30px rgba(64, 224, 255, 0.2),
+                inset 0 0 20px rgba(135, 206, 235, 0.1);
+            overflow: hidden;
+        }
+
+        .ocean-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                rgba(64, 224, 255, 0.8) 0%,
+                rgba(135, 206, 235, 0.6) 50%,
+                rgba(64, 224, 255, 0.8) 100%);
+            animation: scanner 3s infinite ease-in-out;
+        }
+
+        @keyframes scanner {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #40E0FF;
+            text-shadow: 0 0 10px rgba(64, 224, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-icon {
+            width: 24px;
+            height: 24px;
+            background: rgba(64, 224, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Weather Dashboard */
+        .weather-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .submarine-gauge {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px;
+            background: rgba(0, 17, 34, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(64, 224, 255, 0.2);
+        }
+
+        .gauge-display {
+            width: 80px;
+            height: 80px;
+            border: 3px solid rgba(64, 224, 255, 0.6);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, rgba(0, 17, 34, 0.8) 0%, rgba(0, 51, 102, 0.4) 100%);
+        }
+
+        .gauge-needle {
+            position: absolute;
+            width: 2px;
+            height: 30px;
+            background: #FF6B35;
+            border-radius: 1px;
+            transform-origin: bottom center;
+            animation: gauge-sweep 4s infinite ease-in-out;
+            box-shadow: 0 0 8px rgba(255, 107, 53, 0.6);
+        }
+
+        @keyframes gauge-sweep {
+            0%, 100% { transform: rotate(-45deg); }
+            50% { transform: rotate(45deg); }
+        }
+
+        .gauge-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #40E0FF;
+            z-index: 1;
+        }
+
+        .weather-info {
+            flex: 1;
+        }
+
+        .weather-metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .metric-label {
+            color: #87CEEB;
+        }
+
+        .metric-value {
+            color: #40E0FF;
+            font-weight: bold;
+        }
+
+        /* Marine Data with Fish Animation */
+        .marine-data {
+            position: relative;
+        }
+
+        .fish-school {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            pointer-events: none;
+        }
+
+        .fish {
+            position: absolute;
+            width: 20px;
+            height: 12px;
+            background: linear-gradient(45deg, #FF6B35 0%, #F7931E 100%);
+            border-radius: 50% 0 50% 0;
+            animation: swim-pattern 8s infinite ease-in-out;
+        }
+
+        .fish:nth-child(1) { animation-delay: 0s; top: 20px; }
+        .fish:nth-child(2) { animation-delay: 1s; top: 40px; }
+        .fish:nth-child(3) { animation-delay: 2s; top: 60px; }
+        .fish:nth-child(4) { animation-delay: 0.5s; top: 80px; }
+        .fish:nth-child(5) { animation-delay: 1.5s; top: 100px; }
+
+        @keyframes swim-pattern {
+            0% { transform: translateX(-50px) translateY(0px); }
+            25% { transform: translateX(calc(100vw/4)) translateY(-10px); }
+            50% { transform: translateX(calc(100vw/2)) translateY(5px); }
+            75% { transform: translateX(calc(100vw*3/4)) translateY(-5px); }
+            100% { transform: translateX(calc(100vw + 50px)) translateY(0px); }
+        }
+
+        .marine-stats {
+            margin-top: 180px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .marine-stat {
+            background: rgba(0, 17, 34, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(64, 224, 255, 0.2);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #40E0FF;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #87CEEB;
+            opacity: 0.8;
+        }
+
+        .coral-indicator {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 17, 34, 0.6);
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .coral-health {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B35 0%, #F7931E 50%, #4ECDC4 100%);
+            border-radius: 3px;
+            width: 78%;
+            animation: coral-pulse 3s infinite ease-in-out;
+        }
+
+        @keyframes coral-pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* Tide Charts */
+        .tide-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .moon-phase {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .moon-indicator {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #87CEEB 0%, #40E0FF 100%);
+            position: relative;
+            box-shadow: 0 0 15px rgba(64, 224, 255, 0.4);
+        }
+
+        .moon-shadow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: rgba(0, 17, 34, 0.8);
+            border-radius: 50% 0 0 50%;
+            animation: moon-cycle 8s infinite linear;
+        }
+
+        @keyframes moon-cycle {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        .tide-wave {
+            height: 80px;
+            background: rgba(0, 17, 34, 0.6);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(64, 224, 255, 0.2);
+        }
+
+        .wave-pattern {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%,
+                rgba(64, 224, 255, 0.3) 25%,
+                rgba(135, 206, 235, 0.4) 50%,
+                rgba(64, 224, 255, 0.3) 75%,
+                transparent 100%);
+            animation: wave-motion 4s infinite ease-in-out;
+        }
+
+        @keyframes wave-motion {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0%); }
+        }
+
+        .tide-times {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .tide-time {
+            background: rgba(0, 17, 34, 0.6);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(64, 224, 255, 0.2);
+            text-align: center;
+        }
+
+        .tide-type {
+            font-size: 12px;
+            color: #87CEEB;
+            margin-bottom: 5px;
+        }
+
+        .tide-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #40E0FF;
+        }
+
+        /* Ocean Conditions */
+        .ocean-conditions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .depth-sonar {
+            height: 120px;
+            background: rgba(0, 17, 34, 0.6);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(64, 224, 255, 0.2);
+        }
+
+        .sonar-sweep {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            border: 2px solid rgba(64, 224, 255, 0.6);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: sonar-pulse 3s infinite ease-out;
+        }
+
+        .sonar-sweep::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 50px;
+            background: #40E0FF;
+            transform: translate(-50%, -100%);
+            transform-origin: bottom center;
+            animation: sonar-rotate 3s infinite linear;
+            box-shadow: 0 0 10px rgba(64, 224, 255, 0.8);
+        }
+
+        @keyframes sonar-pulse {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+        }
+
+        @keyframes sonar-rotate {
+            0% { transform: translate(-50%, -100%) rotate(0deg); }
+            100% { transform: translate(-50%, -100%) rotate(360deg); }
+        }
+
+        .current-flow {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .flow-indicator {
+            flex: 1;
+            height: 20px;
+            background: rgba(0, 17, 34, 0.6);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(64, 224, 255, 0.2);
+        }
+
+        .flow-stream {
+            height: 100%;
+            width: 200%;
+            background: repeating-linear-gradient(90deg,
+                rgba(64, 224, 255, 0.4) 0px,
+                rgba(64, 224, 255, 0.6) 10px,
+                rgba(135, 206, 235, 0.3) 20px,
+                rgba(64, 224, 255, 0.4) 30px);
+            animation: current-flow 2s infinite linear;
+        }
+
+        @keyframes current-flow {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0%); }
+        }
+
+        .pressure-readings {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .pressure-gauge {
+            background: rgba(0, 17, 34, 0.6);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(64, 224, 255, 0.2);
+            text-align: center;
+            position: relative;
+        }
+
+        .pressure-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #40E0FF;
+            margin-bottom: 5px;
+        }
+
+        .pressure-label {
+            font-size: 11px;
+            color: #87CEEB;
+            opacity: 0.8;
+        }
+
+        .kelp-animation {
+            position: absolute;
+            bottom: 0;
+            right: 20px;
+            width: 30px;
+            height: 100px;
+            pointer-events: none;
+        }
+
+        .kelp-strand {
+            position: absolute;
+            bottom: 0;
+            width: 6px;
+            height: 80px;
+            background: linear-gradient(to top, #2D5016 0%, #4ECDC4 100%);
+            border-radius: 3px;
+            transform-origin: bottom center;
+            animation: kelp-sway 6s infinite ease-in-out;
+        }
+
+        .kelp-strand:nth-child(2) {
+            left: 8px;
+            height: 90px;
+            animation-delay: 1s;
+        }
+
+        .kelp-strand:nth-child(3) {
+            left: 16px;
+            height: 75px;
+            animation-delay: 2s;
+        }
+
+        @keyframes kelp-sway {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .ocean-command-center {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(4, auto);
+                height: auto;
+                min-height: 100vh;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ocean-command-center {
+                padding: 10px;
+                gap: 15px;
+            }
+            
+            .ocean-panel {
+                padding: 15px;
+            }
+            
+            .marine-stats {
+                grid-template-columns: 1fr;
+                margin-top: 120px;
+            }
+            
+            .fish-school {
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Ocean particles and effects -->
+    <div class="ocean-particles" id="particles"></div>
+    <div class="caustic-light"></div>
+    
+    <!-- Main Command Center -->
+    <div class="ocean-command-center">
+        <!-- Weather Dashboard Panel -->
+        <div class="ocean-panel">
+            <div class="panel-title">
+                <div class="panel-icon">🌊</div>
+                Surface Weather Station
+            </div>
+            <div class="weather-dashboard">
+                <div class="submarine-gauge">
+                    <div class="gauge-display">
+                        <div class="gauge-needle"></div>
+                        <div class="gauge-value">72°F</div>
+                    </div>
+                    <div class="weather-info">
+                        <div class="weather-metric">
+                            <span class="metric-label">Temperature</span>
+                            <span class="metric-value">72°F</span>
+                        </div>
+                        <div class="weather-metric">
+                            <span class="metric-label">Humidity</span>
+                            <span class="metric-value">68%</span>
+                        </div>
+                        <div class="weather-metric">
+                            <span class="metric-label">Wind Speed</span>
+                            <span class="metric-value">12 mph</span>
+                        </div>
+                        <div class="weather-metric">
+                            <span class="metric-label">Pressure</span>
+                            <span class="metric-value">30.15 inHg</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="submarine-gauge">
+                    <div class="gauge-display">
+                        <div class="gauge-needle" style="animation-delay: 1s;"></div>
+                        <div class="gauge-value">15kt</div>
+                    </div>
+                    <div class="weather-info">
+                        <div class="weather-metric">
+                            <span class="metric-label">Wind Direction</span>
+                            <span class="metric-value">NW</span>
+                        </div>
+                        <div class="weather-metric">
+                            <span class="metric-label">Visibility</span>
+                            <span class="metric-value">10 miles</span>
+                        </div>
+                        <div class="weather-metric">
+                            <span class="metric-label">UV Index</span>
+                            <span class="metric-value">6 (High)</span>
+                        </div>
+                        <div class="weather-metric">
+                            <span class="metric-label">Cloud Cover</span>
+                            <span class="metric-value">25%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marine Data Panel -->
+        <div class="ocean-panel">
+            <div class="panel-title">
+                <div class="panel-icon">🐠</div>
+                Marine Life & Ecosystem
+            </div>
+            <div class="marine-data">
+                <div class="fish-school">
+                    <div class="fish"></div>
+                    <div class="fish"></div>
+                    <div class="fish"></div>
+                    <div class="fish"></div>
+                    <div class="fish"></div>
+                </div>
+                
+                <div class="marine-stats">
+                    <div class="marine-stat">
+                        <div class="stat-value">2,847</div>
+                        <div class="stat-label">Fish Count</div>
+                        <div class="coral-indicator">
+                            <div class="coral-health" style="width: 85%;"></div>
+                        </div>
+                    </div>
+                    <div class="marine-stat">
+                        <div class="stat-value">78%</div>
+                        <div class="stat-label">Coral Health</div>
+                        <div class="coral-indicator">
+                            <div class="coral-health" style="width: 78%;"></div>
+                        </div>
+                    </div>
+                    <div class="marine-stat">
+                        <div class="stat-value">24°C</div>
+                        <div class="stat-label">Water Temp</div>
+                        <div class="coral-indicator">
+                            <div class="coral-health" style="width: 72%;"></div>
+                        </div>
+                    </div>
+                    <div class="marine-stat">
+                        <div class="stat-value">8.2</div>
+                        <div class="stat-label">pH Level</div>
+                        <div class="coral-indicator">
+                            <div class="coral-health" style="width: 90%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tide Charts Panel -->
+        <div class="ocean-panel">
+            <div class="panel-title">
+                <div class="panel-icon">🌙</div>
+                Tidal Patterns & Moon Phase
+            </div>
+            <div class="tide-chart">
+                <div class="moon-phase">
+                    <div class="moon-indicator">
+                        <div class="moon-shadow"></div>
+                    </div>
+                    <div>
+                        <div style="color: #40E0FF; font-weight: bold;">Waxing Gibbous</div>
+                        <div style="color: #87CEEB; font-size: 12px;">78% Illuminated</div>
+                    </div>
+                </div>
+                
+                <div class="tide-wave">
+                    <div class="wave-pattern"></div>
+                </div>
+                
+                <div class="tide-times">
+                    <div class="tide-time">
+                        <div class="tide-type">High Tide</div>
+                        <div class="tide-value">6:42 AM</div>
+                        <div style="color: #4ECDC4; font-size: 11px;">+4.2 ft</div>
+                    </div>
+                    <div class="tide-time">
+                        <div class="tide-type">Low Tide</div>
+                        <div class="tide-value">12:18 PM</div>
+                        <div style="color: #FF6B35; font-size: 11px;">-1.8 ft</div>
+                    </div>
+                    <div class="tide-time">
+                        <div class="tide-type">High Tide</div>
+                        <div class="tide-value">7:15 PM</div>
+                        <div style="color: #4ECDC4; font-size: 11px;">+3.9 ft</div>
+                    </div>
+                    <div class="tide-time">
+                        <div class="tide-type">Low Tide</div>
+                        <div class="tide-value">1:33 AM</div>
+                        <div style="color: #FF6B35; font-size: 11px;">-2.1 ft</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ocean Conditions Panel -->
+        <div class="ocean-panel">
+            <div class="panel-title">
+                <div class="panel-icon">📡</div>
+                Ocean Conditions Monitor
+            </div>
+            <div class="ocean-conditions">
+                <div class="depth-sonar">
+                    <div class="sonar-sweep"></div>
+                    <div style="position: absolute; top: 10px; left: 15px; color: #40E0FF; font-size: 12px;">
+                        SONAR ACTIVE
+                    </div>
+                    <div style="position: absolute; bottom: 10px; right: 15px; color: #87CEEB; font-size: 14px; font-weight: bold;">
+                        Depth: 247 ft
+                    </div>
+                </div>
+                
+                <div style="color: #87CEEB; font-size: 14px; margin: 10px 0;">Current Flow Pattern</div>
+                <div class="current-flow">
+                    <div class="flow-indicator">
+                        <div class="flow-stream"></div>
+                    </div>
+                    <div style="color: #40E0FF; font-weight: bold; font-size: 14px;">2.3 knots NE</div>
+                </div>
+                
+                <div class="pressure-readings">
+                    <div class="pressure-gauge">
+                        <div class="pressure-value">1.8</div>
+                        <div class="pressure-label">ATM</div>
+                    </div>
+                    <div class="pressure-gauge">
+                        <div class="pressure-value">12</div>
+                        <div class="pressure-label">PSI</div>
+                    </div>
+                    <div class="pressure-gauge">
+                        <div class="pressure-value">85%</div>
+                        <div class="pressure-label">O2 SAT</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kelp-animation">
+                <div class="kelp-strand"></div>
+                <div class="kelp-strand"></div>
+                <div class="kelp-strand"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            
+            // Create floating particles
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.width = (Math.random() * 4 + 2) + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                particlesContainer.appendChild(particle);
+            }
+            
+            // Create bubbles
+            for (let i = 0; i < 15; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.width = (Math.random() * 20 + 10) + 'px';
+                bubble.style.height = bubble.style.width;
+                bubble.style.animationDelay = Math.random() * 6 + 's';
+                bubble.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                particlesContainer.appendChild(bubble);
+            }
+        }
+        
+        // Dynamic data updates
+        function updateOceanData() {
+            // Simulate real-time data updates
+            const tempGauge = document.querySelector('.gauge-value');
+            const fishCount = document.querySelector('.stat-value');
+            
+            // Update temperature with small variations
+            const baseTemp = 72;
+            const newTemp = baseTemp + (Math.random() - 0.5) * 4;
+            if (tempGauge) {
+                tempGauge.textContent = Math.round(newTemp) + '°F';
+            }
+            
+            // Update fish count
+            const baseFish = 2847;
+            const newFishCount = baseFish + Math.floor((Math.random() - 0.5) * 100);
+            if (fishCount) {
+                fishCount.textContent = newFishCount.toLocaleString();
+            }
+        }
+        
+        // Interactive effects
+        function addInteractivity() {
+            const panels = document.querySelectorAll('.ocean-panel');
+            
+            panels.forEach(panel => {
+                panel.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                    this.style.boxShadow = '0 0 50px rgba(64, 224, 255, 0.4), inset 0 0 30px rgba(135, 206, 235, 0.2)';
+                    this.style.transition = 'all 0.3s ease';
+                });
+                
+                panel.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                    this.style.boxShadow = '0 0 30px rgba(64, 224, 255, 0.2), inset 0 0 20px rgba(135, 206, 235, 0.1)';
+                });
+            });
+        }
+        
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            addInteractivity();
+            
+            // Update data every 5 seconds
+            setInterval(updateOceanData, 5000);
+            
+            // Initial data update
+            updateOceanData();
+        });
+        
+        // Add click interaction for sonar
+        document.querySelector('.depth-sonar').addEventListener('click', function() {
+            const sonar = this.querySelector('.sonar-sweep');
+            sonar.style.animation = 'none';
+            setTimeout(() => {
+                sonar.style.animation = 'sonar-pulse 3s infinite ease-out';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vintage Radio - Multi-Function Audio Console</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Bebas+Neue&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f08 100%);
+            font-family: 'Orbitron', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d4af37;
+            overflow-x: auto;
+        }
+        
+        .radio-console {
+            width: 900px;
+            height: 600px;
+            background: linear-gradient(145deg, #8b4513 0%, #654321 50%, #3d2f1f 100%);
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.8),
+                inset 0 2px 10px rgba(255,215,0,0.1),
+                inset 0 -2px 10px rgba(0,0,0,0.3);
+            border: 3px solid #8b7355;
+            overflow: hidden;
+        }
+        
+        .radio-console::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255,215,0,0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255,140,0,0.02) 0%, transparent 50%),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    rgba(139,69,19,0.05) 1px,
+                    transparent 2px,
+                    transparent 4px
+                );
+            pointer-events: none;
+        }
+        
+        .radio-header {
+            height: 80px;
+            background: linear-gradient(180deg, #654321 0%, #4a2c1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-bottom: 2px solid #8b7355;
+        }
+        
+        .radio-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent 0px,
+                rgba(139,115,85,0.1) 1px,
+                transparent 2px,
+                transparent 8px
+            );
+        }
+        
+        .brand-logo {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 32px;
+            color: #d4af37;
+            text-shadow: 0 0 20px rgba(212,175,55,0.5);
+            letter-spacing: 8px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .main-panel {
+            height: 520px;
+            display: grid;
+            grid-template-columns: 300px 1fr 200px;
+            grid-template-rows: 200px 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .speaker-grille {
+            grid-row: 1 / -1;
+            background: 
+                radial-gradient(circle, #2c1810 30%, transparent 31%),
+                radial-gradient(circle, #2c1810 30%, transparent 31%);
+            background-size: 16px 16px;
+            background-position: 0 0, 8px 8px;
+            background-color: #1a0f08;
+            border-radius: 15px;
+            border: 2px solid #8b7355;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .speaker-grille::before {
+            content: '';
+            position: absolute;
+            inset: 10px;
+            background: radial-gradient(circle at center, rgba(212,175,55,0.1) 0%, transparent 70%);
+            border-radius: 10px;
+            animation: speakerPulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes speakerPulse {
+            0% { box-shadow: inset 0 0 20px rgba(212,175,55,0.1); }
+            100% { box-shadow: inset 0 0 40px rgba(212,175,55,0.2); }
+        }
+        
+        .tuner-section {
+            background: linear-gradient(145deg, #4a2c1a 0%, #3d2f1f 100%);
+            border-radius: 15px;
+            border: 2px solid #8b7355;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .frequency-display {
+            height: 60px;
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+            border-radius: 8px;
+            border: 2px solid #8b7355;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .frequency-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent 0px,
+                #d4af37 1px,
+                transparent 2px,
+                transparent 20px
+            );
+            opacity: 0.3;
+        }
+        
+        .frequency-text {
+            font-size: 24px;
+            color: #00ff41;
+            text-shadow: 0 0 20px #00ff41;
+            font-weight: bold;
+            z-index: 2;
+            position: relative;
+            animation: frequencyFlicker 3s ease-in-out infinite;
+        }
+        
+        @keyframes frequencyFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .dial-container {
+            position: relative;
+            height: 80px;
+            margin: 20px 0;
+        }
+        
+        .tuning-dial {
+            width: 80px;
+            height: 80px;
+            background: 
+                radial-gradient(circle at 30% 30%, #d4af37 0%, #b8860b  50%, #8b6914 100%);
+            border-radius: 50%;
+            border: 3px solid #8b7355;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .tuning-dial:hover {
+            transform: scale(1.05);
+        }
+        
+        .dial-indicator {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 20px;
+            background: #8b6914;
+            border-radius: 2px;
+        }
+        
+        .dial-markings {
+            position: absolute;
+            inset: -20px;
+            border-radius: 50%;
+        }
+        
+        .dial-mark {
+            position: absolute;
+            width: 2px;
+            height: 10px;
+            background: #d4af37;
+            top: 0;
+            left: 50%;
+            transform-origin: 50% 60px;
+        }
+        
+        .controls-section {
+            background: linear-gradient(145deg, #4a2c1a 0%, #3d2f1f 100%);
+            border-radius: 15px;
+            border: 2px solid #8b7355;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .volume-control, .tone-control {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-label {
+            font-size: 12px;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .control-knob {
+            width: 60px;
+            height: 60px;
+            background: 
+                radial-gradient(circle at 30% 30%, #d4af37 0%, #b8860b 50%, #8b6914 100%);
+            border-radius: 50%;
+            border: 2px solid #8b7355;
+            position: relative;
+            cursor: pointer;
+            align-self: center;
+            transition: transform 0.2s ease;
+        }
+        
+        .control-knob:hover {
+            transform: scale(1.1);
+        }
+        
+        .knob-indicator {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 15px;
+            background: #8b6914;
+            border-radius: 2px;
+        }
+        
+        .program-section {
+            grid-column: 2 / -1;
+            background: linear-gradient(145deg, #4a2c1a 0%, #3d2f1f 100%);
+            border-radius: 15px;
+            border: 2px solid #8b7355;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .now-playing {
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+            border-radius: 8px;
+            border: 2px solid #8b7355;
+            padding: 15px;
+            position: relative;
+        }
+        
+        .now-playing::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent 0px,
+                rgba(212,175,55,0.05) 1px,
+                transparent 2px,
+                transparent 10px
+            );
+            border-radius: 6px;
+        }
+        
+        .station-info {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .station-name {
+            font-size: 18px;
+            color: #d4af37;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(212,175,55,0.5);
+        }
+        
+        .song-title {
+            font-size: 14px;
+            color: #ffd700;
+            margin-bottom: 3px;
+        }
+        
+        .artist-name {
+            font-size: 12px;
+            color: #b8860b;
+        }
+        
+        .equalizer {
+            display: flex;
+            gap: 8px;
+            align-items: end;
+            justify-content: center;
+            height: 80px;
+            background: linear-gradient(180deg, #2c1810 0%, #1a0f08 100%);
+            border-radius: 8px;
+            border: 2px solid #8b7355;
+            padding: 10px;
+        }
+        
+        .eq-bar {
+            width: 12px;
+            background: linear-gradient(180deg, #d4af37 0%, #b8860b 50%, #8b6914 100%);
+            border-radius: 2px;
+            position: relative;
+            transition: height 0.3s ease;
+        }
+        
+        .eq-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(180deg, transparent 0%, rgba(212,175,55,0.3) 100%);
+            border-radius: 2px;
+            animation: eqPulse 1s ease-in-out infinite alternate;
+        }
+        
+        @keyframes eqPulse {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .playlist {
+            flex: 1;
+            background: linear-gradient(180deg, #2c1810 0%, #1a0f08 100%);
+            border-radius: 8px;
+            border: 2px solid #8b7355;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .playlist-header {
+            font-size: 14px;
+            color: #d4af37;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .playlist-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(139,115,85,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .playlist-item:hover {
+            background: rgba(212,175,55,0.1);
+            padding-left: 10px;
+        }
+        
+        .playlist-item.active {
+            background: rgba(212,175,55,0.2);
+            border-left: 3px solid #d4af37;
+            padding-left: 10px;
+        }
+        
+        .playlist-time {
+            font-size: 10px;
+            color: #8b6914;
+            margin-right: 10px;
+        }
+        
+        .playlist-title {
+            font-size: 12px;
+            color: #ffd700;
+        }
+        
+        .tube-glow {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #ff4500 0%, #ff6347 50%, transparent 70%);
+            border-radius: 50%;
+            animation: tubeGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes tubeGlow {
+            0% { 
+                box-shadow: 0 0 10px #ff4500;
+                opacity: 0.8;
+            }
+            100% { 
+                box-shadow: 0 0 30px #ff4500;
+                opacity: 1;
+            }
+        }
+        
+        .power-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: 
+                radial-gradient(circle at 30% 30%, #d4af37 0%, #b8860b 50%, #8b6914 100%);
+            border-radius: 50%;
+            border: 2px solid #8b7355;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .power-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(212,175,55,0.5);
+        }
+        
+        .power-icon {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #8b6914;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .power-icon::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 8px;
+            background: #8b6914;
+        }
+        
+        .static-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    rgba(255,255,255,0.01) 1px,
+                    transparent 2px,
+                    transparent 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px,
+                    rgba(255,255,255,0.005) 1px,
+                    transparent 2px,
+                    transparent 6px
+                );
+            pointer-events: none;
+            animation: staticNoise 0.1s linear infinite;
+        }
+        
+        @keyframes staticNoise {
+            0% { opacity: 0.05; }
+            50% { opacity: 0.02; }
+            100% { opacity: 0.05; }
+        }
+        
+        @media (max-width: 960px) {
+            .radio-console {
+                width: 100%;
+                max-width: 900px;
+                height: auto;
+                min-height: 600px;
+            }
+            
+            .main-panel {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                height: auto;
+            }
+            
+            .speaker-grille {
+                grid-row: auto;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="radio-console">
+        <div class="tube-glow"></div>
+        <div class="static-overlay"></div>
+        
+        <div class="radio-header">
+            <div class="brand-logo">ZENITH RADIO</div>
+        </div>
+        
+        <div class="main-panel">
+            <div class="speaker-grille"></div>
+            
+            <div class="tuner-section">
+                <div class="frequency-display">
+                    <div class="frequency-text">101.7 FM</div>
+                </div>
+                
+                <div class="dial-container">
+                    <div class="tuning-dial" onclick="tuneRadio()">
+                        <div class="dial-indicator"></div>
+                        <div class="dial-markings">
+                            <div class="dial-mark" style="transform: translateX(-50%) rotate(0deg);"></div>
+                            <div class="dial-mark" style="transform: translateX(-50%) rotate(30deg);"></div>
+                            <div class="dial-mark" style="transform: translateX(-50%) rotate(60deg);"></div>
+                            <div class="dial-mark" style="transform: translateX(-50%) rotate(90deg);"></div>
+                            <div class="dial-mark" style="transform: translateX(-50%) rotate(120deg);"></div>
+                            <div class="dial-mark" style="transform: translateX(-50%) rotate(150deg);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls-section">
+                <div class="volume-control">
+                    <div class="control-label">Volume</div>
+                    <div class="control-knob" onclick="adjustVolume()">
+                        <div class="knob-indicator"></div>
+                    </div>
+                </div>
+                
+                <div class="tone-control">
+                    <div class="control-label">Tone</div>
+                    <div class="control-knob" onclick="adjustTone()">
+                        <div class="knob-indicator"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="program-section">
+                <div class="now-playing">
+                    <div class="station-info">
+                        <div class="station-name">WXYZ Classic Jazz</div>
+                        <div class="song-title">"Summertime" - Ella Fitzgerald</div>
+                        <div class="artist-name">The Great American Songbook Hour</div>
+                    </div>
+                </div>
+                
+                <div class="equalizer">
+                    <div class="eq-bar" style="height: 30px;"></div>
+                    <div class="eq-bar" style="height: 45px;"></div>
+                    <div class="eq-bar" style="height: 25px;"></div>
+                    <div class="eq-bar" style="height: 55px;"></div>
+                    <div class="eq-bar" style="height: 35px;"></div>
+                    <div class="eq-bar" style="height: 40px;"></div>
+                    <div class="eq-bar" style="height: 50px;"></div>
+                    <div class="eq-bar" style="height: 20px;"></div>
+                </div>
+                
+                <div class="playlist">
+                    <div class="playlist-header">Tonight's Programming</div>
+                    <div class="playlist-item active">
+                        <span class="playlist-time">8:00 PM</span>
+                        <span class="playlist-title">The Great American Songbook Hour</span>
+                    </div>
+                    <div class="playlist-item">
+                        <span class="playlist-time">9:00 PM</span>
+                        <span class="playlist-title">Midnight Jazz with Duke Ellington</span>
+                    </div>
+                    <div class="playlist-item">
+                        <span class="playlist-time">10:00 PM</span>
+                        <span class="playlist-title">Big Band Classics</span>
+                    </div>
+                    <div class="playlist-item">
+                        <span class="playlist-time">11:00 PM</span>
+                        <span class="playlist-title">Late Night Blues</span>
+                    </div>
+                    <div class="playlist-item">
+                        <span class="playlist-time">12:00 AM</span>
+                        <span class="playlist-title">The Midnight Hour</span>
+                    </div>
+                    <div class="playlist-item">
+                        <span class="playlist-time">1:00 AM</span>
+                        <span class="playlist-title">Smooth Jazz After Dark</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="power-button" onclick="togglePower()">
+            <div class="power-icon"></div>
+        </div>
+    </div>
+
+    <script>
+        // Vintage Radio Functionality
+        let isOn = true;
+        let currentFrequency = 101.7;
+        let volume = 75;
+        let tone = 50;
+        
+        const stations = [
+            { freq: 88.5, name: "KPFA News", program: "Morning Edition", artist: "NPR News Hour" },
+            { freq: 95.7, name: "KQED Classical", program: "Bach's Brandenburg Concerto No. 3", artist: "Chamber Orchestra" },
+            { freq: 101.7, name: "WXYZ Classic Jazz", program: "Summertime - Ella Fitzgerald", artist: "The Great American Songbook Hour" },
+            { freq: 106.1, name: "The Wave", program: "Moonlight Serenade - Glenn Miller", artist: "Big Band Classics" },
+            { freq: 107.9, name: "KCRW Blues", program: "The Thrill is Gone - B.B. King", artist: "Late Night Blues" }
+        ];
+        
+        const programs = [
+            { time: "8:00 PM", title: "The Great American Songbook Hour" },
+            { time: "9:00 PM", title: "Midnight Jazz with Duke Ellington" },
+            { time: "10:00 PM", title: "Big Band Classics" },
+            { time: "11:00 PM", title: "Late Night Blues" },
+            { time: "12:00 AM", title: "The Midnight Hour" },
+            { time: "1:00 AM", title: "Smooth Jazz After Dark" }
+        ];
+        
+        function tuneRadio() {
+            // Simulate tuning to random station
+            const randomStation = stations[Math.floor(Math.random() * stations.length)];
+            currentFrequency = randomStation.freq;
+            
+            // Update frequency display
+            document.querySelector('.frequency-text').textContent = currentFrequency + ' FM';
+            
+            // Update now playing info
+            document.querySelector('.station-name').textContent = randomStation.name;
+            document.querySelector('.song-title').textContent = randomStation.program;
+            document.querySelector('.artist-name').textContent = randomStation.artist;
+            
+            // Add static effect
+            addStaticEffect();
+            
+            // Animate dial rotation
+            const dial = document.querySelector('.tuning-dial');
+            dial.style.transform = `rotate(${Math.random() * 360}deg)`;
+            
+            // Update equalizer
+            updateEqualizer();
+        }
+        
+        function adjustVolume() {
+            volume = Math.max(0, Math.min(100, volume + (Math.random() * 20 - 10)));
+            
+            const knob = document.querySelector('.volume-control .control-knob');
+            knob.style.transform = `rotate(${(volume / 100) * 270 - 135}deg)`;
+            
+            // Visual feedback
+            knob.style.boxShadow = `0 0 ${volume / 5}px rgba(212,175,55,0.5)`;
+            
+            updateEqualizer();
+        }
+        
+        function adjustTone() {
+            tone = Math.max(0, Math.min(100, tone + (Math.random() * 20 - 10)));
+            
+            const knob = document.querySelector('.tone-control .control-knob');
+            knob.style.transform = `rotate(${(tone / 100) * 270 - 135}deg)`;
+            
+            // Visual feedback
+            knob.style.boxShadow = `0 0 ${tone / 5}px rgba(212,175,55,0.3)`;
+        }
+        
+        function togglePower() {
+            isOn = !isOn;
+            const console = document.querySelector('.radio-console');
+            const tubeGlow = document.querySelector('.tube-glow');
+            
+            if (!isOn) {
+                console.style.filter = 'brightness(0.3)';
+                tubeGlow.style.display = 'none';
+                document.querySelector('.frequency-text').style.color = '#333';
+                document.querySelector('.frequency-text').style.textShadow = 'none';
+            } else {
+                console.style.filter = 'brightness(1)';
+                tubeGlow.style.display = 'block';
+                document.querySelector('.frequency-text').style.color = '#00ff41';
+                document.querySelector('.frequency-text').style.textShadow = '0 0 20px #00ff41';
+            }
+        }
+        
+        function addStaticEffect() {
+            const frequencyDisplay = document.querySelector('.frequency-display');
+            frequencyDisplay.style.animation = 'none';
+            frequencyDisplay.offsetHeight; // Trigger reflow
+            frequencyDisplay.style.animation = 'staticFlicker 0.5s ease-out';
+        }
+        
+        function updateEqualizer() {
+            const eqBars = document.querySelectorAll('.eq-bar');
+            eqBars.forEach(bar => {
+                const height = Math.random() * 50 + 20;
+                bar.style.height = height + 'px';
+                bar.style.opacity = volume / 100;
+            });
+        }
+        
+        // Auto-update equalizer
+        setInterval(updateEqualizer, 500);
+        
+        // Simulate program changes
+        let currentProgramIndex = 0;
+        setInterval(() => {
+            const items = document.querySelectorAll('.playlist-item');
+            items.forEach(item => item.classList.remove('active'));
+            
+            currentProgramIndex = (currentProgramIndex + 1) % programs.length;
+            items[currentProgramIndex].classList.add('active');
+            
+            // Update now playing
+            const program = programs[currentProgramIndex];
+            document.querySelector('.artist-name').textContent = program.title;
+        }, 15000);
+        
+        // Add click handlers for playlist items
+        document.querySelectorAll('.playlist-item').forEach((item, index) => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.playlist-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                const program = programs[index];
+                document.querySelector('.artist-name').textContent = program.title;
+                currentProgramIndex = index;
+            });
+        });
+        
+        // Add CSS animation for static flicker
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes staticFlicker {
+                0% { filter: brightness(1); }
+                25% { filter: brightness(0.8) contrast(1.2); }
+                50% { filter: brightness(1.2) contrast(0.8); }
+                75% { filter: brightness(0.9) contrast(1.1); }
+                100% { filter: brightness(1); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize
+        updateEqualizer();
+    </script>
+</body>
+</html>

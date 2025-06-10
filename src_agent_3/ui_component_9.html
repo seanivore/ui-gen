@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Craft Organizer - UI Component 9</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --cream-white: #faf8f3;
+            --kraft-brown: #d4a574;
+            --paper-beige: #f5f1e8;
+            --ink-blue: #2c5f87;
+            --sage-green: #9db5a0;
+            --rust-red: #c85450;
+            --pencil-gray: #6b6b6b;
+            --shadow-brown: rgba(139, 101, 75, 0.3);
+            --fold-shadow: rgba(0, 0, 0, 0.15);
+            --paper-texture: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f4f0e6' opacity='0.3'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3Ccircle cx='13' cy='13' r='1'/%3E%3Ccircle cx='19' cy='19' r='1'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--cream-white) 0%, var(--paper-beige) 100%);
+            font-family: 'Kalam', cursive;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: var(--paper-texture);
+        }
+        
+        .paper-organizer {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--cream-white);
+            border-radius: 8px;
+            box-shadow: 
+                0 8px 32px rgba(139, 101, 75, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .paper-organizer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: var(--paper-texture);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        
+        .organizer-header {
+            background: linear-gradient(45deg, var(--kraft-brown), #e8c49c);
+            padding: 24px;
+            border-bottom: 3px solid var(--shadow-brown);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .organizer-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 255, 255, 0.1) 2px,
+                rgba(255, 255, 255, 0.1) 4px
+            );
+            animation: paperWeave 20s linear infinite;
+        }
+        
+        @keyframes paperWeave {
+            0% { transform: translateX(-50px) translateY(-50px); }
+            100% { transform: translateX(50px) translateY(50px); }
+        }
+        
+        .organizer-title {
+            font-family: 'Caveat', cursive;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--ink-blue);
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .organizer-subtitle {
+            text-align: center;
+            color: var(--pencil-gray);
+            font-size: 1.1rem;
+            font-weight: 300;
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding: 24px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .paper-section {
+            background: var(--paper-beige);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 
+                0 4px 16px rgba(139, 101, 75, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            position: relative;
+            transform-origin: top left;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .paper-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--kraft-brown), transparent);
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+            border-radius: 0 12px 0 0;
+        }
+        
+        .paper-section:hover {
+            transform: scale(1.02) rotate(0.5deg);
+            box-shadow: 
+                0 8px 24px rgba(139, 101, 75, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed var(--kraft-brown);
+        }
+        
+        .section-title {
+            font-family: 'Caveat', cursive;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--ink-blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-icon {
+            width: 24px;
+            height: 24px;
+            opacity: 0.8;
+        }
+        
+        .fold-button {
+            background: var(--kraft-brown);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(139, 101, 75, 0.3);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .fold-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 2px;
+            background: var(--cream-white);
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+        
+        .fold-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 12px;
+            background: var(--cream-white);
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+        
+        .fold-button:hover {
+            transform: scale(1.1) rotate(45deg);
+            box-shadow: 0 4px 12px rgba(139, 101, 75, 0.4);
+        }
+        
+        .section-content.folded {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .section-content {
+            max-height: 1000px;
+            transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        /* Todo List Styles */
+        .todo-item {
+            background: var(--cream-white);
+            margin: 8px 0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 4px solid var(--sage-green);
+            box-shadow: 
+                2px 2px 8px rgba(139, 101, 75, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            position: relative;
+            transform-origin: left center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .todo-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: var(--sage-green);
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+            opacity: 0.7;
+        }
+        
+        .todo-item:hover {
+            transform: translateX(4px) rotate(0.5deg);
+            box-shadow: 
+                4px 4px 12px rgba(139, 101, 75, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+        
+        .todo-item.completed {
+            opacity: 0.7;
+            text-decoration: line-through;
+            border-left-color: var(--pencil-gray);
+        }
+        
+        .todo-item.completed::before {
+            background: var(--pencil-gray);
+        }
+        
+        .todo-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--kraft-brown);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: var(--paper-beige);
+            transition: all 0.2s ease;
+        }
+        
+        .todo-checkbox:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 6px rgba(139, 101, 75, 0.3);
+        }
+        
+        .todo-checkbox.checked {
+            background: var(--sage-green);
+            border-color: var(--sage-green);
+        }
+        
+        .todo-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .todo-text {
+            flex: 1;
+            font-size: 1rem;
+            color: var(--ink-blue);
+            font-weight: 400;
+        }
+        
+        .priority-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: auto;
+        }
+        
+        .priority-high {
+            background: var(--rust-red);
+            box-shadow: 0 0 6px rgba(200, 84, 80, 0.6);
+        }
+        
+        .priority-medium {
+            background: var(--kraft-brown);
+            box-shadow: 0 0 6px rgba(212, 165, 116, 0.6);
+        }
+        
+        .priority-low {
+            background: var(--sage-green);
+            box-shadow: 0 0 6px rgba(157, 181, 160, 0.6);
+        }
+        
+        /* Calendar Styles */
+        .calendar-container {
+            background: var(--cream-white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(139, 101, 75, 0.1);
+        }
+        
+        .calendar-header {
+            background: linear-gradient(90deg, var(--ink-blue), #3a7196);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .calendar-header::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid var(--ink-blue);
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--kraft-brown);
+            padding: 1px;
+        }
+        
+        .calendar-day {
+            background: var(--paper-beige);
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 0.9rem;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            background: var(--kraft-brown);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .calendar-day.today {
+            background: var(--sage-green);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .calendar-day.has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 6px;
+            height: 6px;
+            background: var(--rust-red);
+            border-radius: 50%;
+        }
+        
+        /* Notes Styles */
+        .notes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .sticky-note {
+            background: linear-gradient(135deg, #fff8b3, #fff3a0);
+            padding: 16px;
+            border-radius: 4px;
+            box-shadow: 
+                2px 2px 8px rgba(139, 101, 75, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            position: relative;
+            transform: rotate(-0.5deg);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .sticky-note::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 8px;
+            background: rgba(212, 165, 116, 0.6);
+            border-radius: 0 0 4px 4px;
+        }
+        
+        .sticky-note:nth-child(even) {
+            transform: rotate(0.5deg);
+            background: linear-gradient(135deg, #b3f0ff, #a0ebff);
+        }
+        
+        .sticky-note:nth-child(3n) {
+            transform: rotate(-0.3deg);
+            background: linear-gradient(135deg, #ffb3e6, #ffa0e0);
+        }
+        
+        .sticky-note:hover {
+            transform: scale(1.05) rotate(0deg);
+            z-index: 10;
+            box-shadow: 
+                4px 4px 16px rgba(139, 101, 75, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+        
+        .note-text {
+            font-family: 'Caveat', cursive;
+            font-size: 1.1rem;
+            color: var(--ink-blue);
+            line-height: 1.4;
+            font-weight: 500;
+        }
+        
+        /* Tags Styles */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .paper-tag {
+            background: var(--kraft-brown);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        
+        .paper-tag::before {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: var(--cream-white);
+            border-radius: 50%;
+            border: 2px solid var(--kraft-brown);
+        }
+        
+        .paper-tag:hover {
+            transform: scale(1.1) rotate(2deg);
+            border-color: var(--ink-blue);
+            box-shadow: 0 2px 8px rgba(139, 101, 75, 0.3);
+        }
+        
+        .paper-tag.active {
+            background: var(--ink-blue);
+            border-color: var(--sage-green);
+        }
+        
+        .paper-tag.active::before {
+            background: var(--sage-green);
+            border-color: var(--ink-blue);
+        }
+        
+        /* Add Task Button */
+        .add-task-btn {
+            background: linear-gradient(45deg, var(--sage-green), #b8d1bb);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 24px;
+            color: white;
+            font-family: 'Kalam', cursive;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(157, 181, 160, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .add-task-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 2px;
+            background: white;
+        }
+        
+        .add-task-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 27px;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 16px;
+            background: white;
+        }
+        
+        .add-task-btn:hover {
+            transform: scale(1.05) rotate(-1deg);
+            box-shadow: 0 6px 20px rgba(157, 181, 160, 0.5);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 16px;
+            }
+            
+            .organizer-title {
+                font-size: 2.2rem;
+            }
+            
+            .paper-section {
+                padding: 16px;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* Animation Keyframes */
+        @keyframes paperFlip {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(90deg); }
+            100% { transform: rotateY(0deg); }
+        }
+        
+        @keyframes crease {
+            0% { box-shadow: inset 0 0 0 rgba(139, 101, 75, 0); }
+            50% { box-shadow: inset 2px 2px 8px rgba(139, 101, 75, 0.3); }
+            100% { box-shadow: inset 0 0 0 rgba(139, 101, 75, 0); }
+        }
+        
+        @keyframes unfold {
+            0% { 
+                transform: scaleY(0) rotateX(-90deg);
+                transform-origin: top;
+            }
+            100% { 
+                transform: scaleY(1) rotateX(0deg);
+                transform-origin: top;
+            }
+        }
+        
+        .paper-section.unfolding {
+            animation: unfold 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .calendar-day.flipping {
+            animation: paperFlip 0.6s ease-in-out;
+        }
+        
+        .todo-item.creasing {
+            animation: crease 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="paper-organizer">
+        <div class="organizer-header">
+            <h1 class="organizer-title">📝 Paper Craft Organizer</h1>
+            <p class="organizer-subtitle">Handcrafted productivity with origami folds</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- Todo List Section -->
+            <div class="paper-section" id="todoSection">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="section-icon">📋</span>
+                        Todo Notes
+                    </h2>
+                    <button class="fold-button" onclick="toggleSection('todoSection')"></button>
+                </div>
+                <div class="section-content">
+                    <div class="todo-item" onclick="toggleTodo(this)">
+                        <div class="todo-content">
+                            <div class="todo-checkbox"></div>
+                            <span class="todo-text">Design new paper craft templates</span>
+                            <div class="priority-indicator priority-high"></div>
+                        </div>
+                    </div>
+                    <div class="todo-item completed" onclick="toggleTodo(this)">
+                        <div class="todo-content">
+                            <div class="todo-checkbox checked"></div>
+                            <span class="todo-text">Organize craft supplies cabinet</span>
+                            <div class="priority-indicator priority-medium"></div>
+                        </div>
+                    </div>
+                    <div class="todo-item" onclick="toggleTodo(this)">
+                        <div class="todo-content">
+                            <div class="todo-checkbox"></div>
+                            <span class="todo-text">Plan weekend origami workshop</span>
+                            <div class="priority-indicator priority-medium"></div>
+                        </div>
+                    </div>
+                    <div class="todo-item" onclick="toggleTodo(this)">
+                        <div class="todo-content">
+                            <div class="todo-checkbox"></div>
+                            <span class="todo-text">Buy new washi tape collection</span>
+                            <div class="priority-indicator priority-low"></div>
+                        </div>
+                    </div>
+                    <button class="add-task-btn" onclick="addNewTask()">Add New Task</button>
+                </div>
+            </div>
+            
+            <!-- Calendar Section -->
+            <div class="paper-section" id="calendarSection">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="section-icon">📅</span>
+                        Paper Calendar
+                    </h2>
+                    <button class="fold-button" onclick="toggleSection('calendarSection')"></button>
+                </div>
+                <div class="section-content">
+                    <div class="calendar-container">
+                        <div class="calendar-header">December 2024</div>
+                        <div class="calendar-grid">
+                            <div class="calendar-day">Sun</div>
+                            <div class="calendar-day">Mon</div>
+                            <div class="calendar-day">Tue</div>
+                            <div class="calendar-day">Wed</div>
+                            <div class="calendar-day">Thu</div>
+                            <div class="calendar-day">Fri</div>
+                            <div class="calendar-day">Sat</div>
+                            <div class="calendar-day">1</div>
+                            <div class="calendar-day">2</div>
+                            <div class="calendar-day">3</div>
+                            <div class="calendar-day">4</div>
+                            <div class="calendar-day">5</div>
+                            <div class="calendar-day">6</div>
+                            <div class="calendar-day">7</div>
+                            <div class="calendar-day">8</div>
+                            <div class="calendar-day">9</div>
+                            <div class="calendar-day today">10</div>
+                            <div class="calendar-day">11</div>
+                            <div class="calendar-day">12</div>
+                            <div class="calendar-day">13</div>
+                            <div class="calendar-day has-event">14</div>
+                            <div class="calendar-day has-event">15</div>
+                            <div class="calendar-day">16</div>
+                            <div class="calendar-day">17</div>
+                            <div class="calendar-day">18</div>
+                            <div class="calendar-day">19</div>
+                            <div class="calendar-day">20</div>
+                            <div class="calendar-day has-event">21</div>
+                            <div class="calendar-day">22</div>
+                            <div class="calendar-day">23</div>
+                            <div class="calendar-day">24</div>
+                            <div class="calendar-day">25</div>
+                            <div class="calendar-day">26</div>
+                            <div class="calendar-day">27</div>
+                            <div class="calendar-day">28</div>
+                            <div class="calendar-day">29</div>
+                            <div class="calendar-day">30</div>
+                            <div class="calendar-day">31</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notes Section -->
+            <div class="paper-section" id="notesSection">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="section-icon">📝</span>
+                        Sticky Notes
+                    </h2>
+                    <button class="fold-button" onclick="toggleSection('notesSection')"></button>
+                </div>
+                <div class="section-content">
+                    <div class="notes-container">
+                        <div class="sticky-note" onclick="editNote(this)">
+                            <div class="note-text">Remember to pick up specialty paper from the art store downtown - they have that handmade textured paper I love!</div>
+                        </div>
+                        <div class="sticky-note" onclick="editNote(this)">
+                            <div class="note-text">Workshop idea: Teach kids how to make paper airplanes with different fold techniques</div>
+                        </div>
+                        <div class="sticky-note" onclick="editNote(this)">
+                            <div class="note-text">Gift idea for mom: Create a handmade photo album with decorative paper borders</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tags & Projects Section -->
+            <div class="paper-section" id="tagsSection">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="section-icon">🏷️</span>
+                        Project Tags
+                    </h2>
+                    <button class="fold-button" onclick="toggleSection('tagsSection')"></button>
+                </div>
+                <div class="section-content">
+                    <div class="tags-container">
+                        <div class="paper-tag active" onclick="toggleTag(this)">Origami</div>
+                        <div class="paper-tag" onclick="toggleTag(this)">Scrapbooking</div>
+                        <div class="paper-tag" onclick="toggleTag(this)">Card Making</div>
+                        <div class="paper-tag active" onclick="toggleTag(this)">Paper Cutting</div>
+                        <div class="paper-tag" onclick="toggleTag(this)">Bookbinding</div>
+                        <div class="paper-tag" onclick="toggleTag(this)">Collage</div>
+                        <div class="paper-tag" onclick="toggleTag(this)">Paper Flowers</div>
+                        <div class="paper-tag" onclick="toggleTag(this)">Gift Wrapping</div>
+                        <div class="paper-tag active" onclick="toggleTag(this)">Mixed Media</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Section folding functionality
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const content = section.querySelector('.section-content');
+            const button = section.querySelector('.fold-button');
+            
+            if (content.classList.contains('folded')) {
+                content.classList.remove('folded');
+                section.classList.add('unfolding');
+                button.style.transform = 'rotate(45deg)';
+                setTimeout(() => section.classList.remove('unfolding'), 600);
+            } else {
+                content.classList.add('folded');
+                button.style.transform = 'rotate(0deg)';
+            }
+        }
+        
+        // Todo item functionality
+        function toggleTodo(todoItem) {
+            const checkbox = todoItem.querySelector('.todo-checkbox');
+            const isCompleted = todoItem.classList.contains('completed');
+            
+            todoItem.classList.add('creasing');
+            
+            setTimeout(() => {
+                if (isCompleted) {
+                    todoItem.classList.remove('completed');
+                    checkbox.classList.remove('checked');
+                } else {
+                    todoItem.classList.add('completed');
+                    checkbox.classList.add('checked');
+                }
+                todoItem.classList.remove('creasing');
+            }, 200);
+        }
+        
+        // Add new task functionality
+        function addNewTask() {
+            const todoSection = document.getElementById('todoSection');
+            const todoContainer = todoSection.querySelector('.section-content');
+            const addButton = todoContainer.querySelector('.add-task-btn');
+            
+            const taskText = prompt('Enter new task:');
+            if (taskText && taskText.trim()) {
+                const priorities = ['priority-low', 'priority-medium', 'priority-high'];
+                const randomPriority = priorities[Math.floor(Math.random() * priorities.length)];
+                
+                const newTodo = document.createElement('div');
+                newTodo.className = 'todo-item';
+                newTodo.onclick = function() { toggleTodo(this); };
+                newTodo.innerHTML = `
+                    <div class="todo-content">
+                        <div class="todo-checkbox"></div>
+                        <span class="todo-text">${taskText.trim()}</span>
+                        <div class="priority-indicator ${randomPriority}"></div>
+                    </div>
+                `;
+                
+                todoContainer.insertBefore(newTodo, addButton);
+                
+                // Add creation animation
+                newTodo.style.transform = 'scale(0) rotate(-180deg)';
+                setTimeout(() => {
+                    newTodo.style.transform = 'scale(1) rotate(0deg)';
+                    newTodo.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                }, 50);
+            }
+        }
+        
+        // Calendar day interaction
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            if (day.textContent && !isNaN(day.textContent)) {
+                day.addEventListener('click', function() {
+                    this.classList.add('flipping');
+                    setTimeout(() => {
+                        this.classList.remove('flipping');
+                        if (Math.random() > 0.7) {
+                            this.classList.toggle('has-event');
+                        }
+                    }, 600);
+                });
+            }
+        });
+        
+        // Sticky note editing
+        function editNote(note) {
+            const noteText = note.querySelector('.note-text');
+            const currentText = noteText.textContent;
+            const newText = prompt('Edit note:', currentText);
+            
+            if (newText !== null && newText.trim() !== '') {
+                note.style.transform = 'scale(0.8) rotate(180deg)';
+                setTimeout(() => {
+                    noteText.textContent = newText.trim();
+                    note.style.transform = note.style.transform.includes('0.5deg') ? 'scale(1) rotate(0.5deg)' : 'scale(1) rotate(-0.5deg)';
+                }, 300);
+            }
+        }
+        
+        // Tag toggling
+        function toggleTag(tag) {
+            tag.classList.toggle('active');
+            
+            // Add a little bounce animation
+            tag.style.transform = 'scale(1.2) rotate(5deg)';
+            setTimeout(() => {
+                tag.style.transform = tag.classList.contains('active') ? 
+                    'scale(1) rotate(2deg)' : 'scale(1) rotate(0deg)';
+            }, 150);
+        }
+        
+        // Add paper texture animation on hover
+        document.querySelectorAll('.paper-section').forEach(section => {
+            section.addEventListener('mouseenter', function() {
+                this.style.backgroundImage = `
+                    radial-gradient(circle at 20% 80%, rgba(139, 101, 75, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(157, 181, 160, 0.1) 0%, transparent 50%),
+                    var(--paper-texture)
+                `;
+            });
+            
+            section.addEventListener('mouseleave', function() {
+                this.style.backgroundImage = 'var(--paper-texture)';
+            });
+        });
+        
+        // Initialize some random paper fold effects
+        function addRandomFoldEffects() {
+            const sections = document.querySelectorAll('.paper-section');
+            sections.forEach((section, index) => {
+                setTimeout(() => {
+                    section.style.transform = `perspective(1000px) rotateX(${Math.random() * 2 - 1}deg) rotateY(${Math.random() * 2 - 1}deg)`;
+                }, index * 200);
+            });
+        }
+        
+        // Initialize the paper craft organizer
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(addRandomFoldEffects, 500);
+            
+            // Add some subtle animations to sticky notes
+            const stickyNotes = document.querySelectorAll('.sticky-note');
+            stickyNotes.forEach((note, index) => {
+                note.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+        
+        // Paper crinkle sound effect simulation (visual feedback)
+        function simulatePaperCrinkle(element) {
+            element.style.filter = 'brightness(0.95) contrast(1.05)';
+            setTimeout(() => {
+                element.style.filter = 'brightness(1) contrast(1)';
+            }, 100);
+        }
+        
+        // Add crinkle effect to interactive elements
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.todo-item, .sticky-note, .calendar-day, .paper-tag')) {
+                simulatePaperCrinkle(e.target.closest('.todo-item, .sticky-note, .calendar-day, .paper-tag'));
+            }
+        });
+    </script>
+</body>
+</html>

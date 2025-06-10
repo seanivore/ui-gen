@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brutalist Command Center - Multi-Function Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Oswald:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --concrete-dark: #2a2a2a;
+            --concrete-medium: #4a4a4a;
+            --concrete-light: #6a6a6a;
+            --concrete-base: #8a8a8a;
+            --raw-white: #f5f5f5;
+            --stark-black: #0a0a0a;
+            --brutal-red: #cc0000;
+            --shadow-deep: rgba(0, 0, 0, 0.8);
+            --shadow-medium: rgba(0, 0, 0, 0.4);
+            --concrete-texture: linear-gradient(45deg, 
+                transparent 35%, 
+                rgba(0,0,0,0.1) 35%, 
+                rgba(0,0,0,0.1) 50%, 
+                transparent 50%, 
+                transparent 85%, 
+                rgba(0,0,0,0.1) 85%);
+        }
+        
+        body {
+            font-family: 'Oswald', sans-serif;
+            background: var(--concrete-dark);
+            color: var(--raw-white);
+            overflow-x: hidden;
+            background-image: 
+                var(--concrete-texture),
+                radial-gradient(circle at 20% 80%, var(--concrete-medium) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, var(--concrete-light) 0%, transparent 50%);
+            background-size: 20px 20px, 800px 800px, 600px 600px;
+            min-height: 100vh;
+        }
+        
+        .brutalist-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: 80px 60px 1fr;
+            grid-template-areas: 
+                "nav nav"
+                "breadcrumbs breadcrumbs"
+                "sidebar content";
+            height: 100vh;
+            background: var(--concrete-dark);
+        }
+        
+        /* Navigation Beam */
+        .nav-beam {
+            grid-area: nav;
+            background: linear-gradient(135deg, var(--stark-black), var(--concrete-dark));
+            border-bottom: 6px solid var(--brutal-red);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px 0 60px;
+            box-shadow: 0 8px 24px var(--shadow-deep);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-beam::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: var(--concrete-texture);
+            background-size: 15px 15px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .nav-beam::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 100%;
+            background: var(--brutal-red);
+            box-shadow: 20px 0 40px rgba(204, 0, 0, 0.3);
+        }
+        
+        .logo-block {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--raw-white);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 0;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .nav-block {
+            background: var(--concrete-medium);
+            padding: 16px 24px;
+            margin-left: 2px;
+            transform: skew(-5deg);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            border: none;
+            color: var(--raw-white);
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--brutal-red), transparent);
+            transition: left 0.5s;
+        }
+        
+        .nav-block:hover {
+            background: var(--concrete-light);
+            transform: skew(-5deg) scale(1.05);
+            box-shadow: 0 4px 16px var(--shadow-medium);
+        }
+        
+        .nav-block:hover::before {
+            left: 100%;
+        }
+        
+        .nav-block span {
+            position: relative;
+            z-index: 1;
+            transform: skew(5deg);
+            display: block;
+        }
+        
+        /* Search Integration */
+        .search-beam {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 3;
+        }
+        
+        .search-container {
+            position: relative;
+            background: var(--stark-black);
+            border: 3px solid var(--concrete-medium);
+            transform: skew(-10deg);
+            overflow: hidden;
+        }
+        
+        .search-input {
+            background: transparent;
+            border: none;
+            color: var(--raw-white);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            padding: 12px 50px 12px 20px;
+            width: 280px;
+            transform: skew(10deg);
+            outline: none;
+        }
+        
+        .search-input::placeholder {
+            color: var(--concrete-base);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%) skew(10deg);
+            background: var(--brutal-red);
+            border: none;
+            color: var(--raw-white);
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-btn:hover {
+            background: #ff0000;
+            box-shadow: 0 0 20px rgba(204, 0, 0, 0.5);
+        }
+        
+        /* Breadcrumb Pathway */
+        .breadcrumb-pathway {
+            grid-area: breadcrumbs;
+            background: linear-gradient(90deg, var(--concrete-medium), var(--concrete-light));
+            display: flex;
+            align-items: center;
+            padding: 0 60px;
+            position: relative;
+            border-bottom: 2px solid var(--stark-black);
+        }
+        
+        .breadcrumb-pathway::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: var(--concrete-texture);
+            background-size: 12px 12px;
+            opacity: 0.2;
+        }
+        
+        .breadcrumb-chain {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .breadcrumb-block {
+            background: var(--stark-black);
+            color: var(--raw-white);
+            padding: 8px 20px 8px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            margin-right: 8px;
+            clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%, 12px 50%);
+            transition: all 0.3s;
+        }
+        
+        .breadcrumb-block:first-child {
+            clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
+        }
+        
+        .breadcrumb-block:last-child {
+            background: var(--brutal-red);
+            margin-right: 0;
+        }
+        
+        .breadcrumb-block:hover {
+            background: var(--concrete-dark);
+            transform: scale(1.05);
+        }
+        
+        /* Concrete Column Sidebar */
+        .concrete-column {
+            grid-area: sidebar;
+            background: linear-gradient(180deg, var(--concrete-dark), var(--stark-black));
+            border-right: 6px solid var(--brutal-red);
+            position: relative;
+            overflow-y: auto;
+            box-shadow: 6px 0 24px var(--shadow-deep);
+        }
+        
+        .concrete-column::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: var(--concrete-texture);
+            background-size: 18px 18px;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        
+        .column-section {
+            position: relative;
+            z-index: 1;
+            margin: 0 20px 30px 20px;
+        }
+        
+        .section-header {
+            background: var(--brutal-red);
+            color: var(--raw-white);
+            padding: 16px 20px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0 -20px 20px -20px;
+            transform: skew(-2deg);
+            box-shadow: 0 4px 12px var(--shadow-medium);
+        }
+        
+        .section-header span {
+            transform: skew(2deg);
+            display: block;
+        }
+        
+        .section-item {
+            background: var(--concrete-medium);
+            margin-bottom: 2px;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section-item-link {
+            display: block;
+            padding: 16px 20px;
+            color: var(--raw-white);
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-item::before {
+            content: '';
+            position: absolute;
+            left: -100%;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--brutal-red);
+            transition: left 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 0;
+        }
+        
+        .section-item:hover {
+            transform: translateX(8px);
+            box-shadow: -4px 0 12px var(--shadow-medium);
+        }
+        
+        .section-item:hover::before {
+            left: 0;
+        }
+        
+        /* Content Grid Area */
+        .content-grid {
+            grid-area: content;
+            background: var(--raw-white);
+            color: var(--stark-black);
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .content-grid::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(90deg, transparent 49%, var(--concrete-light) 49%, var(--concrete-light) 51%, transparent 51%),
+                linear-gradient(0deg, transparent 49%, var(--concrete-light) 49%, var(--concrete-light) 51%, transparent 51%);
+            background-size: 80px 80px;
+            opacity: 0.05;
+            pointer-events: none;
+        }
+        
+        .content-header {
+            font-family: 'Oswald', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+            color: var(--stark-black);
+        }
+        
+        .content-header::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 120px;
+            height: 6px;
+            background: var(--brutal-red);
+        }
+        
+        .content-blocks {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .content-block {
+            background: var(--concrete-dark);
+            color: var(--raw-white);
+            padding: 30px;
+            transform: skew(-1deg);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+            border: 3px solid transparent;
+        }
+        
+        .content-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: var(--concrete-texture);
+            background-size: 16px 16px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .content-block:hover {
+            transform: skew(-1deg) scale(1.02);
+            border-color: var(--brutal-red);
+            box-shadow: 0 12px 36px var(--shadow-deep);
+        }
+        
+        .block-content {
+            position: relative;
+            z-index: 1;
+            transform: skew(1deg);
+        }
+        
+        .block-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            color: var(--brutal-red);
+        }
+        
+        .block-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .block-action {
+            background: var(--brutal-red);
+            border: none;
+            color: var(--raw-white);
+            padding: 12px 24px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            transform: skew(-3deg);
+        }
+        
+        .block-action:hover {
+            background: #ff0000;
+            transform: skew(-3deg) scale(1.05);
+            box-shadow: 0 4px 16px rgba(204, 0, 0, 0.4);
+        }
+        
+        .block-action span {
+            transform: skew(3deg);
+            display: block;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .brutalist-container {
+                grid-template-columns: 240px 1fr;
+            }
+            
+            .search-input {
+                width: 200px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .brutalist-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 80px 60px 200px 1fr;
+                grid-template-areas: 
+                    "nav"
+                    "breadcrumbs"
+                    "sidebar"
+                    "content";
+            }
+            
+            .concrete-column {
+                border-right: none;
+                border-bottom: 6px solid var(--brutal-red);
+            }
+            
+            .search-input {
+                width: 160px;
+            }
+        }
+        
+        /* Animation Classes */
+        .brutal-pulse {
+            animation: brutal-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes brutal-pulse {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 rgba(204, 0, 0, 0.7);
+            }
+            50% { 
+                box-shadow: 0 0 0 20px rgba(204, 0, 0, 0);
+            }
+        }
+        
+        .concrete-crack {
+            position: relative;
+        }
+        
+        .concrete-crack::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--stark-black), transparent);
+            transform: translateY(-50%) rotate(-2deg);
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="brutalist-container">
+        <!-- Navigation Beam -->
+        <nav class="nav-beam">
+            <div class="logo-block">NEXUS</div>
+            <div class="nav-menu">
+                <button class="nav-block"><span>Dashboard</span></button>
+                <button class="nav-block"><span>Projects</span></button>
+                <button class="nav-block"><span>Resources</span></button>
+                <button class="nav-block"><span>Analytics</span></button>
+                <button class="nav-block"><span>Settings</span></button>
+            </div>
+            <div class="search-beam">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search Command...">
+                    <button class="search-btn">▶</button>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Breadcrumb Pathway -->
+        <div class="breadcrumb-pathway">
+            <div class="breadcrumb-chain">
+                <div class="breadcrumb-block">System</div>
+                <div class="breadcrumb-block">Projects</div>
+                <div class="breadcrumb-block">Architecture</div>
+                <div class="breadcrumb-block">Command Center</div>
+            </div>
+        </div>
+        
+        <!-- Concrete Column Sidebar -->
+        <aside class="concrete-column">
+            <div class="column-section">
+                <div class="section-header">
+                    <span>Core Systems</span>
+                </div>
+                <div class="section-item">
+                    <a href="#" class="section-item-link">Infrastructure</a>
+                </div>
+                <div class="section-item">
+                    <a href="#" class="section-item-link">Database Cluster</a>
+                </div>
+                <div class="section-item">
+                    <a href="#" class="section-item-link">Network Gateway</a>
+                </div>
+                <div class="section-item">
+                    <a href="#" class="section-item-link">Security Protocols</a>
+                </div>
+            </div>
+            
+            <div class="column-section">
+                <div class="section-header">
+                    <span>Operations</span>
+                </div>
+                <div class="section-item concrete-crack">
+                    <a href="#" class="section-item-link">Deployment Pipeline</a>
+                </div>
+                <div class="section-item">
+                    <a href="#" class="section-item-link">Monitoring Systems</a>
+                </div>
+                <div class="section-item">
+                    <a href="#" class="section-item-link">Log Analysis</a>
+                </div>
+                <div class="section-item">
+                    <a href="#" class="section-item-link">Performance Metrics</a>
+                </div>
+            </div>
+            
+            <div class="column-section">
+                <div class="section-header">
+                    <span>Resources</span>
+                </div>
+                <div class="section-item">
+                    <a href="#" class="section-item-link">Documentation</a>
+                </div>
+                <div class="section-item">
+                    <a href="#" class="section-item-link">API References</a>
+                </div>
+                <div class="section-item">
+                    <a href="#" class="section-item-link">Code Repositories</a>
+                </div>
+                <div class="section-item">
+                    <a href="#" class="section-item-link">Team Directory</a>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Content Grid Area -->
+        <main class="content-grid">
+            <h1 class="content-header">Command Center</h1>
+            
+            <div class="content-blocks">
+                <div class="content-block">
+                    <div class="block-content">
+                        <h3 class="block-title">System Status</h3>
+                        <p class="block-text">
+                            All core systems operational. Infrastructure running at 99.8% uptime. 
+                            Database cluster synchronized across all nodes. Network throughput optimal.
+                        </p>
+                        <button class="block-action">
+                            <span>View Details</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="content-block">
+                    <div class="block-content">
+                        <h3 class="block-title">Active Deployments</h3>
+                        <p class="block-text">
+                            12 deployments in progress. Pipeline executing automated tests. 
+                            Staging environment ready for production release cycle.
+                        </p>
+                        <button class="block-action brutal-pulse">
+                            <span>Monitor Pipeline</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="content-block">
+                    <div class="block-content">
+                        <h3 class="block-title">Security Protocols</h3>
+                        <p class="block-text">
+                            All security layers active. Firewall rules updated. 
+                            Authentication systems synchronized. Zero breach incidents detected.
+                        </p>
+                        <button class="block-action">
+                            <span>Security Dashboard</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="content-block concrete-crack">
+                    <div class="block-content">
+                        <h3 class="block-title">Performance Metrics</h3>
+                        <p class="block-text">
+                            CPU utilization: 67%. Memory usage: 73%. Storage capacity: 84%. 
+                            Response times within acceptable parameters across all endpoints.
+                        </p>
+                        <button class="block-action">
+                            <span>Analyze Metrics</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="content-block">
+                    <div class="block-content">
+                        <h3 class="block-title">Team Operations</h3>
+                        <p class="block-text">
+                            8 developers active. 23 commits today. 4 code reviews pending. 
+                            Sprint progress at 78% completion rate ahead of schedule.
+                        </p>
+                        <button class="block-action">
+                            <span>Team Dashboard</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="content-block">
+                    <div class="block-content">
+                        <h3 class="block-title">Resource Management</h3>
+                        <p class="block-text">
+                            Container orchestration stable. Auto-scaling policies active. 
+                            Resource allocation optimized for current workload distribution.
+                        </p>
+                        <button class="block-action">
+                            <span>Manage Resources</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Brutalist UI Interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation interactions
+            const navBlocks = document.querySelectorAll('.nav-block');
+            navBlocks.forEach(block => {
+                block.addEventListener('click', function() {
+                    // Remove active state from all blocks
+                    navBlocks.forEach(b => b.classList.remove('active'));
+                    // Add active state to clicked block
+                    this.classList.add('active');
+                    
+                    // Simulate page navigation with brutal animation
+                    document.body.style.transform = 'skew(2deg)';
+                    setTimeout(() => {
+                        document.body.style.transform = 'skew(0deg)';
+                    }, 200);
+                });
+            });
+            
+            // Search functionality
+            const searchInput = document.querySelector('.search-input');
+            const searchBtn = document.querySelector('.search-btn');
+            
+            function performSearch() {
+                const query = searchInput.value.trim();
+                if (query) {
+                    // Brutal search animation
+                    searchBtn.style.transform = 'translateY(-50%) skew(10deg) scale(1.2)';
+                    searchBtn.style.background = '#ff0000';
+                    
+                    setTimeout(() => {
+                        searchBtn.style.transform = 'translateY(-50%) skew(10deg) scale(1)';
+                        searchBtn.style.background = 'var(--brutal-red)';
+                        
+                        // Simulate search results update
+                        console.log('Searching for:', query);
+                        highlightSearchResults(query);
+                    }, 300);
+                }
+            }
+            
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Sidebar interactions
+            const sectionItems = document.querySelectorAll('.section-item');
+            sectionItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active state from all items
+                    sectionItems.forEach(i => i.classList.remove('active'));
+                    // Add active state to clicked item
+                    this.classList.add('active');
+                    
+                    // Update content area based on selection
+                    const linkText = this.querySelector('.section-item-link').textContent;
+                    updateContentArea(linkText);
+                });
+            });
+            
+            // Content block interactions
+            const contentBlocks = document.querySelectorAll('.content-block');
+            contentBlocks.forEach(block => {
+                block.addEventListener('mouseenter', function() {
+                    // Add subtle concrete crack effect on hover
+                    if (!this.classList.contains('concrete-crack')) {
+                        this.classList.add('concrete-crack');
+                    }
+                });
+                
+                block.addEventListener('mouseleave', function() {
+                    // Remove crack effect after delay
+                    setTimeout(() => {
+                        if (!this.dataset.permanent) {
+                            this.classList.remove('concrete-crack');
+                        }
+                    }, 500);
+                });
+            });
+            
+            // Block action buttons
+            const blockActions = document.querySelectorAll('.block-action');
+            blockActions.forEach(action => {
+                action.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Brutal button press animation
+                    this.style.transform = 'skew(-3deg) scale(0.95)';
+                    this.style.boxShadow = 'inset 0 4px 8px rgba(0,0,0,0.5)';
+                    
+                    setTimeout(() => {
+                        this.style.transform = 'skew(-3deg) scale(1.05)';
+                        this.style.boxShadow = '0 4px 16px rgba(204, 0, 0, 0.4)';
+                        
+                        // Simulate action execution
+                        const actionText = this.querySelector('span').textContent;
+                        console.log('Executing action:', actionText);
+                        showBrutalNotification(`Executing: ${actionText}`);
+                    }, 100);
+                });
+            });
+            
+            // Breadcrumb navigation
+            const breadcrumbBlocks = document.querySelectorAll('.breadcrumb-block');
+            breadcrumbBlocks.forEach(block => {
+                block.addEventListener('click', function() {
+                    // Brutal breadcrumb navigation effect
+                    const level = this.textContent;
+                    navigateToBreadcrumb(level);
+                });
+            });
+        });
+        
+        // Helper functions
+        function highlightSearchResults(query) {
+            const contentBlocks = document.querySelectorAll('.content-block');
+            contentBlocks.forEach(block => {
+                const text = block.textContent.toLowerCase();
+                if (text.includes(query.toLowerCase())) {
+                    block.style.borderColor = 'var(--brutal-red)';
+                    block.style.transform = 'skew(-1deg) scale(1.02)';
+                    
+                    setTimeout(() => {
+                        block.style.borderColor = 'transparent';
+                        block.style.transform = 'skew(-1deg) scale(1)';
+                    }, 2000);
+                }
+            });
+        }
+        
+        function updateContentArea(selection) {
+            const contentHeader = document.querySelector('.content-header');
+            
+            // Brutal content transition
+            contentHeader.style.transform = 'skew(5deg)';
+            contentHeader.style.opacity = '0.5';
+            
+            setTimeout(() => {
+                contentHeader.textContent = selection.toUpperCase();
+                contentHeader.style.transform = 'skew(0deg)';
+                contentHeader.style.opacity = '1';
+            }, 200);
+        }
+        
+        function navigateToBreadcrumb(level) {
+            // Brutal breadcrumb navigation animation
+            const pathway = document.querySelector('.breadcrumb-pathway');
+            pathway.style.transform = 'skew(2deg)';
+            
+            setTimeout(() => {
+                pathway.style.transform = 'skew(0deg)';
+                console.log('Navigating to:', level);
+            }, 300);
+        }
+        
+        function showBrutalNotification(message) {
+            // Create brutal notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 40px;
+                background: var(--brutal-red);
+                color: var(--raw-white);
+                padding: 16px 24px;
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 12px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                transform: skew(-5deg) translateX(400px);
+                transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+                z-index: 1000;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'skew(-5deg) translateX(0)';
+            }, 100);
+            
+            // Animate out
+            setTimeout(() => {
+                notification.style.transform = 'skew(-5deg) translateX(400px)';
+                setTimeout(() => {
+                    notification.remove();
+                }, 400);
+            }, 3000);
+        }
+        
+        // Add concrete texture loading animation
+        window.addEventListener('load', function() {
+            const container = document.querySelector('.brutalist-container');
+            container.style.opacity = '0';
+            container.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.8s cubic-bezier(0.23, 1, 0.32, 1)';
+                container.style.opacity = '1';
+                container.style.transform = 'scale(1)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

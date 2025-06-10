@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playful Animation Shopping - UI Component 6</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .products-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 3px solid transparent;
+        }
+
+        .product-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border-color: #ff6b6b;
+            animation: wiggle 0.6s ease-in-out;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: translateY(-15px) scale(1.03) rotate(0deg); }
+            25% { transform: translateY(-15px) scale(1.03) rotate(2deg); }
+            75% { transform: translateY(-15px) scale(1.03) rotate(-2deg); }
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .product-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-price {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border-radius: 25px;
+            padding: 8px 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .quantity-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .quantity-btn:hover {
+            transform: scale(1.2) rotate(15deg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .quantity-btn:active {
+            transform: scale(0.9) rotate(-15deg);
+            animation: bounce 0.3s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(0.9) rotate(-15deg); }
+            50% { transform: scale(1.1) rotate(-15deg); }
+        }
+
+        .quantity-display {
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            min-width: 30px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .wishlist-btn {
+            background: none;
+            border: none;
+            font-size: 35px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .wishlist-btn:hover {
+            transform: scale(1.3) rotate(10deg);
+            animation: heartbeat 0.6s ease infinite;
+        }
+
+        .wishlist-btn.loved {
+            color: #ff6b6b;
+            animation: loveExplosion 0.8s ease;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1.3) rotate(10deg); }
+            50% { transform: scale(1.5) rotate(10deg); }
+        }
+
+        @keyframes loveExplosion {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.8) rotate(360deg); }
+            100% { transform: scale(1.3); }
+        }
+
+        .add-to-cart-btn {
+            background: linear-gradient(45deg, #feca57, #ff9ff3, #54a0ff);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 25px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .add-to-cart-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            animation: rainbow 1s ease infinite;
+        }
+
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        .cart-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 30px;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 3px solid #ff6b6b;
+        }
+
+        .cart-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .cart-icon {
+            font-size: 35px;
+            animation: cartBounce 2s ease infinite;
+        }
+
+        @keyframes cartBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .cart-items {
+            min-height: 200px;
+            margin-bottom: 20px;
+        }
+
+        .cart-empty {
+            text-align: center;
+            color: #888;
+            font-size: 18px;
+            padding: 50px 20px;
+        }
+
+        .cart-empty-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .cart-item {
+            background: linear-gradient(45deg, #ffeaa7, #fab1a0);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideIn 0.5s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%) scale(0.8); opacity: 0; }
+            to { transform: translateX(0) scale(1); opacity: 1; }
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .cart-item-quantity {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .cart-total {
+            border-top: 3px dashed #ff6b6b;
+            padding-top: 20px;
+            text-align: center;
+        }
+
+        .total-amount {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .checkout-btn {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            animation: pulse 1s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow: 0 12px 30px rgba(0, 184, 148, 0.4); }
+        }
+
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #feca57, transparent);
+            border-radius: 50%;
+            animation: sparkleAnim 1s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes sparkleAnim {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2) rotate(180deg);
+                opacity: 0;
+            }
+        }
+
+        .loading-character {
+            display: inline-block;
+            font-size: 30px;
+            animation: dance 1s ease-in-out infinite;
+        }
+
+        @keyframes dance {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(5deg); }
+            75% { transform: translateY(-5px) rotate(-5deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .products-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .cart-section {
+                position: relative;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="products-section">
+            <!-- Product Card 1 -->
+            <div class="product-card" data-product-id="1">
+                <div class="product-image">🍕</div>
+                <div class="product-title">Rainbow Pizza Delight</div>
+                <div class="product-price">$12.99</div>
+                <div class="product-controls">
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-action="decrease">-</button>
+                        <span class="quantity-display">1</span>
+                        <button class="quantity-btn plus" data-action="increase">+</button>
+                    </div>
+                    <button class="wishlist-btn">🤍</button>
+                </div>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+
+            <!-- Product Card 2 -->
+            <div class="product-card" data-product-id="2">
+                <div class="product-image">🍦</div>
+                <div class="product-title">Magical Ice Cream Sundae</div>
+                <div class="product-price">$8.50</div>
+                <div class="product-controls">
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-action="decrease">-</button>
+                        <span class="quantity-display">1</span>
+                        <button class="quantity-btn plus" data-action="increase">+</button>
+                    </div>
+                    <button class="wishlist-btn">🤍</button>
+                </div>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+
+            <!-- Product Card 3 -->
+            <div class="product-card" data-product-id="3">
+                <div class="product-image">🌮</div>
+                <div class="product-title">Cosmic Taco Adventure</div>
+                <div class="product-price">$15.75</div>
+                <div class="product-controls">
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-action="decrease">-</button>
+                        <span class="quantity-display">1</span>
+                        <button class="quantity-btn plus" data-action="increase">+</button>
+                    </div>
+                    <button class="wishlist-btn">🤍</button>
+                </div>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+
+            <!-- Product Card 4 -->
+            <div class="product-card" data-product-id="4">
+                <div class="product-image">🧁</div>
+                <div class="product-title">Sparkle Cupcake Dreams</div>
+                <div class="product-price">$6.25</div>
+                <div class="product-controls">
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-action="decrease">-</button>
+                        <span class="quantity-display">1</span>
+                        <button class="quantity-btn plus" data-action="increase">+</button>
+                    </div>
+                    <button class="wishlist-btn">🤍</button>
+                </div>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="cart-section">
+            <div class="cart-header">
+                <span class="cart-icon">🛒</span>
+                <span>Shopping Cart</span>
+            </div>
+            
+            <div class="cart-items" id="cartItems">
+                <div class="cart-empty">
+                    <div class="cart-empty-icon">🛍️</div>
+                    <div>Your cart is empty!</div>
+                    <div style="font-size: 14px; margin-top: 10px;">Add some magical items to get started!</div>
+                </div>
+            </div>
+
+            <div class="cart-total" id="cartTotal" style="display: none;">
+                <div class="total-amount">Total: $0.00</div>
+                <button class="checkout-btn">
+                    <span class="loading-character">🎉</span>
+                    Checkout Now!
+                    <span class="loading-character">🎉</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="confetti" id="confetti"></div>
+
+    <script>
+        class PlayfulShoppingCart {
+            constructor() {
+                this.cart = [];
+                this.wishlist = new Set();
+                this.products = {
+                    1: { name: 'Rainbow Pizza Delight', price: 12.99, emoji: '🍕' },
+                    2: { name: 'Magical Ice Cream Sundae', price: 8.50, emoji: '🍦' },
+                    3: { name: 'Cosmic Taco Adventure', price: 15.75, emoji: '🌮' },
+                    4: { name: 'Sparkle Cupcake Dreams', price: 6.25, emoji: '🧁' }
+                };
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                // Quantity controls
+                document.querySelectorAll('.quantity-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.handleQuantityChange(e);
+                    });
+                });
+
+                // Wishlist buttons
+                document.querySelectorAll('.wishlist-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.handleWishlistToggle(e);
+                    });
+                });
+
+                // Add to cart buttons
+                document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.handleAddToCart(e);
+                    });
+                });
+
+                // Checkout button
+                document.querySelector('.checkout-btn').addEventListener('click', () => {
+                    this.handleCheckout();
+                });
+            }
+
+            handleQuantityChange(e) {
+                const btn = e.target;
+                const card = btn.closest('.product-card');
+                const display = card.querySelector('.quantity-display');
+                const action = btn.dataset.action;
+                let quantity = parseInt(display.textContent);
+
+                if (action === 'increase') {
+                    quantity++;
+                    this.createSparkleEffect(btn);
+                } else if (action === 'decrease' && quantity > 1) {
+                    quantity--;
+                    this.createBounceEffect(btn);
+                }
+
+                display.textContent = quantity;
+                this.animateNumber(display);
+            }
+
+            handleWishlistToggle(e) {
+                const btn = e.target;
+                const card = btn.closest('.product-card');
+                const productId = card.dataset.productId;
+
+                if (this.wishlist.has(productId)) {
+                    this.wishlist.delete(productId);
+                    btn.textContent = '🤍';
+                    btn.classList.remove('loved');
+                } else {
+                    this.wishlist.add(productId);
+                    btn.textContent = '❤️';
+                    btn.classList.add('loved');
+                    this.createHeartExplosion(btn);
+                }
+            }
+
+            handleAddToCart(e) {
+                const btn = e.target;
+                const card = btn.closest('.product-card');
+                const productId = card.dataset.productId;
+                const quantity = parseInt(card.querySelector('.quantity-display').textContent);
+                const product = this.products[productId];
+
+                // Add to cart
+                const existingItem = this.cart.find(item => item.id === productId);
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                } else {
+                    this.cart.push({
+                        id: productId,
+                        ...product,
+                        quantity: quantity
+                    });
+                }
+
+                // Visual feedback
+                this.createConfettiExplosion(btn);
+                this.animateCartAdd(card);
+                this.updateCartDisplay();
+
+                // Reset quantity to 1
+                card.querySelector('.quantity-display').textContent = '1';
+            }
+
+            handleCheckout() {
+                if (this.cart.length === 0) return;
+
+                const btn = document.querySelector('.checkout-btn');
+                btn.innerHTML = '<span class="loading-character">🎊</span> Processing... <span class="loading-character">🎊</span>';
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    this.createMegaConfetti();
+                    btn.innerHTML = '<span class="loading-character">✨</span> Order Complete! <span class="loading-character">✨</span>';
+                    
+                    setTimeout(() => {
+                        this.cart = [];
+                        this.updateCartDisplay();
+                        btn.innerHTML = '<span class="loading-character">🎉</span> Checkout Now! <span class="loading-character">🎉</span>';
+                        btn.disabled = false;
+                    }, 3000);
+                }, 2000);
+            }
+
+            updateCartDisplay() {
+                const cartItems = document.getElementById('cartItems');
+                const cartTotal = document.getElementById('cartTotal');
+
+                if (this.cart.length === 0) {
+                    cartItems.innerHTML = `
+                        <div class="cart-empty">
+                            <div class="cart-empty-icon">🛍️</div>
+                            <div>Your cart is empty!</div>
+                            <div style="font-size: 14px; margin-top: 10px;">Add some magical items to get started!</div>
+                        </div>
+                    `;
+                    cartTotal.style.display = 'none';
+                    return;
+                }
+
+                let total = 0;
+                cartItems.innerHTML = this.cart.map(item => {
+                    total += item.price * item.quantity;
+                    return `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${item.emoji} ${item.name}</div>
+                                <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                            </div>
+                            <div class="cart-item-quantity">×${item.quantity}</div>
+                        </div>
+                    `;
+                }).join('');
+
+                cartTotal.style.display = 'block';
+                cartTotal.querySelector('.total-amount').textContent = `Total: $${total.toFixed(2)}`;
+            }
+
+            createSparkleEffect(element) {
+                const rect = element.getBoundingClientRect();
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = (rect.left + rect.width / 2) + 'px';
+                sparkle.style.top = (rect.top + rect.height / 2) + 'px';
+                document.body.appendChild(sparkle);
+
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 1000);
+            }
+
+            createBounceEffect(element) {
+                element.style.transform = 'scale(0.8) rotate(-10deg)';
+                setTimeout(() => {
+                    element.style.transform = '';
+                }, 200);
+            }
+
+            createHeartExplosion(element) {
+                const rect = element.getBoundingClientRect();
+                const hearts = ['💖', '💕', '💗', '💝', '💘'];
+                
+                for (let i = 0; i < 8; i++) {
+                    const heart = document.createElement('div');
+                    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                    heart.style.position = 'fixed';
+                    heart.style.left = (rect.left + rect.width / 2) + 'px';
+                    heart.style.top = (rect.top + rect.height / 2) + 'px';
+                    heart.style.fontSize = '20px';
+                    heart.style.pointerEvents = 'none';
+                    heart.style.zIndex = '1000';
+                    
+                    const angle = (i / 8) * Math.PI * 2;
+                    const distance = 100;
+                    const targetX = rect.left + rect.width / 2 + Math.cos(angle) * distance;
+                    const targetY = rect.top + rect.height / 2 + Math.sin(angle) * distance;
+                    
+                    heart.animate([
+                        { transform: 'translate(0, 0) scale(0)', opacity: 1 },
+                        { transform: `translate(${targetX - rect.left - rect.width / 2}px, ${targetY - rect.top - rect.height / 2}px) scale(1.5)`, opacity: 0 }
+                    ], {
+                        duration: 800,
+                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    });
+                    
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 800);
+                }
+            }
+
+            createConfettiExplosion(element) {
+                const rect = element.getBoundingClientRect();
+                const confetti = document.getElementById('confetti');
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+                
+                for (let i = 0; i < 30; i++) {
+                    const piece = document.createElement('div');
+                    piece.className = 'confetti-piece';
+                    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    piece.style.left = (rect.left + Math.random() * rect.width) + 'px';
+                    piece.style.top = rect.top + 'px';
+                    piece.style.animationDelay = Math.random() * 0.3 + 's';
+                    piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    
+                    confetti.appendChild(piece);
+                    setTimeout(() => piece.remove(), 5000);
+                }
+            }
+
+            createMegaConfetti() {
+                const confetti = document.getElementById('confetti');
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+                
+                for (let i = 0; i < 150; i++) {
+                    const piece = document.createElement('div');
+                    piece.className = 'confetti-piece';
+                    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    piece.style.left = Math.random() * window.innerWidth + 'px';
+                    piece.style.top = '-20px';
+                    piece.style.animationDelay = Math.random() * 1 + 's';
+                    piece.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                    
+                    confetti.appendChild(piece);
+                    setTimeout(() => piece.remove(), 8000);
+                }
+            }
+
+            animateCartAdd(card) {
+                const cartIcon = document.querySelector('.cart-icon');
+                const rect = card.getBoundingClientRect();
+                const cartRect = cartIcon.getBoundingClientRect();
+                
+                const flyingItem = card.querySelector('.product-image').cloneNode(true);
+                flyingItem.style.position = 'fixed';
+                flyingItem.style.left = rect.left + 'px';
+                flyingItem.style.top = rect.top + 'px';
+                flyingItem.style.width = '200px';
+                flyingItem.style.height = '200px';
+                flyingItem.style.zIndex = '1000';
+                flyingItem.style.pointerEvents = 'none';
+                flyingItem.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                
+                document.body.appendChild(flyingItem);
+                
+                setTimeout(() => {
+                    flyingItem.style.left = cartRect.left + 'px';
+                    flyingItem.style.top = cartRect.top + 'px';
+                    flyingItem.style.transform = 'scale(0.2)';
+                    flyingItem.style.opacity = '0';
+                }, 100);
+                
+                setTimeout(() => {
+                    flyingItem.remove();
+                    cartIcon.style.transform = 'scale(1.3)';
+                    setTimeout(() => {
+                        cartIcon.style.transform = '';
+                    }, 200);
+                }, 900);
+            }
+
+            animateNumber(element) {
+                element.style.transform = 'scale(1.5) rotate(10deg)';
+                element.style.color = '#ff6b6b';
+                setTimeout(() => {
+                    element.style.transform = '';
+                    element.style.color = '';
+                }, 300);
+            }
+        }
+
+        // Initialize the playful shopping cart
+        document.addEventListener('DOMContentLoaded', () => {
+            new PlayfulShoppingCart();
+        });
+    </script>
+</body>
+</html>

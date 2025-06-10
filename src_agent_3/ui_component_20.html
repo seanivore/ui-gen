@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ancient Clockwork - Master Timepiece</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700&display=swap');
+        
+        :root {
+            --antique-brass: #cd7f32;
+            --aged-copper: #b87333;
+            --mahogany: #c04000;
+            --clock-ivory: #fdf6e3;
+            --bronze-dark: #8b4513;
+            --gear-shadow: rgba(139, 69, 19, 0.3);
+            --brass-shine: #daa520;
+            --pendulum-weight: #654321;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(135deg, #2c1810, #1a0f08);
+            color: var(--clock-ivory);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .clockwork-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .master-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .master-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--brass-shine);
+            text-shadow: 2px 2px 4px var(--gear-shadow);
+            margin-bottom: 10px;
+        }
+
+        .master-subtitle {
+            font-size: 1.1rem;
+            color: var(--aged-copper);
+            letter-spacing: 2px;
+        }
+
+        .clockwork-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .clockwork-panel {
+            background: linear-gradient(145deg, var(--antique-brass), var(--aged-copper));
+            border: 3px solid var(--bronze-dark);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 
+                0 8px 32px var(--gear-shadow),
+                inset 0 2px 8px rgba(218, 165, 32, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--bronze-dark);
+        }
+
+        .panel-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--clock-ivory);
+        }
+
+        .gear-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--bronze-dark);
+            border-radius: 50%;
+            position: relative;
+            animation: rotate-gear 8s linear infinite;
+        }
+
+        .gear-icon::before,
+        .gear-icon::after {
+            content: '';
+            position: absolute;
+            background: var(--bronze-dark);
+        }
+
+        .gear-icon::before {
+            width: 6px;
+            height: 40px;
+            top: -5px;
+            left: 12px;
+        }
+
+        .gear-icon::after {
+            width: 40px;
+            height: 6px;
+            top: 12px;
+            left: -5px;
+        }
+
+        @keyframes rotate-gear {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Time Tracking Panel */
+        .time-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .clock-face {
+            background: var(--clock-ivory);
+            border: 4px solid var(--bronze-dark);
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .clock-numbers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            color: var(--bronze-dark);
+            font-weight: 600;
+        }
+
+        .clock-number {
+            position: absolute;
+            font-size: 0.9rem;
+            transform: translate(-50%, -50%);
+        }
+
+        .clock-hand {
+            position: absolute;
+            background: var(--bronze-dark);
+            border-radius: 2px;
+            transform-origin: bottom center;
+            left: 50%;
+        }
+
+        .hour-hand {
+            width: 3px;
+            height: 35px;
+            top: 25px;
+            margin-left: -1.5px;
+            animation: hour-rotate 43200s linear infinite;
+        }
+
+        .minute-hand {
+            width: 2px;
+            height: 45px;
+            top: 15px;
+            margin-left: -1px;
+            animation: minute-rotate 3600s linear infinite;
+        }
+
+        .clock-center {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--bronze-dark);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        @keyframes hour-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes minute-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .time-zone-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--clock-ivory);
+            font-weight: 500;
+        }
+
+        .project-timers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .timer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(253, 246, 227, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--bronze-dark);
+        }
+
+        .timer-name {
+            font-weight: 500;
+            color: var(--clock-ivory);
+        }
+
+        .timer-value {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: var(--brass-shine);
+            font-weight: 600;
+        }
+
+        /* Schedule Management Panel */
+        .calendar-wheel {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            background: var(--clock-ivory);
+            border: 4px solid var(--bronze-dark);
+            border-radius: 50%;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .wheel-dates {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: rotate-wheel 30s linear infinite;
+        }
+
+        .date-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--aged-copper);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--clock-ivory);
+            transform: translate(-50%, -50%);
+        }
+
+        .date-marker.today {
+            background: var(--mahogany);
+            box-shadow: 0 0 10px var(--mahogany);
+        }
+
+        @keyframes rotate-wheel {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .schedule-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: rgba(253, 246, 227, 0.1);
+            border-radius: 6px;
+            border-left: 3px solid var(--brass-shine);
+        }
+
+        .schedule-time {
+            font-weight: 600;
+            color: var(--brass-shine);
+        }
+
+        .schedule-event {
+            color: var(--clock-ivory);
+            flex-grow: 1;
+            margin-left: 10px;
+        }
+
+        /* Reminder System Panel */
+        .bell-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .mechanical-bell {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, var(--antique-brass), var(--aged-copper));
+            border-radius: 50% 50% 0 0;
+            position: relative;
+            animation: bell-chime 3s ease-in-out infinite;
+            box-shadow: 0 4px 12px var(--gear-shadow);
+        }
+
+        .bell-clapper {
+            width: 8px;
+            height: 30px;
+            background: var(--bronze-dark);
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 0 0 4px 4px;
+            animation: clapper-swing 3s ease-in-out infinite;
+        }
+
+        @keyframes bell-chime {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(2deg); }
+            75% { transform: rotate(-2deg); }
+        }
+
+        @keyframes clapper-swing {
+            0%, 100% { transform: translateX(-50%) rotate(0deg); }
+            50% { transform: translateX(-50%) rotate(10deg); }
+        }
+
+        .reminder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .reminder-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: rgba(253, 246, 227, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--bronze-dark);
+        }
+
+        .reminder-priority {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .priority-high { background: var(--mahogany); }
+        .priority-medium { background: var(--brass-shine); }
+        .priority-low { background: var(--aged-copper); }
+
+        .reminder-text {
+            flex-grow: 1;
+            color: var(--clock-ivory);
+        }
+
+        .reminder-time {
+            font-size: 0.9rem;
+            color: var(--brass-shine);
+            font-weight: 500;
+        }
+
+        /* Productivity Timer Panel */
+        .hourglass-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .mechanical-hourglass {
+            width: 60px;
+            height: 100px;
+            position: relative;
+        }
+
+        .hourglass-top,
+        .hourglass-bottom {
+            width: 60px;
+            height: 45px;
+            background: var(--clock-ivory);
+            border: 3px solid var(--bronze-dark);
+            position: relative;
+        }
+
+        .hourglass-top {
+            border-radius: 8px 8px 0 0;
+            clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);
+        }
+
+        .hourglass-bottom {
+            border-radius: 0 0 8px 8px;
+            clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%);
+        }
+
+        .sand-top {
+            background: var(--brass-shine);
+            height: 60%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            animation: sand-fall 25s linear infinite;
+        }
+
+        .sand-bottom {
+            background: var(--brass-shine);
+            height: 20%;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            animation: sand-rise 25s linear infinite;
+        }
+
+        @keyframes sand-fall {
+            from { height: 60%; }
+            to { height: 10%; }
+        }
+
+        @keyframes sand-rise {
+            from { height: 20%; }
+            to { height: 80%; }
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .timer-btn {
+            padding: 8px 16px;
+            background: var(--bronze-dark);
+            color: var(--clock-ivory);
+            border: none;
+            border-radius: 6px;
+            font-family: 'Cinzel', serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px var(--gear-shadow);
+        }
+
+        .timer-btn:hover {
+            background: var(--mahogany);
+            transform: translateY(-1px);
+        }
+
+        .productivity-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(253, 246, 227, 0.1);
+            border-radius: 6px;
+            border: 1px solid var(--bronze-dark);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--brass-shine);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--clock-ivory);
+            margin-top: 5px;
+        }
+
+        /* Pendulum Animation */
+        .master-pendulum {
+            position: fixed;
+            top: 0;
+            right: 50px;
+            width: 4px;
+            height: 200px;
+            background: var(--bronze-dark);
+            transform-origin: top center;
+            animation: pendulum-swing 4s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        .pendulum-weight {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 24px;
+            background: var(--pendulum-weight);
+            border-radius: 50%;
+            box-shadow: 0 2px 8px var(--gear-shadow);
+        }
+
+        @keyframes pendulum-swing {
+            0%, 100% { transform: rotate(15deg); }
+            50% { transform: rotate(-15deg); }
+        }
+
+        /* Ornate Decorations */
+        .ornate-corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><path d="M5 5 L35 5 L35 15 L25 15 L25 25 L15 25 L15 35 L5 35 Z" fill="%23cd7f32" stroke="%238b4513" stroke-width="2"/></svg>') no-repeat center;
+            opacity: 0.6;
+        }
+
+        .corner-tl { top: 10px; left: 10px; }
+        .corner-tr { top: 10px; right: 10px; transform: rotate(90deg); }
+        .corner-bl { bottom: 10px; left: 10px; transform: rotate(-90deg); }
+        .corner-br { bottom: 10px; right: 10px; transform: rotate(180deg); }
+
+        .tick-sound {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: var(--brass-shine);
+            opacity: 0.7;
+            animation: tick-flash 2s ease-in-out infinite;
+        }
+
+        @keyframes tick-flash {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.9; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .clockwork-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .master-title {
+                font-size: 2rem;
+            }
+            
+            .time-display {
+                grid-template-columns: 1fr;
+            }
+            
+            .clock-face {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tick-sound" id="tickSound">TICK</div>
+    <div class="master-pendulum">
+        <div class="pendulum-weight"></div>
+    </div>
+
+    <div class="clockwork-container">
+        <div class="ornate-corner corner-tl"></div>
+        <div class="ornate-corner corner-tr"></div>
+        <div class="ornate-corner corner-bl"></div>
+        <div class="ornate-corner corner-br"></div>
+
+        <div class="master-header">
+            <h1 class="master-title">CHRONOS MECHANICUS</h1>
+            <p class="master-subtitle">Master Timepiece & Temporal Management System</p>
+        </div>
+
+        <div class="clockwork-grid">
+            <!-- Time Tracking Panel -->
+            <div class="clockwork-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Time Tracking</h2>
+                    <div class="gear-icon"></div>
+                </div>
+                
+                <div class="time-display">
+                    <div>
+                        <div class="clock-face">
+                            <div class="clock-numbers">
+                                <span class="clock-number" style="top: 8%; left: 50%;">XII</span>
+                                <span class="clock-number" style="top: 25%; right: 8%;">III</span>
+                                <span class="clock-number" style="bottom: 8%; left: 50%;">VI</span>
+                                <span class="clock-number" style="top: 25%; left: 8%;">IX</span>
+                            </div>
+                            <div class="clock-hand hour-hand" style="transform: rotate(90deg);"></div>
+                            <div class="clock-hand minute-hand" style="transform: rotate(180deg);"></div>
+                            <div class="clock-center"></div>
+                        </div>
+                        <div class="time-zone-label">Local Time</div>
+                    </div>
+                    
+                    <div>
+                        <div class="clock-face">
+                            <div class="clock-numbers">
+                                <span class="clock-number" style="top: 8%; left: 50%;">XII</span>
+                                <span class="clock-number" style="top: 25%; right: 8%;">III</span>
+                                <span class="clock-number" style="bottom: 8%; left: 50%;">VI</span>
+                                <span class="clock-number" style="top: 25%; left: 8%;">IX</span>
+                            </div>
+                            <div class="clock-hand hour-hand" style="transform: rotate(45deg);"></div>
+                            <div class="clock-hand minute-hand" style="transform: rotate(270deg);"></div>
+                            <div class="clock-center"></div>
+                        </div>
+                        <div class="time-zone-label">GMT</div>
+                    </div>
+                </div>
+
+                <div class="project-timers">
+                    <div class="timer-item">
+                        <span class="timer-name">Clockwork Design</span>
+                        <span class="timer-value">02:34:17</span>
+                    </div>
+                    <div class="timer-item">
+                        <span class="timer-name">Gear Assembly</span>
+                        <span class="timer-value">01:45:32</span>
+                    </div>
+                    <div class="timer-item">
+                        <span class="timer-name">Pendulum Calibration</span>
+                        <span class="timer-value">00:58:24</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Management Panel -->
+            <div class="clockwork-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Schedule Wheel</h2>
+                    <div class="gear-icon" style="animation-delay: -2s;"></div>
+                </div>
+                
+                <div class="calendar-wheel">
+                    <div class="wheel-dates">
+                        <div class="date-marker today" style="top: 15%; left: 50%;">15</div>
+                        <div class="date-marker" style="top: 25%; right: 15%;">16</div>
+                        <div class="date-marker" style="top: 50%; right: 10%;">17</div>
+                        <div class="date-marker" style="bottom: 25%; right: 15%;">18</div>
+                        <div class="date-marker" style="bottom: 15%; left: 50%;">19</div>
+                        <div class="date-marker" style="bottom: 25%; left: 15%;">20</div>
+                        <div class="date-marker" style="top: 50%; left: 10%;">21</div>
+                        <div class="date-marker" style="top: 25%; left: 15%;">22</div>
+                    </div>
+                </div>
+
+                <div class="schedule-list">
+                    <div class="schedule-item">
+                        <span class="schedule-time">09:00</span>
+                        <span class="schedule-event">Gear Mechanism Review</span>
+                    </div>
+                    <div class="schedule-item">
+                        <span class="schedule-time">11:30</span>
+                        <span class="schedule-event">Clockmaker's Guild Meeting</span>
+                    </div>
+                    <div class="schedule-item">
+                        <span class="schedule-time">14:00</span>
+                        <span class="schedule-event">Pendulum Synchronization</span>
+                    </div>
+                    <div class="schedule-item">
+                        <span class="schedule-time">16:45</span>
+                        <span class="schedule-event">Timepiece Calibration</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reminder System Panel -->
+            <div class="clockwork-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Chiming Alerts</h2>
+                    <div class="gear-icon" style="animation-delay: -4s;"></div>
+                </div>
+                
+                <div class="bell-container">
+                    <div class="mechanical-bell">
+                        <div class="bell-clapper"></div>
+                    </div>
+                </div>
+
+                <div class="reminder-list">
+                    <div class="reminder-item">
+                        <div class="reminder-priority priority-high"></div>
+                        <span class="reminder-text">Wind master chronometer</span>
+                        <span class="reminder-time">in 15m</span>
+                    </div>
+                    <div class="reminder-item">
+                        <div class="reminder-priority priority-medium"></div>
+                        <span class="reminder-text">Check gear oil levels</span>
+                        <span class="reminder-time">in 1h</span>
+                    </div>
+                    <div class="reminder-item">
+                        <div class="reminder-priority priority-low"></div>
+                        <span class="reminder-text">Polish brass fittings</span>
+                        <span class="reminder-time">in 3h</span>
+                    </div>
+                    <div class="reminder-item">
+                        <div class="reminder-priority priority-medium"></div>
+                        <span class="reminder-text">Adjust pendulum weight</span>
+                        <span class="reminder-time">tomorrow</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Productivity Timer Panel -->
+            <div class="clockwork-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Temporal Focus</h2>
+                    <div class="gear-icon" style="animation-delay: -6s;"></div>
+                </div>
+                
+                <div class="hourglass-container">
+                    <div class="mechanical-hourglass">
+                        <div class="hourglass-top">
+                            <div class="sand-top"></div>
+                        </div>
+                        <div class="hourglass-bottom">
+                            <div class="sand-bottom"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timer-controls">
+                    <button class="timer-btn" onclick="startTimer()">Start</button>
+                    <button class="timer-btn" onclick="pauseTimer()">Pause</button>
+                    <button class="timer-btn" onclick="resetTimer()">Reset</button>
+                </div>
+
+                <div class="productivity-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">4</div>
+                        <div class="stat-label">Sessions Today</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">87%</div>
+                        <div class="stat-label">Focus Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2h 15m</div>
+                        <div class="stat-label">Deep Work</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Weekly Goal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tick sound animation
+        function updateTickSound() {
+            const tickElement = document.getElementById('tickSound');
+            setInterval(() => {
+                tickElement.textContent = tickElement.textContent === 'TICK' ? 'TOCK' : 'TICK';
+            }, 1000);
+        }
+
+        // Real-time clock updates
+        function updateClocks() {
+            const now = new Date();
+            const localHours = now.getHours() % 12;
+            const localMinutes = now.getMinutes();
+            
+            const utcHours = now.getUTCHours() % 12;
+            const utcMinutes = now.getUTCMinutes();
+            
+            // Update local clock
+            const localHourHand = document.querySelector('.clock-face:first-child .hour-hand');
+            const localMinuteHand = document.querySelector('.clock-face:first-child .minute-hand');
+            
+            if (localHourHand) {
+                localHourHand.style.transform = `rotate(${(localHours * 30) + (localMinutes * 0.5)}deg)`;
+            }
+            if (localMinuteHand) {
+                localMinuteHand.style.transform = `rotate(${localMinutes * 6}deg)`;
+            }
+            
+            // Update GMT clock
+            const gmtHourHand = document.querySelector('.clock-face:last-child .hour-hand');
+            const gmtMinuteHand = document.querySelector('.clock-face:last-child .minute-hand');
+            
+            if (gmtHourHand) {
+                gmtHourHand.style.transform = `rotate(${(utcHours * 30) + (utcMinutes * 0.5)}deg)`;
+            }
+            if (gmtMinuteHand) {
+                gmtMinuteHand.style.transform = `rotate(${utcMinutes * 6}deg)`;
+            }
+        }
+
+        // Timer functionality
+        let timerState = 'stopped';
+        let timerMinutes = 25;
+        let timerSeconds = 0;
+
+        function startTimer() {
+            if (timerState === 'stopped' || timerState === 'paused') {
+                timerState = 'running';
+                console.log('Timer started - Focus session begins');
+            }
+        }
+
+        function pauseTimer() {
+            if (timerState === 'running') {
+                timerState = 'paused';
+                console.log('Timer paused - Take a brief respite');
+            }
+        }
+
+        function resetTimer() {
+            timerState = 'stopped';
+            timerMinutes = 25;
+            timerSeconds = 0;
+            console.log('Timer reset - Ready for new session');
+        }
+
+        // Initialize animations and real-time updates
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTickSound();
+            updateClocks();
+            setInterval(updateClocks, 1000);
+            
+            // Add some interactive elements
+            document.querySelectorAll('.gear-icon').forEach(gear => {
+                gear.addEventListener('click', function() {
+                    this.style.animation = 'rotate-gear 1s linear infinite';
+                    setTimeout(() => {
+                        this.style.animation = 'rotate-gear 8s linear infinite';
+                    }, 2000);
+                });
+            });
+
+            // Bell chiming on click
+            document.querySelector('.mechanical-bell').addEventListener('click', function() {
+                this.style.animation = 'bell-chime 0.5s ease-in-out 3';
+                setTimeout(() => {
+                    this.style.animation = 'bell-chime 3s ease-in-out infinite';
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>

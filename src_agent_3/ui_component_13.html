@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Station Command Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: radial-gradient(circle at 20% 30%, #0a0a2e 0%, #000000 50%);
+            color: #00ff88;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+        
+        /* Animated star field background */
+        .starfield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .star {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+        
+        .star:nth-child(odd) {
+            animation-delay: 1s;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* Floating galaxy effect */
+        .galaxy {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: rotate 20s linear infinite;
+            top: 10%;
+            right: 10%;
+            z-index: -1;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Main control interface */
+        .command-interface {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            padding: 20px;
+            height: 100vh;
+            position: relative;
+        }
+        
+        /* Header section */
+        .station-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(45deg, rgba(0, 255, 136, 0.1), rgba(138, 43, 226, 0.1));
+            border: 2px solid #00ff88;
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            animation: holographic 3s ease-in-out infinite;
+        }
+        
+        @keyframes holographic {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.6); }
+        }
+        
+        .station-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .station-name {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        
+        .mission-time {
+            font-size: 14px;
+            color: #ff6b35;
+        }
+        
+        /* Left panel - System Monitoring */
+        .system-monitor {
+            background: linear-gradient(135deg, rgba(0, 50, 100, 0.2), rgba(0, 20, 40, 0.2));
+            border: 1px solid #4169e1;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .panel-title {
+            color: #4169e1;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 5px #4169e1;
+        }
+        
+        .system-metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: rgba(65, 105, 225, 0.1);
+            border-radius: 5px;
+            border-left: 3px solid #4169e1;
+        }
+        
+        .metric-bar {
+            width: 60px;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .metric-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 2s ease;
+        }
+        
+        .power-fill { background: #00ff88; width: 87%; }
+        .oxygen-fill { background: #4169e1; width: 94%; }
+        .temp-fill { background: #ff6b35; width: 72%; }
+        .pressure-fill { background: #8a2be2; width: 89%; }
+        
+        /* Center panel - Navigation & Communications */
+        .central-console {
+            background: linear-gradient(135deg, rgba(0, 20, 40, 0.3), rgba(0, 0, 0, 0.3));
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-display {
+            width: 100%;
+            height: 200px;
+            background: radial-gradient(circle at center, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            position: relative;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .orbital-path {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            border: 2px dashed #00ff88;
+            border-radius: 50%;
+            animation: orbit 10s linear infinite;
+        }
+        
+        @keyframes orbit {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .station-marker {
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: #ff6b35;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff6b35;
+        }
+        
+        .earth {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #4169e1, #1e3a8a);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(65, 105, 225, 0.5);
+        }
+        
+        .comms-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .signal-strength {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #00ff88;
+        }
+        
+        .signal-bars {
+            display: flex;
+            gap: 3px;
+            margin-top: 10px;
+        }
+        
+        .signal-bar {
+            width: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 2px;
+        }
+        
+        .signal-bar.active {
+            background: #00ff88;
+            box-shadow: 0 0 5px #00ff88;
+        }
+        
+        .bar-1 { height: 10px; }
+        .bar-2 { height: 15px; }
+        .bar-3 { height: 20px; }
+        .bar-4 { height: 25px; }
+        .bar-5 { height: 30px; }
+        
+        /* Right panel - Crew Status */
+        .crew-status {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(75, 0, 130, 0.2));
+            border: 1px solid #8a2be2;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .crew-member {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(138, 43, 226, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #8a2be2;
+        }
+        
+        .crew-avatar {
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #8a2be2, #4b0082);
+            border-radius: 50%;
+            margin-right: 10px;
+            position: relative;
+        }
+        
+        .crew-avatar::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        
+        .crew-info {
+            flex: 1;
+        }
+        
+        .crew-name {
+            font-size: 12px;
+            color: #8a2be2;
+            font-weight: bold;
+        }
+        
+        .crew-location {
+            font-size: 10px;
+            color: #b19cd9;
+        }
+        
+        .crew-vital {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+        
+        .vital-good { background: #00ff88; box-shadow: 0 0 5px #00ff88; }
+        .vital-caution { background: #ff6b35; box-shadow: 0 0 5px #ff6b35; }
+        
+        /* Footer - Emergency Systems */
+        .emergency-footer {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        
+        .emergency-panel {
+            flex: 1;
+            background: linear-gradient(45deg, rgba(255, 107, 53, 0.1), rgba(139, 69, 19, 0.1));
+            border: 1px solid #ff6b35;
+            padding: 10px;
+            border-radius: 8px;
+            text-center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .emergency-status {
+            font-size: 12px;
+            color: #ff6b35;
+            font-weight: bold;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 5px auto;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .status-green { background: #00ff88; }
+        .status-orange { background: #ff6b35; }
+        
+        /* Floating holographic effect */
+        .holographic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 48%, rgba(0, 255, 136, 0.1) 49%, rgba(0, 255, 136, 0.1) 51%, transparent 52%);
+            pointer-events: none;
+            animation: scan-line 3s linear infinite;
+        }
+        
+        @keyframes scan-line {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .command-interface {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto;
+            }
+            
+            .station-header {
+                grid-column: 1;
+            }
+            
+            .emergency-footer {
+                grid-column: 1;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated starfield background -->
+    <div class="starfield" id="starfield"></div>
+    
+    <!-- Floating galaxy -->
+    <div class="galaxy"></div>
+    
+    <!-- Holographic scanning overlay -->
+    <div class="holographic-overlay"></div>
+    
+    <div class="command-interface">
+        <!-- Station Header -->
+        <header class="station-header">
+            <div class="station-title">
+                <div class="station-name">ISS NEXUS-7 COMMAND</div>
+                <div class="mission-time">
+                    SOL 247 | 14:32:15 UTC<br>
+                    <span style="color: #00ff88;">OPERATIONAL</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- System Monitoring Panel -->
+        <section class="system-monitor">
+            <div class="panel-title">SYSTEM DIAGNOSTICS</div>
+            
+            <div class="system-metric">
+                <span>POWER CORE</span>
+                <div class="metric-bar">
+                    <div class="metric-fill power-fill"></div>
+                </div>
+                <span>87%</span>
+            </div>
+            
+            <div class="system-metric">
+                <span>OXYGEN LVL</span>
+                <div class="metric-bar">
+                    <div class="metric-fill oxygen-fill"></div>
+                </div>
+                <span>94%</span>
+            </div>
+            
+            <div class="system-metric">
+                <span>TEMP REG</span>
+                <div class="metric-bar">
+                    <div class="metric-fill temp-fill"></div>
+                </div>
+                <span>72%</span>
+            </div>
+            
+            <div class="system-metric">
+                <span>PRESSURE</span>
+                <div class="metric-bar">
+                    <div class="metric-fill pressure-fill"></div>
+                </div>
+                <span>89%</span>
+            </div>
+            
+            <div class="system-metric">
+                <span>GRAVITY SIM</span>
+                <div class="metric-bar">
+                    <div class="metric-fill" style="background: #8a2be2; width: 91%;"></div>
+                </div>
+                <span>91%</span>
+            </div>
+            
+            <div class="system-metric">
+                <span>SHIELDS</span>
+                <div class="metric-bar">
+                    <div class="metric-fill" style="background: #4169e1; width: 85%;"></div>
+                </div>
+                <span>85%</span>
+            </div>
+        </section>
+        
+        <!-- Central Navigation & Communications Console -->
+        <section class="central-console">
+            <div class="panel-title" style="color: #00ff88;">NAVIGATION & COMMS</div>
+            
+            <div class="nav-display">
+                <div class="orbital-path">
+                    <div class="station-marker"></div>
+                </div>
+                <div class="earth"></div>
+                
+                <!-- Orbital trajectory info overlay -->
+                <div style="position: absolute; top: 10px; left: 10px; font-size: 10px; color: #00ff88;">
+                    ALT: 408 KM<br>
+                    VEL: 7.66 KM/S<br>
+                    INCL: 51.6°
+                </div>
+                
+                <div style="position: absolute; bottom: 10px; right: 10px; font-size: 10px; color: #00ff88;">
+                    NEXT PASS: 92 MIN<br>
+                    GROUND CONTACT: 12 MIN
+                </div>
+            </div>
+            
+            <div class="comms-section">
+                <div class="signal-strength">
+                    <div style="font-size: 12px; color: #00ff88; font-weight: bold;">EARTH COMM</div>
+                    <div class="signal-bars">
+                        <div class="signal-bar bar-1 active"></div>
+                        <div class="signal-bar bar-2 active"></div>
+                        <div class="signal-bar bar-3 active"></div>
+                        <div class="signal-bar bar-4 active"></div>
+                        <div class="signal-bar bar-5"></div>
+                    </div>
+                    <div style="font-size: 10px; color: #b19cd9; margin-top: 5px;">
+                        SIGNAL: 78% | DELAY: 1.34s
+                    </div>
+                </div>
+                
+                <div class="signal-strength">
+                    <div style="font-size: 12px; color: #8a2be2; font-weight: bold;">SAT ARRAY</div>
+                    <div class="signal-bars">
+                        <div class="signal-bar bar-1 active"></div>
+                        <div class="signal-bar bar-2 active"></div>
+                        <div class="signal-bar bar-3 active"></div>
+                        <div class="signal-bar bar-4 active"></div>
+                        <div class="signal-bar bar-5 active"></div>
+                    </div>
+                    <div style="font-size: 10px; color: #b19cd9; margin-top: 5px;">
+                        LINK: OPTIMAL | 12 SATS
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px; padding: 10px; background: rgba(0, 255, 136, 0.05); border-radius: 5px; border: 1px solid rgba(0, 255, 136, 0.3);">
+                <div style="font-size: 11px; color: #00ff88; margin-bottom: 5px;">ACTIVE TRANSMISSIONS:</div>
+                <div style="font-size: 9px; color: #b19cd9;">
+                    → HOUSTON: ROUTINE STATUS<br>
+                    → ESA: EXPERIMENT DATA<br>
+                    → ROSCOSMOS: DOCKING PREP
+                </div>
+            </div>
+        </section>
+        
+        <!-- Crew Status Panel -->
+        <section class="crew-status">
+            <div class="panel-title">CREW STATUS</div>
+            
+            <div class="crew-member">
+                <div class="crew-avatar"></div>
+                <div class="crew-info">
+                    <div class="crew-name">CMDR. CHEN</div>
+                    <div class="crew-location">BRIDGE - ALPHA</div>
+                </div>
+                <div class="crew-vital vital-good"></div>
+            </div>
+            
+            <div class="crew-member">
+                <div class="crew-avatar"></div>
+                <div class="crew-info">
+                    <div class="crew-name">DR. KOWALSKI</div>
+                    <div class="crew-location">LAB - BETA</div>
+                </div>
+                <div class="crew-vital vital-good"></div>
+            </div>
+            
+            <div class="crew-member">
+                <div class="crew-avatar"></div>
+                <div class="crew-info">
+                    <div class="crew-name">ENG. TANAKA</div>
+                    <div class="crew-location">ENGINE - GAMMA</div>
+                </div>
+                <div class="crew-vital vital-caution"></div>
+            </div>
+            
+            <div class="crew-member">
+                <div class="crew-avatar"></div>
+                <div class="crew-info">
+                    <div class="crew-name">SCI. VOLKOV</div>
+                    <div class="crew-location">OBSERVATION</div>
+                </div>
+                <div class="crew-vital vital-good"></div>
+            </div>
+            
+            <div class="crew-member">
+                <div class="crew-avatar"></div>
+                <div class="crew-info">
+                    <div class="crew-name">MED. SANTOS</div>
+                    <div class="crew-location">MED BAY</div>
+                </div>
+                <div class="crew-vital vital-good"></div>
+            </div>
+            
+            <div style="margin-top: 15px; padding: 8px; background: rgba(138, 43, 226, 0.1); border-radius: 5px; font-size: 10px; color: #8a2be2;">
+                SLEEP CYCLE: 4 CREW<br>
+                ON DUTY: 5 CREW<br>
+                EVA READY: 2 CREW
+            </div>
+        </section>
+        
+        <!-- Emergency Systems Footer -->
+        <footer class="emergency-footer">
+            <div class="emergency-panel">
+                <div class="emergency-status">LIFE SUPPORT</div>
+                <div class="status-indicator status-green"></div>
+                <div style="font-size: 10px; color: #b19cd9;">NOMINAL</div>
+            </div>
+            
+            <div class="emergency-panel">
+                <div class="emergency-status">FIRE SUPPRESS</div>
+                <div class="status-indicator status-green"></div>
+                <div style="font-size: 10px; color: #b19cd9;">ARMED</div>
+            </div>
+            
+            <div class="emergency-panel">
+                <div class="emergency-status">HULL INTEGRITY</div>
+                <div class="status-indicator status-green"></div>
+                <div style="font-size: 10px; color: #b19cd9;">SECURE</div>
+            </div>
+            
+            <div class="emergency-panel">
+                <div class="emergency-status">ESCAPE PODS</div>
+                <div class="status-indicator status-orange"></div>
+                <div style="font-size: 10px; color: #b19cd9;">MAINT MODE</div>
+            </div>
+            
+            <div class="emergency-panel">
+                <div class="emergency-status">RADIATION</div>
+                <div class="status-indicator status-green"></div>
+                <div style="font-size: 10px; color: #b19cd9;">LOW</div>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        // Generate random stars for background
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            const numberOfStars = 100;
+            
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starfield.appendChild(star);
+            }
+        }
+        
+        // Update mission time
+        function updateMissionTime() {
+            const timeElement = document.querySelector('.mission-time');
+            const now = new Date();
+            const hours = String(now.getUTCHours()).padStart(2, '0');
+            const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(now.getUTCSeconds()).padStart(2, '0');
+            
+            timeElement.innerHTML = `SOL 247 | ${hours}:${minutes}:${seconds} UTC<br><span style="color: #00ff88;">OPERATIONAL</span>`;
+        }
+        
+        // Simulate system fluctuations
+        function simulateSystemChanges() {
+            const metrics = document.querySelectorAll('.metric-fill');
+            metrics.forEach(metric => {
+                const currentWidth = parseFloat(metric.style.width || metric.classList[1].match(/\d+/)[0]);
+                const fluctuation = (Math.random() - 0.5) * 4; // ±2% fluctuation
+                const newWidth = Math.max(60, Math.min(100, currentWidth + fluctuation));
+                metric.style.width = newWidth + '%';
+                
+                // Update display text
+                const parentMetric = metric.closest('.system-metric');
+                const percentageSpan = parentMetric.querySelector('span:last-child');
+                percentageSpan.textContent = Math.round(newWidth) + '%';
+            });
+        }
+        
+        // Simulate communication signal changes
+        function simulateCommSignals() {
+            const signalBars = document.querySelectorAll('.signal-bars');
+            signalBars.forEach(signalGroup => {
+                const bars = signalGroup.querySelectorAll('.signal-bar');
+                const activeCount = Math.floor(Math.random() * 2) + 3; // 3-5 active bars
+                
+                bars.forEach((bar, index) => {
+                    if (index < activeCount) {
+                        bar.classList.add('active');
+                    } else {
+                        bar.classList.remove('active');
+                    }
+                });
+            });
+        }
+        
+        // Initialize
+        createStarfield();
+        
+        // Update intervals
+        setInterval(updateMissionTime, 1000);
+        setInterval(simulateSystemChanges, 5000);
+        setInterval(simulateCommSignals, 8000);
+        
+        // Holographic display effects
+        document.querySelectorAll('.system-monitor, .central-console, .crew-status').forEach(panel => {
+            panel.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 0 30px rgba(0, 255, 136, 0.5)';
+                this.style.transform = 'translateY(-2px)';
+                this.style.transition = 'all 0.3s ease';
+            });
+            
+            panel.addEventListener('mouseleave', function() {
+                this.style.boxShadow = '';
+                this.style.transform = '';
+            });
+        });
+        
+        // Emergency alert simulation (rare)
+        setInterval(() => {
+            if (Math.random() < 0.1) { // 10% chance every 10 seconds
+                const emergencyPanels = document.querySelectorAll('.emergency-panel');
+                const randomPanel = emergencyPanels[Math.floor(Math.random() * emergencyPanels.length)];
+                const indicator = randomPanel.querySelector('.status-indicator');
+                const status = randomPanel.querySelector('div:last-child');
+                
+                // Flash warning
+                indicator.style.background = '#ff6b35';
+                indicator.style.boxShadow = '0 0 10px #ff6b35';
+                status.textContent = 'ALERT';
+                status.style.color = '#ff6b35';
+                
+                // Return to normal after 3 seconds
+                setTimeout(() => {
+                    indicator.style.background = '#00ff88';
+                    indicator.style.boxShadow = '0 0 5px #00ff88';
+                    status.textContent = 'NOMINAL';
+                    status.style.color = '#b19cd9';
+                }, 3000);
+            }
+        }, 10000);
+    </script>
+</body>
+</html>

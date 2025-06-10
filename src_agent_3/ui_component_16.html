@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forest Mystique - Enchanted File Explorer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;1,400&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Crimson Text', serif;
+            background: linear-gradient(135deg, #1a3d2e 0%, #2d5a3d 25%, #1e4a35 50%, #0f2419 100%);
+            color: #d4e6d4;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+        
+        /* Animated background with mystical fog */
+        .forest-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 80%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 40% 40%, rgba(139, 195, 74, 0.05) 0%, transparent 50%);
+            animation: mysticalFog 15s ease-in-out infinite alternate;
+        }
+        
+        @keyframes mysticalFog {
+            0% { opacity: 0.3; transform: translateX(-10px); }
+            100% { opacity: 0.7; transform: translateX(10px); }
+        }
+        
+        /* Firefly particles */
+        .fireflies {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .firefly {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: radial-gradient(circle, #ffd700 0%, transparent 70%);
+            border-radius: 50%;
+            animation: firefly-float 8s infinite ease-in-out;
+            box-shadow: 0 0 6px #ffd700;
+        }
+        
+        @keyframes firefly-float {
+            0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.3; }
+            33% { transform: translateY(-30px) translateX(20px); opacity: 1; }
+            66% { transform: translateY(-10px) translateX(-15px); opacity: 0.7; }
+        }
+        
+        /* Main container */
+        .enchanted-explorer {
+            display: grid;
+            grid-template-columns: 350px 1fr 320px;
+            height: 100vh;
+            gap: 20px;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Tree Navigation Panel */
+        .tree-panel {
+            background: linear-gradient(145deg, rgba(46, 69, 51, 0.9), rgba(27, 40, 30, 0.95));
+            border-radius: 15px;
+            border: 2px solid rgba(139, 195, 74, 0.3);
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+        }
+        
+        .tree-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .tree-panel::-webkit-scrollbar-track {
+            background: rgba(139, 195, 74, 0.1);
+            border-radius: 4px;
+        }
+        
+        .tree-panel::-webkit-scrollbar-thumb {
+            background: rgba(139, 195, 74, 0.4);
+            border-radius: 4px;
+        }
+        
+        .tree-header {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #8bc34a;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(139, 195, 74, 0.5);
+        }
+        
+        /* Tree structure */
+        .tree-node {
+            margin: 8px 0;
+            position: relative;
+        }
+        
+        .tree-branch {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: rgba(139, 195, 74, 0.05);
+        }
+        
+        .tree-branch:hover {
+            background: rgba(139, 195, 74, 0.15);
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(139, 195, 74, 0.2);
+        }
+        
+        .tree-branch.active {
+            background: rgba(139, 195, 74, 0.25);
+            border-left: 3px solid #8bc34a;
+        }
+        
+        .branch-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            background: radial-gradient(circle, #8bc34a 30%, transparent 70%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+        }
+        
+        .folder-icon::before {
+            content: "🌳";
+            filter: sepia(1) hue-rotate(90deg);
+        }
+        
+        .file-icon::before {
+            content: "🍃";
+            filter: sepia(1) hue-rotate(60deg);
+        }
+        
+        .tree-children {
+            margin-left: 25px;
+            border-left: 1px dashed rgba(139, 195, 74, 0.3);
+            padding-left: 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.3s ease;
+            opacity: 0;
+        }
+        
+        .tree-children.expanded {
+            max-height: 1000px;
+            opacity: 1;
+        }
+        
+        /* Preview Crystal */
+        .preview-crystal {
+            background: linear-gradient(145deg, rgba(46, 69, 51, 0.9), rgba(27, 40, 30, 0.95));
+            border-radius: 20px;
+            border: 2px solid rgba(139, 195, 74, 0.3);
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .crystal-header {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #8bc34a;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(139, 195, 74, 0.5);
+        }
+        
+        .crystal-content {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 300px;
+            border: 1px solid rgba(139, 195, 74, 0.2);
+            position: relative;
+            overflow-y: auto;
+        }
+        
+        .crystal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .crystal-content::-webkit-scrollbar-track {
+            background: rgba(139, 195, 74, 0.1);
+        }
+        
+        .crystal-content::-webkit-scrollbar-thumb {
+            background: rgba(139, 195, 74, 0.4);
+            border-radius: 3px;
+        }
+        
+        .preview-text {
+            line-height: 1.6;
+            color: #d4e6d4;
+            white-space: pre-wrap;
+            font-family: 'Crimson Text', serif;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Metadata Glade */
+        .metadata-glade {
+            background: linear-gradient(145deg, rgba(46, 69, 51, 0.9), rgba(27, 40, 30, 0.95));
+            border-radius: 15px;
+            border: 2px solid rgba(139, 195, 74, 0.3);
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .glade-header {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #8bc34a;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(139, 195, 74, 0.5);
+        }
+        
+        .metadata-item {
+            background: rgba(139, 195, 74, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-left: 3px solid rgba(139, 195, 74, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .metadata-item:hover {
+            background: rgba(139, 195, 74, 0.2);
+            transform: translateX(3px);
+        }
+        
+        .metadata-label {
+            font-weight: 600;
+            color: #8bc34a;
+            font-size: 0.9em;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .metadata-value {
+            color: #d4e6d4;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+        
+        .druid-symbol {
+            font-size: 1.2em;
+            filter: sepia(1) hue-rotate(90deg);
+        }
+        
+        /* Sunbeam effects */
+        .sunbeam {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, rgba(255, 215, 0, 0.1) 20%, rgba(255, 215, 0, 0.05) 80%, transparent 100%);
+            animation: sunbeam-move 12s infinite linear;
+            pointer-events: none;
+        }
+        
+        @keyframes sunbeam-move {
+            0% { left: -2px; opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { left: calc(100% + 2px); opacity: 0; }
+        }
+        
+        /* Growth animation for expanding folders */
+        @keyframes tree-grow {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .tree-children.expanding .tree-node {
+            animation: tree-grow 0.5s ease-out forwards;
+        }
+        
+        /* File type indicators */
+        .file-type-js .file-icon::before { content: "🌿"; }
+        .file-type-css .file-icon::before { content: "🌱"; }
+        .file-type-html .file-icon::before { content: "🌸"; }
+        .file-type-md .file-icon::before { content: "📜"; filter: sepia(1) hue-rotate(30deg); }
+        .file-type-img .file-icon::before { content: "🌺"; }
+        .file-type-json .file-icon::before { content: "🌾"; }
+        
+        /* Loading state */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #8bc34a;
+            font-style: italic;
+        }
+        
+        .loading::after {
+            content: "...";
+            animation: loading-dots 1.5s infinite;
+        }
+        
+        @keyframes loading-dots {
+            0%, 20% { opacity: 0; }
+            40% { opacity: 0.5; }
+            60%, 100% { opacity: 1; }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .enchanted-explorer {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            .tree-panel, .preview-crystal, .metadata-glade {
+                max-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="forest-background"></div>
+    
+    <!-- Fireflies -->
+    <div class="fireflies">
+        <div class="firefly" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="firefly" style="top: 60%; left: 80%; animation-delay: 2s;"></div>
+        <div class="firefly" style="top: 40%; left: 30%; animation-delay: 4s;"></div>
+        <div class="firefly" style="top: 80%; left: 60%; animation-delay: 6s;"></div>
+        <div class="firefly" style="top: 15%; left: 75%; animation-delay: 1s;"></div>
+        <div class="firefly" style="top: 70%; left: 20%; animation-delay: 3s;"></div>
+        <div class="firefly" style="top: 30%; left: 90%; animation-delay: 5s;"></div>
+        <div class="firefly" style="top: 85%; left: 45%; animation-delay: 7s;"></div>
+    </div>
+    
+    <!-- Sunbeams -->
+    <div class="sunbeam" style="animation-delay: 0s;"></div>
+    <div class="sunbeam" style="animation-delay: 4s;"></div>
+    <div class="sunbeam" style="animation-delay: 8s;"></div>
+    
+    <div class="enchanted-explorer">
+        <!-- Tree Navigation Panel -->
+        <div class="tree-panel">
+            <div class="tree-header">🌲 Ancient Forest Structure</div>
+            <div class="tree-root" id="treeRoot">
+                <div class="tree-node">
+                    <div class="tree-branch folder-branch active" data-path="/">
+                        <div class="branch-icon folder-icon"></div>
+                        <span>Enchanted Woods</span>
+                    </div>
+                    <div class="tree-children expanded">
+                        <div class="tree-node">
+                            <div class="tree-branch folder-branch" data-path="/mystical-groves">
+                                <div class="branch-icon folder-icon"></div>
+                                <span>Mystical Groves</span>
+                            </div>
+                            <div class="tree-children">
+                                <div class="tree-node">
+                                    <div class="tree-branch file-branch file-type-js" data-path="/mystical-groves/enchantments.js">
+                                        <div class="branch-icon file-icon"></div>
+                                        <span>enchantments.js</span>
+                                    </div>
+                                </div>
+                                <div class="tree-node">
+                                    <div class="tree-branch file-branch file-type-css" data-path="/mystical-groves/forest-styles.css">
+                                        <div class="branch-icon file-icon"></div>
+                                        <span>forest-styles.css</span>
+                                    </div>
+                                </div>
+                                <div class="tree-node">
+                                    <div class="tree-branch file-branch file-type-html" data-path="/mystical-groves/sacred-circle.html">
+                                        <div class="branch-icon file-icon"></div>
+                                        <span>sacred-circle.html</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tree-node">
+                            <div class="tree-branch folder-branch" data-path="/ancient-texts">
+                                <div class="branch-icon folder-icon"></div>
+                                <span>Ancient Texts</span>
+                            </div>
+                            <div class="tree-children">
+                                <div class="tree-node">
+                                    <div class="tree-branch file-branch file-type-md" data-path="/ancient-texts/druid-wisdom.md">
+                                        <div class="branch-icon file-icon"></div>
+                                        <span>druid-wisdom.md</span>
+                                    </div>
+                                </div>
+                                <div class="tree-node">
+                                    <div class="tree-branch file-branch file-type-md" data-path="/ancient-texts/forest-lore.md">
+                                        <div class="branch-icon file-icon"></div>
+                                        <span>forest-lore.md</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tree-node">
+                            <div class="tree-branch folder-branch" data-path="/woodland-creatures">
+                                <div class="branch-icon folder-icon"></div>
+                                <span>Woodland Creatures</span>
+                            </div>
+                            <div class="tree-children">
+                                <div class="tree-node">
+                                    <div class="tree-branch file-branch file-type-json" data-path="/woodland-creatures/inhabitants.json">
+                                        <div class="branch-icon file-icon"></div>
+                                        <span>inhabitants.json</span>
+                                    </div>
+                                </div>
+                                <div class="tree-node">
+                                    <div class="tree-branch file-branch file-type-img" data-path="/woodland-creatures/fairy-ring.jpg">
+                                        <div class="branch-icon file-icon"></div>
+                                        <span>fairy-ring.jpg</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tree-node">
+                            <div class="tree-branch folder-branch" data-path="/moonlit-paths">
+                                <div class="branch-icon folder-icon"></div>
+                                <span>Moonlit Paths</span>
+                            </div>
+                            <div class="tree-children">
+                                <div class="tree-node">
+                                    <div class="tree-branch file-branch file-type-js" data-path="/moonlit-paths/night-magic.js">
+                                        <div class="branch-icon file-icon"></div>
+                                        <span>night-magic.js</span>
+                                    </div>
+                                </div>
+                                <div class="tree-node">
+                                    <div class="tree-branch file-branch file-type-css" data-path="/moonlit-paths/lunar-glow.css">
+                                        <div class="branch-icon file-icon"></div>
+                                        <span>lunar-glow.css</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Preview Crystal -->
+        <div class="preview-crystal">
+            <div class="crystal-header">🔮 Scrying Crystal</div>
+            <div class="crystal-content" id="previewContent">
+                <div class="loading">Gazing into the mystical depths</div>
+            </div>
+        </div>
+        
+        <!-- Metadata Glade -->
+        <div class="metadata-glade">
+            <div class="glade-header">📋 Druidic Records</div>
+            <div id="metadataContent">
+                <div class="metadata-item">
+                    <div class="metadata-label">
+                        <span class="druid-symbol">🌟</span>
+                        Sacred Name
+                    </div>
+                    <div class="metadata-value">Enchanted Woods</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">
+                        <span class="druid-symbol">🍄</span>
+                        Essence Type
+                    </div>
+                    <div class="metadata-value">Ancient Forest Directory</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">
+                        <span class="druid-symbol">⏰</span>
+                        Time of Creation
+                    </div>
+                    <div class="metadata-value">During the First Growth</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">
+                        <span class="druid-symbol">📏</span>
+                        Spiritual Weight
+                    </div>
+                    <div class="metadata-value">Immeasurable Ancient Wisdom</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">
+                        <span class="druid-symbol">🔐</span>
+                        Guardian Protections
+                    </div>
+                    <div class="metadata-value">Read & Traverse</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">
+                        <span class="druid-symbol">🌙</span>
+                        Last Communion
+                    </div>
+                    <div class="metadata-value">Under the Harvest Moon</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // File system data with mystical content
+        const forestData = {
+            '/': {
+                type: 'folder',
+                name: 'Enchanted Woods',
+                size: 'Ancient Wisdom',
+                modified: 'During the First Growth',
+                permissions: 'Read & Traverse',
+                description: 'The root of all forest magic, where ancient trees hold the memories of millennia.'
+            },
+            '/mystical-groves/enchantments.js': {
+                type: 'file',
+                name: 'enchantments.js',
+                size: '2.3 KB of Pure Magic',
+                modified: 'Under the Crescent Moon',
+                permissions: 'Enchanter Access',
+                content: `// Ancient JavaScript Enchantments
+// Written in the old tongue of the forest
+
+const forestMagic = {
+    // Spell of Illumination
+    castLightSpell: function(target) {
+        const fireflies = document.querySelectorAll('.firefly');
+        fireflies.forEach(firefly => {
+            firefly.style.animation = 'firefly-dance 2s ease-in-out';
+        });
+        
+        console.log('🌟 Light dances through the ancient woods...');
+    },
+    
+    // Whisper of the Trees
+    treeWhisper: function(message) {
+        const branches = document.querySelectorAll('.tree-branch');
+        branches.forEach((branch, index) => {
+            setTimeout(() => {
+                branch.style.transform = 'translateX(5px)';
+                setTimeout(() => {
+                    branch.style.transform = 'translateX(0)';
+                }, 200);
+            }, index * 100);
+        });
+        
+        return \`🌲 The ancient oaks whisper: "\${message}"\`;
+    },
+    
+    // Summon Forest Creatures
+    summonCreatures: function() {
+        const creatures = ['🦉', '🐿️', '🦌', '🐰', '🦔'];
+        return creatures[Math.floor(Math.random() * creatures.length)];
+    }
+};
+
+// The old ways still hold power
+window.forestMagic = forestMagic;`
+            },
+            '/mystical-groves/forest-styles.css': {
+                type: 'file',
+                name: 'forest-styles.css',
+                size: '4.7 KB of Aesthetic Enchantment',
+                modified: 'During the Spring Awakening',
+                permissions: 'Style Druid Access',
+                content: `/* Ancient Forest Styling Incantations */
+/* These styles hold the essence of the woodland realm */
+
+.enchanted-glade {
+    background: linear-gradient(
+        135deg,
+        #1a3d2e 0%,    /* Deep forest shadows */
+        #2d5a3d 25%,   /* Moss-covered stones */
+        #1e4a35 50%,   /* Twilight beneath canopy */
+        #0f2419 100%   /* Mysterious depths */
+    );
+    
+    /* Sacred geometry of the forest */
+    border-radius: 15px;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* The dance of fireflies */
+@keyframes firefly-dance {
+    0% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.5); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.7; }
+}
+
+/* Ancient tree growth patterns */
+.tree-growth {
+    animation: ancient-growth 3s ease-out;
+}
+
+@keyframes ancient-growth {
+    0% { 
+        height: 0; 
+        opacity: 0; 
+        transform: rotateZ(-5deg);
+    }
+    100% { 
+        height: auto; 
+        opacity: 1; 
+        transform: rotateZ(0deg);
+    }
+}`
+            },
+            '/mystical-groves/sacred-circle.html': {
+                type: 'file',
+                name: 'sacred-circle.html',
+                size: '1.8 KB of Sacred Markup',
+                modified: 'During the Ritual of Coding',
+                permissions: 'Circle Keeper Access',
+                content: `<!DOCTYPE html>
+<!-- Sacred HTML Circle - A place of power and gathering -->
+<html lang="en" class="enchanted">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sacred Circle of the Woodland Realm</title>
+    <link rel="stylesheet" href="forest-styles.css">
+</head>
+<body class="sacred-ground">
+    <div class="sacred-circle">
+        <div class="center-stone">
+            🌟 Ancient Power Source 🌟
+        </div>
+        
+        <div class="cardinal-points">
+            <div class="north">🌲 Wisdom of the North Wind</div>
+            <div class="east">🌅 Dawn's First Light</div>
+            <div class="south">🔥 Sacred Flame</div>
+            <div class="west">🌙 Moon's Gentle Glow</div>
+        </div>
+        
+        <div class="ritual-space">
+            <p>In this sacred circle, the ancient magics flow freely.</p>
+            <p>Here, code becomes incantation, and logic becomes spell.</p>
+            <p>The old ways and the new dance together in harmony.</p>
+        </div>
+    </div>
+    
+    <script src="enchantments.js"></script>
+</body>
+</html>`
+            },
+            '/ancient-texts/druid-wisdom.md': {
+                type: 'file',
+                name: 'druid-wisdom.md',
+                size: '3.2 KB of Ancient Knowledge',
+                modified: 'Inscribed by Elder Moonwhisper',
+                permissions: 'Seeker of Wisdom Access',
+                content: `# The Codex of Druidic Wisdom
+*As inscribed by the Elder Circle beneath the Great Oak*
+
+## The First Teaching: Harmony with Code
+> "As the tree grows in perfect balance between earth and sky, so must your code balance functionality with beauty."
+
+The ancient druids understood that true power comes not from forcing nature to your will, but from working in harmony with its patterns. In the realm of code, this wisdom translates to:
+
+### The Principle of Natural Flow
+- Let your functions flow like streams through the forest
+- Each variable should have its place, like every creature in the ecosystem
+- Avoid forcing solutions - sometimes the path reveals itself when you pause and listen
+
+## The Second Teaching: The Cycles of Development
+Just as the forest follows the eternal cycles of seasons, so too must your development process embrace natural rhythms:
+
+### Spring - The Time of Planning
+🌱 New ideas sprout like tender shoots
+🌸 Design patterns bloom with possibility
+🦋 Architecture transforms and takes wing
+
+### Summer - The Season of Growth
+☀️ Code flourishes under focused attention
+🌿 Features develop their full potential
+🐝 Collaboration buzzes with productive energy
+
+### Autumn - The Harvest of Testing
+🍂 Bugs fall away like autumn leaves
+🌰 Wisdom is gathered and stored for winter
+🦌 Performance runs swift and true
+
+### Winter - The Rest of Reflection
+❄️ Code sleeps peacefully in version control
+🔥 Teams gather around the warmth of retrospectives
+🌟 Stars of inspiration guide the next journey
+
+## The Third Teaching: The Language of Trees
+The ancient oaks speak in whispers that only those who listen can hear:
+
+*Listen to your code - it will tell you when something is wrong*
+*Trust the process - growth cannot be rushed*
+*Respect the ecosystem - every line affects the whole*
+
+---
+*May your code grow strong like the ancient oaks,*
+*And may your bugs be as fleeting as morning mist.*
+
+**Blessed be the compile,**
+**Elder Moonwhisper of the Sacred Grove**`
+            },
+            '/ancient-texts/forest-lore.md': {
+                type: 'file',
+                name: 'forest-lore.md',
+                size: '2.8 KB of Mystical Tales',
+                modified: 'Recorded by the Woodland Chronicler',
+                permissions: 'Lore Keeper Access',
+                content: `# Tales from the Enchanted Forest
+*Legends passed down through generations of woodland folk*
+
+## The Legend of the First Commit
+Long ago, when the world was young and version control was but a dream, there lived a programmer named Aethon the Wise. He dwelled in a cottage at the heart of the Enchanted Forest, where the trees themselves were said to hold the memories of all code ever written.
+
+One fateful night, under the light of a blood moon, Aethon made the first commit to what would become the Great Repository. As his fingers touched the ancient keyboard (carved from moonstone and blessed by forest spirits), the trees began to glow with an otherworldly light.
+
+### The Prophecy Spoken
+The eldest oak, its voice like rustling leaves, spoke these words:
+
+> *"When bugs run rampant and features grow wild,*
+> *When deadlines loom like storm clouds dark,*
+> *Remember the wisdom of the first commit:*
+> *Small changes, made with love and care,*
+> *Build kingdoms that will never fall."*
+
+## The Creatures of the Coding Forest
+
+### The Debugging Sprites
+These tiny beings, no larger than your thumb, dance around broken code with mischievous glee. They are not malicious, but rather serve as teachers - showing us that every bug is an opportunity to learn.
+
+**Appearance:** Shimmering wings that change color based on the severity of the bug
+**Habitat:** Found near console.log statements and error messages
+**Behavior:** Leave tiny glowing trails that lead to the source of problems
+
+### The Documentation Dryads
+Tree spirits who have bound their essence to well-commented code. They whisper guidance to those who take time to write clear documentation.
+
+**Appearance:** Graceful figures composed of flowing text and branching syntax trees
+**Gifts:** They bless clean code with longevity and help other developers understand complex logic
+**Blessing:** "May your comments be as clear as mountain streams"
+
+### The Refactoring Phoenix
+A magnificent bird that appears only when code has become so tangled that it must be reborn from its own ashes.
+
+**Legend:** Every thousand lines of legacy code summons the Phoenix
+**Power:** Transforms sprawling, unreadable code into elegant, maintainable solutions
+**Song:** A melody that sounds like the harmony of perfectly nested functions
+
+## The Sacred Groves
+
+### Grove of Pure Functions
+A place where side effects cannot enter, and every function returns the same output for the same input, creating a paradise of predictability.
+
+### The Async Forest
+A mystical realm where promises grow on trees and await fulfillment. Time flows differently here, and events happen not in sequence, but in the order they complete.
+
+### Repository of Lost Code
+Where deleted functions go to rest. Some say you can still hear their echoes on quiet nights, calling out variable names that have been forgotten.
+
+---
+
+*These tales are more than mere stories - they are the wisdom of ages,*
+*Encoded in myth and preserved in the heart of the forest.*
+
+*May they guide your coding journey,*
+*And may your functions always return true to their purpose.*
+
+**🌙 Recorded under the Harvest Moon**
+**By the Woodland Chronicler**`
+            },
+            '/woodland-creatures/inhabitants.json': {
+                type: 'file',
+                name: 'inhabitants.json',
+                size: '1.6 KB of Creature Data',
+                modified: 'Census of the Autumn Gathering',
+                permissions: 'Forest Ranger Access',
+                content: `{
+  "forestInhabitants": {
+    "magicalCreatures": [
+      {
+        "name": "Whisper the Code Owl",
+        "species": "Bubo technicus",
+        "habitat": "Ancient Oak Terminal",
+        "abilities": ["Night debugging", "Wisdom dispensing", "Hoot-based error reporting"],
+        "favoriteLanguage": "Python (for its indentation beauty)",
+        "lastSeen": "Perched atop the main function branch"
+      },
+      {
+        "name": "Rustle the Squirrel",
+        "species": "Sciurus cacheurus",
+        "habitat": "Memory Tree Hollow",
+        "abilities": ["Cache optimization", "Nut sorting algorithms", "Rapid file gathering"],
+        "specialization": "Data structure organization",
+        "quirk": "Hoards unused variables for winter"
+      },
+      {
+        "name": "Patch the Hedgehog",
+        "species": "Erinaceus fixicus",
+        "habitat": "Bug Garden beneath the Fern Console",
+        "abilities": ["Bug detection", "Defensive curling", "Spike-based version control"],
+        "motto": "Every bug is just a feature waiting to be understood",
+        "tools": ["Thorn debugger", "Needle-point precision testing"]
+      }
+    ],
+    "forestSpirits": [
+      {
+        "name": "Echo of the First Function",
+        "type": "Ancestral Code Spirit",
+        "manifestation": "Glowing text that appears in old comments",
+        "wisdom": "The first function ever written still echoes through all code",
+        "blessing": "May your recursion always find its base case"
+      },
+      {
+        "name": "The Merge Conflict Guardian",
+        "type": "Protective Entity",
+        "role": "Prevents catastrophic merges",
+        "appearance": "Swirling patterns of conflicting code",
+        "intervention": "Creates impossible-to-ignore warnings before bad merges"
+      }
+    ],
+    "mysticalPlants": [
+      {
+        "name": "Logic Gate Moss",
+        "scientificName": "Bryum booleanicus",
+        "properties": {
+          "AND": "Grows only where two conditions are met",
+          "OR": "Thrives in either sunny or shady spots",
+          "NOT": "Dies where other plants flourish"
+        },
+        "use": "Natural circuit board substrate"
+      },
+      {
+        "name": "Fibonacci Fern",
+        "pattern": "Fronds follow the golden ratio perfectly",
+        "generations": "Each generation has 1.618 times more fronds",
+        "legend": "First discovered by a mathematician lost in the recursive woods"
+      }
+    ]
+  },
+  "forestStatistics": {
+    "totalInhabitants": 247,
+    "averageCodeQuality": "Enchantingly elegant",
+    "bugDensity": "One per thousand lines (very low thanks to forest spirits)",
+    "documentationCoverage": "100% (maintained by the Documentation Dryads)",
+    "lastCensus": "Autumn Equinox, Year of the Great Refactoring"
+  }
+}`
+            },
+            '/woodland-creatures/fairy-ring.jpg': {
+                type: 'image',
+                name: 'fairy-ring.jpg',
+                size: '2.4 MB of Captured Wonder',
+                modified: 'Photographed during the Mystic Hour',
+                permissions: 'Image Viewer Access',
+                description: 'A mystical photograph of mushrooms arranged in a perfect circle, where forest spirits are said to dance under moonlight.'
+            },
+            '/moonlit-paths/night-magic.js': {
+                type: 'file',
+                name: 'night-magic.js',
+                size: '1.9 KB of Nocturnal Enchantment',
+                modified: 'Under the Silver Moon',
+                permissions: 'Night Coder Access',
+                content: `// Night Magic - JavaScript for the Twilight Hours
+// Best executed when the moon is full and the code is quiet
+
+class MoonlitMagic {
+    constructor() {
+        this.moonPhase = this.getCurrentMoonPhase();
+        this.nightCreatures = ['🦉', '🦇', '🌙', '⭐', '🌟'];
+        this.spellPower = this.calculateSpellPower();
+    }
+    
+    // Cast nocturnal enchantments
+    castNightSpell(spellType) {
+        const spells = {
+            starlight: () => this.createStarlightEffect(),
+            moonbeam: () => this.summonMoonbeam(),
+            nightWhisper: () => this.whisperToTheNight(),
+            lunarGlow: () => this.activateLunarGlow()
+        };
+        
+        if (spells[spellType]) {
+            console.log(\`🌙 Casting \${spellType} under the \${this.moonPhase} moon...\`);
+            return spells[spellType]();
+        } else {
+            console.warn('⚠️ Unknown spell - the night spirits do not recognize this magic');
+        }
+    }
+    
+    // Create dancing starlight
+    createStarlightEffect() {
+        const stars = document.querySelectorAll('.firefly');
+        stars.forEach((star, index) => {
+            setTimeout(() => {
+                star.style.animation = 'firefly-float 4s ease-in-out infinite';
+                star.style.filter = 'brightness(150%) hue-rotate(60deg)';
+            }, index * 200);
+        });
+        return '✨ Stars dance in celebration of your code';
+    }
+    
+    // Summon a protective moonbeam
+    summonMoonbeam() {
+        const moonbeam = document.createElement('div');
+        moonbeam.className = 'sunbeam';
+        moonbeam.style.background = 'linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.2) 20%, rgba(200, 200, 255, 0.1) 80%, transparent 100%)';
+        document.body.appendChild(moonbeam);
+        
+        setTimeout(() => moonbeam.remove(), 5000);
+        return '🌙 A silver moonbeam blesses your workspace';
+    }
+    
+    // Whisper secrets to the night
+    whisperToTheNight(message = "The code flows like moonlight through ancient trees") {
+        const whisper = document.createElement('div');
+        whisper.textContent = message;
+        whisper.style.cssText = \`
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+            animation: fade-whisper 3s ease-out forwards;
+            pointer-events: none;
+            z-index: 1000;
+        \`;
+        
+        document.body.appendChild(whisper);
+        setTimeout(() => whisper.remove(), 3000);
+        return '💫 Your whisper joins the chorus of the night';
+    }
+    
+    // Calculate current spell power based on time
+    calculateSpellPower() {
+        const hour = new Date().getHours();
+        if (hour >= 0 && hour <= 3) return 'Maximum - The Witching Hour';
+        if (hour >= 21 || hour <= 6) return 'High - Night\'s Embrace';
+        if (hour >= 18 && hour <= 20) return 'Moderate - Twilight\'s Touch';
+        return 'Low - Daylight Weakens Night Magic';
+    }
+    
+    // Determine current moon phase (simplified)
+    getCurrentMoonPhase() {
+        const phases = ['New', 'Waxing Crescent', 'First Quarter', 'Waxing Gibbous', 
+                       'Full', 'Waning Gibbous', 'Last Quarter', 'Waning Crescent'];
+        const dayOfMonth = new Date().getDate();
+        return phases[Math.floor(dayOfMonth / 4) % 8];
+    }
+}
+
+// Create global night magic instance
+window.nightMagic = new MoonlitMagic();
+
+// CSS for whisper animation
+const style = document.createElement('style');
+style.textContent = \`
+    @keyframes fade-whisper {
+        0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        50% { opacity: 1; transform: translateX(-50%) translateY(0px); }
+        100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    }
+\`;
+document.head.appendChild(style);
+
+console.log('🌙 Night magic awakens... Current spell power:', window.nightMagic.spellPower);`
+            },
+            '/moonlit-paths/lunar-glow.css': {
+                type: 'file',
+                name: 'lunar-glow.css',
+                size: '2.1 KB of Moonlit Styling',
+                modified: 'Crafted in the Silver Light',
+                permissions: 'Lunar Designer Access',
+                content: `/* Lunar Glow Styles - CSS for the Midnight Hour */
+/* These styles harness the power of moonlight and shadow */
+
+:root {
+    /* Lunar color palette */
+    --moon-silver: #c9d6df;
+    --starlight-blue: #52616b;
+    --midnight-deep: #1e2022;
+    --cosmic-purple: #6c5b7b;
+    --aurora-green: #a8e6cf;
+    
+    /* Sacred measurements */
+    --lunar-radius: 15px;
+    --cosmic-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --starlight-glow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* The base lunar container */
+.moonlit-container {
+    background: linear-gradient(
+        135deg,
+        var(--midnight-deep) 0%,
+        var(--starlight-blue) 30%,
+        var(--cosmic-purple) 70%,
+        var(--midnight-deep) 100%
+    );
+    
+    border-radius: var(--lunar-radius);
+    box-shadow: 
+        var(--cosmic-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    
+    /* Subtle aurora effect */
+    position: relative;
+    overflow: hidden;
+}
+
+.moonlit-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(168, 230, 207, 0.1) 50%,
+        transparent 100%
+    );
+    animation: aurora-sweep 8s infinite ease-in-out;
+}
+
+@keyframes aurora-sweep {
+    0% { left: -100%; opacity: 0; }
+    50% { opacity: 1; }
+    100% { left: 100%; opacity: 0; }
+}
+
+/* Moonbeam text effect */
+.moonbeam-text {
+    color: var(--moon-silver);
+    text-shadow: var(--starlight-glow);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+}
+
+/* Glowing buttons for night interfaces */
+.lunar-button {
+    background: linear-gradient(45deg, var(--cosmic-purple), var(--starlight-blue));
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: calc(var(--lunar-radius) / 2);
+    color: var(--moon-silver);
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.lunar-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        var(--starlight-glow),
+        0 4px 15px rgba(108, 91, 123, 0.4);
+}
+
+.lunar-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%
+    );
+    transition: left 0.5s ease;
+}
+
+.lunar-button:hover::before {
+    left: 100%;
+}
+
+/* Constellation patterns */
+.constellation {
+    position: relative;
+}
+
+.constellation::after {
+    content: '✦';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    color: var(--aurora-green);
+    font-size: 0.8em;
+    animation: twinkle 2s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Night mode transitions */
+.night-transition {
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Lunar form elements */
+.moonlit-input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: calc(var(--lunar-radius) / 3);
+    color: var(--moon-silver);
+    padding: 10px 15px;
+    backdrop-filter: blur(10px);
+}
+
+.moonlit-input:focus {
+    outline: none;
+    border-color: var(--aurora-green);
+    box-shadow: 0 0 10px rgba(168, 230, 207, 0.3);
+}
+
+.moonlit-input::placeholder {
+    color: rgba(201, 214, 223, 0.6);
+    font-style: italic;
+}
+
+/* Responsive lunar magic */
+@media (max-width: 768px) {
+    .moonlit-container {
+        border-radius: calc(var(--lunar-radius) / 2);
+    }
+    
+    .lunar-button {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+}
+
+/* Special midnight hour enhancements */
+@media (prefers-color-scheme: dark) {
+    .moonlit-container {
+        box-shadow: 
+            var(--cosmic-shadow),
+            var(--starlight-glow),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+}`
+            }
+        };
+
+        // UI Controller
+        class EnchantedExplorerUI {
+            constructor() {
+                this.currentPath = '/';
+                this.previewContent = document.getElementById('previewContent');
+                this.metadataContent = document.getElementById('metadataContent');
+                this.init();
+            }
+
+            init() {
+                // Add click handlers to tree branches
+                document.querySelectorAll('.tree-branch').forEach(branch => {
+                    branch.addEventListener('click', (e) => this.handleBranchClick(e));
+                });
+
+                // Initialize with root folder selected
+                this.selectFile('/');
+            }
+
+            handleBranchClick(e) {
+                const branch = e.currentTarget;
+                const path = branch.dataset.path;
+                
+                // Remove active class from all branches
+                document.querySelectorAll('.tree-branch').forEach(b => b.classList.remove('active'));
+                
+                // Add active class to clicked branch
+                branch.classList.add('active');
+
+                // Handle folder expansion
+                if (branch.classList.contains('folder-branch')) {
+                    const children = branch.parentNode.querySelector('.tree-children');
+                    if (children) {
+                        const isExpanded = children.classList.contains('expanded');
+                        children.classList.toggle('expanded');
+                        
+                        if (!isExpanded) {
+                            children.classList.add('expanding');
+                            setTimeout(() => children.classList.remove('expanding'), 500);
+                        }
+                    }
+                }
+
+                // Update preview and metadata
+                this.selectFile(path);
+            }
+
+            selectFile(path) {
+                this.currentPath = path;
+                const fileData = forestData[path];
+                
+                if (!fileData) {
+                    this.showPreview('File not found in the mystical archives...');
+                    return;
+                }
+
+                // Update preview
+                this.updatePreview(fileData);
+                
+                // Update metadata
+                this.updateMetadata(fileData);
+            }
+
+            updatePreview(fileData) {
+                if (fileData.type === 'folder') {
+                    this.previewContent.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <div style="font-size: 3em; margin-bottom: 20px;">🌲</div>
+                            <h3 style="color: #8bc34a; margin-bottom: 15px; font-family: 'Cinzel', serif;">Ancient Forest Directory</h3>
+                            <p style="font-style: italic; line-height: 1.6;">
+                                ${fileData.description || 'A sacred grove where files dwell in harmony with nature.'}
+                            </p>
+                            <div style="margin-top: 30px; padding: 20px; background: rgba(139, 195, 74, 0.1); border-radius: 10px; border-left: 3px solid #8bc34a;">
+                                <p><strong>🌟 Mystical Properties:</strong></p>
+                                <p>This ancient directory holds the memories of countless files, each one a leaf in the great tree of knowledge.</p>
+                            </div>
+                        </div>
+                    `;
+                } else if (fileData.type === 'image') {
+                    this.previewContent.innerHTML = `
+                        <div style="text-align: center;">
+                            <div style="margin-bottom: 20px;">
+                                <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #8bc34a, #4caf50); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 4em;">🌺</div>
+                            </div>
+                            <h4 style="color: #8bc34a; margin-bottom: 10px;">Mystical Image Captured</h4>
+                            <p style="font-style: italic;">
+                                ${fileData.description || 'A beautiful image from the enchanted forest'}
+                            </p>
+                            <div style="margin-top: 20px; padding: 15px; background: rgba(139, 195, 74, 0.1); border-radius: 8px;">
+                                <p><strong>📸 Image Essence:</strong> Captured during the golden hour when magic is strongest</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Text file preview
+                    this.previewContent.innerHTML = `
+                        <div class="preview-text">${fileData.content}</div>
+                    `;
+                }
+            }
+
+            updateMetadata(fileData) {
+                const druidSymbols = {
+                    name: '🌟',
+                    type: fileData.type === 'folder' ? '🌳' : '🍃',
+                    size: '📏',
+                    modified: '⏰',
+                    permissions: '🔐',
+                    path: '🗺️'
+                };
+
+                this.metadataContent.innerHTML = `
+                    <div class="metadata-item">
+                        <div class="metadata-label">
+                            <span class="druid-symbol">${druidSymbols.name}</span>
+                            Sacred Name
+                        </div>
+                        <div class="metadata-value">${fileData.name}</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">
+                            <span class="druid-symbol">${druidSymbols.type}</span>
+                            Essence Type
+                        </div>
+                        <div class="metadata-value">${fileData.type === 'folder' ? 'Ancient Forest Directory' : 'Sacred Manuscript'}</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">
+                            <span class="druid-symbol">${druidSymbols.size}</span>
+                            Spiritual Weight
+                        </div>
+                        <div class="metadata-value">${fileData.size}</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">
+                            <span class="druid-symbol">${druidSymbols.modified}</span>
+                            Last Communion
+                        </div>
+                        <div class="metadata-value">${fileData.modified}</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">
+                            <span class="druid-symbol">${druidSymbols.permissions}</span>
+                            Guardian Protections
+                        </div>
+                        <div class="metadata-value">${fileData.permissions}</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">
+                            <span class="druid-symbol">${druidSymbols.path}</span>
+                            Sacred Path
+                        </div>
+                        <div class="metadata-value">${this.currentPath}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize the enchanted explorer
+        document.addEventListener('DOMContentLoaded', () => {
+            new EnchantedExplorerUI();
+            
+            // Create additional fireflies dynamically
+            const firefliesContainer = document.querySelector('.fireflies');
+            for (let i = 0; i < 5; i++) {
+                const firefly = document.createElement('div');
+                firefly.className = 'firefly';
+                firefly.style.top = Math.random() * 100 + '%';
+                firefly.style.left = Math.random() * 100 + '%';
+                firefly.style.animationDelay = Math.random() * 8 + 's';
+                firefliesContainer.appendChild(firefly);
+            }
+            
+            // Add mystical console message
+            console.log('🌲 Welcome to the Enchanted Forest Explorer 🌲');
+            console.log('The ancient trees whisper: "Click to explore the mystical file system"');
+        });
+    </script>
+</body>
+</html>

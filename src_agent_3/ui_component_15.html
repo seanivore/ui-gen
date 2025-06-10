@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crystal Cave Analytics - Geological Data Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at center, #1a0e2e 0%, #0d0411 100%);
+            color: #e6d7ff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .crystal-cave-container {
+            position: relative;
+            padding: 20px;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 127, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(30, 144, 255, 0.06) 0%, transparent 50%);
+        }
+
+        .cave-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .stalactite {
+            position: absolute;
+            background: linear-gradient(180deg, #4a4a5c 0%, #2d2d3a 100%);
+            border-radius: 0 0 50% 50%;
+            box-shadow: inset 0 -10px 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .stalactite:nth-child(1) { top: -20px; left: 10%; width: 30px; height: 100px; }
+        .stalactite:nth-child(2) { top: -15px; left: 30%; width: 20px; height: 80px; }
+        .stalactite:nth-child(3) { top: -25px; left: 70%; width: 40px; height: 120px; }
+        .stalactite:nth-child(4) { top: -10px; left: 90%; width: 25px; height: 90px; }
+
+        .main-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .crystal-title {
+            font-size: 2.8rem;
+            font-weight: 300;
+            background: linear-gradient(45deg, #e6d7ff, #9d4edd, #3c096c, #7209b7);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: prismaticShine 4s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(157, 78, 221, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #b19cd9;
+            opacity: 0.8;
+            letter-spacing: 1px;
+        }
+
+        @keyframes prismaticShine {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .analytics-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .main-crystal-display {
+            background: linear-gradient(135deg, rgba(75, 0, 130, 0.2) 0%, rgba(25, 25, 112, 0.15) 100%);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            box-shadow: 
+                0 20px 40px rgba(138, 43, 226, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-crystal-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(138, 43, 226, 0.05), transparent, rgba(30, 144, 255, 0.05), transparent);
+            animation: crystalRotation 20s linear infinite;
+            z-index: 1;
+        }
+
+        .main-crystal-display > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes crystalRotation {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .crystal-chart-container {
+            height: 400px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .crystal-formation {
+            position: absolute;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(138, 43, 226, 0.8), rgba(138, 43, 226, 0.4));
+            border-radius: 10px 10px 0 0;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            box-shadow: 
+                0 -10px 20px rgba(138, 43, 226, 0.3),
+                0 0 20px rgba(138, 43, 226, 0.2);
+            animation: crystalGrowth 3s ease-out;
+        }
+
+        .crystal-formation:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 
+                0 -20px 40px rgba(138, 43, 226, 0.5),
+                0 0 30px rgba(138, 43, 226, 0.4);
+        }
+
+        .crystal-formation::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 20px solid rgba(138, 43, 226, 0.8);
+        }
+
+        @keyframes crystalGrowth {
+            from { height: 0; opacity: 0; }
+            to { height: var(--height); opacity: 1; }
+        }
+
+        .formation-amethyst { --color: #9d4edd; }
+        .formation-emerald { --color: #00f5ff; }
+        .formation-sapphire { --color: #1e90ff; }
+        .formation-quartz { --color: #f8f8ff; }
+
+        .crystal-insights-panel {
+            background: linear-gradient(135deg, rgba(25, 25, 112, 0.3) 0%, rgba(75, 0, 130, 0.2) 100%);
+            border-radius: 20px;
+            padding: 25px;
+            border: 2px solid rgba(30, 144, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(30, 144, 255, 0.1);
+        }
+
+        .panel-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            color: #e6d7ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .crystal-icon {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #9d4edd, #1e90ff);
+            border-radius: 3px;
+            position: relative;
+            animation: crystalPulse 2s ease-in-out infinite alternate;
+        }
+
+        .crystal-icon::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 8px solid #9d4edd;
+        }
+
+        @keyframes crystalPulse {
+            from { box-shadow: 0 0 10px rgba(157, 78, 221, 0.3); }
+            to { box-shadow: 0 0 20px rgba(157, 78, 221, 0.6); }
+        }
+
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .crystal-filter {
+            padding: 8px 16px;
+            background: rgba(138, 43, 226, 0.2);
+            border: 1px solid rgba(138, 43, 226, 0.4);
+            border-radius: 20px;
+            color: #e6d7ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .crystal-filter:hover,
+        .crystal-filter.active {
+            background: rgba(138, 43, 226, 0.4);
+            border-color: rgba(138, 43, 226, 0.6);
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .insights-gem {
+            background: rgba(30, 144, 255, 0.1);
+            border: 1px solid rgba(30, 144, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .insights-gem::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(30, 144, 255, 0.2), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .gem-title {
+            font-size: 1rem;
+            color: #87ceeb;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .gem-value {
+            font-size: 1.8rem;
+            color: #e6d7ff;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+
+        .gem-trend {
+            font-size: 0.8rem;
+            color: #98fb98;
+        }
+
+        .export-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .export-button {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(30, 144, 255, 0.3));
+            border: 2px solid rgba(138, 43, 226, 0.5);
+            border-radius: 15px;
+            color: #e6d7ff;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .export-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 10px 25px rgba(138, 43, 226, 0.3),
+                0 0 30px rgba(138, 43, 226, 0.2);
+        }
+
+        .export-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
+            transition: all 0.6s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .export-button:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .geological-legend {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(25, 25, 112, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(138, 43, 226, 0.2);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .legend-crystal {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .legend-crystal::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+        }
+
+        .amethyst { background: #9d4edd; }
+        .amethyst::before { border-bottom: 4px solid #9d4edd; }
+        .emerald { background: #00f5ff; }
+        .emerald::before { border-bottom: 4px solid #00f5ff; }
+        .sapphire { background: #1e90ff; }
+        .sapphire::before { border-bottom: 4px solid #1e90ff; }
+        .quartz { background: #f8f8ff; }
+        .quartz::before { border-bottom: 4px solid #f8f8ff; }
+
+        .treasure-discovered {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.9), rgba(30, 144, 255, 0.9));
+            border: 3px solid rgba(255, 215, 0, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 
+                0 20px 60px rgba(138, 43, 226, 0.5),
+                0 0 50px rgba(255, 215, 0, 0.3);
+            animation: treasureReveal 2s ease-out forwards;
+        }
+
+        @keyframes treasureReveal {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(180deg); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2) rotate(0deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .light-ray {
+            position: absolute;
+            width: 2px;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, rgba(138, 43, 226, 0.6), transparent);
+            animation: lightSweep 5s ease-in-out infinite;
+        }
+
+        .light-ray:nth-child(1) { top: 20%; left: 15%; animation-delay: 0s; }
+        .light-ray:nth-child(2) { top: 40%; left: 60%; animation-delay: 1s; }
+        .light-ray:nth-child(3) { top: 60%; left: 25%; animation-delay: 2s; }
+
+        @keyframes lightSweep {
+            0%, 100% { opacity: 0.2; transform: scaleY(0.5); }
+            50% { opacity: 0.8; transform: scaleY(1.5); }
+        }
+
+        @media (max-width: 768px) {
+            .analytics-dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .crystal-title {
+                font-size: 2rem;
+            }
+            
+            .export-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cave-backdrop">
+        <div class="stalactite"></div>
+        <div class="stalactite"></div>
+        <div class="stalactite"></div>
+        <div class="stalactite"></div>
+        <div class="light-ray"></div>
+        <div class="light-ray"></div>
+        <div class="light-ray"></div>
+    </div>
+
+    <div class="crystal-cave-container">
+        <header class="main-header">
+            <h1 class="crystal-title">Crystal Cave Analytics</h1>
+            <p class="subtitle">Geological Data Mining & Treasure Discovery Platform</p>
+        </header>
+
+        <div class="analytics-dashboard">
+            <div class="main-crystal-display">
+                <div class="filter-controls">
+                    <div class="crystal-filter active" data-type="all">All Formations</div>
+                    <div class="crystal-filter" data-type="amethyst">Amethyst Clusters</div>
+                    <div class="crystal-filter" data-type="emerald">Emerald Veins</div>
+                    <div class="crystal-filter" data-type="sapphire">Sapphire Deposits</div>
+                    <div class="crystal-filter" data-type="quartz">Quartz Formations</div>
+                </div>
+
+                <div class="crystal-chart-container" id="crystalChart">
+                    <!-- Crystal formations will be generated here -->
+                </div>
+
+                <div class="geological-legend">
+                    <div class="legend-item">
+                        <div class="legend-crystal amethyst"></div>
+                        <span>Amethyst (Productivity)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-crystal emerald"></div>
+                        <span>Emerald (Growth)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-crystal sapphire"></div>
+                        <span>Sapphire (Quality)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-crystal quartz"></div>
+                        <span>Quartz (Purity)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="crystal-insights-panel">
+                <div class="panel-section">
+                    <h3 class="section-title">
+                        <div class="crystal-icon"></div>
+                        Treasure Insights
+                    </h3>
+                    <div class="insights-gem">
+                        <div class="gem-title">Total Excavated</div>
+                        <div class="gem-value">47,392</div>
+                        <div class="gem-trend">↗ +12.4% this quarter</div>
+                    </div>
+                    <div class="insights-gem">
+                        <div class="gem-title">Rare Discoveries</div>
+                        <div class="gem-value">1,847</div>
+                        <div class="gem-trend">↗ +8.7% rare finds</div>
+                    </div>
+                    <div class="insights-gem">
+                        <div class="gem-title">Cave Depth</div>
+                        <div class="gem-value">2,341m</div>
+                        <div class="gem-trend">→ Optimal depth reached</div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="section-title">
+                        <div class="crystal-icon"></div>
+                        Active Expeditions
+                    </h3>
+                    <div class="insights-gem">
+                        <div class="gem-title">Deep Cave Alpha</div>
+                        <div class="gem-value">94%</div>
+                        <div class="gem-trend">Nearly complete</div>
+                    </div>
+                    <div class="insights-gem">
+                        <div class="gem-title">Crystal Tunnel Beta</div>
+                        <div class="gem-value">67%</div>
+                        <div class="gem-trend">Rich vein discovered</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="export-controls">
+            <button class="export-button" onclick="exportTreasure('crystal')">
+                💎 Export Crystal Data
+            </button>
+            <button class="export-button" onclick="exportTreasure('geological')">
+                🗿 Export Geological Survey
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Crystal formation data
+        const formationData = [
+            { type: 'amethyst', value: 85, label: 'Jan', color: '#9d4edd' },
+            { type: 'emerald', value: 92, label: 'Feb', color: '#00f5ff' },
+            { type: 'sapphire', value: 78, label: 'Mar', color: '#1e90ff' },
+            { type: 'quartz', value: 96, label: 'Apr', color: '#f8f8ff' },
+            { type: 'amethyst', value: 88, label: 'May', color: '#9d4edd' },
+            { type: 'emerald', value: 94, label: 'Jun', color: '#00f5ff' },
+            { type: 'sapphire', value: 82, label: 'Jul', color: '#1e90ff' },
+            { type: 'quartz', value: 99, label: 'Aug', color: '#f8f8ff' },
+            { type: 'amethyst', value: 91, label: 'Sep', color: '#9d4edd' },
+            { type: 'emerald', value: 87, label: 'Oct', color: '#00f5ff' },
+            { type: 'sapphire', value: 89, label: 'Nov', color: '#1e90ff' },
+            { type: 'quartz', value: 93, label: 'Dec', color: '#f8f8ff' }
+        ];
+
+        // Generate crystal formations
+        function generateCrystalChart() {
+            const chartContainer = document.getElementById('crystalChart');
+            chartContainer.innerHTML = '';
+
+            const maxHeight = 350;
+            const barWidth = 60;
+            const spacing = 10;
+
+            formationData.forEach((data, index) => {
+                const formation = document.createElement('div');
+                formation.className = `crystal-formation formation-${data.type}`;
+                formation.style.left = `${index * (barWidth + spacing) + 20}px`;
+                formation.style.width = `${barWidth}px`;
+                formation.style.height = `${(data.value / 100) * maxHeight}px`;
+                formation.style.setProperty('--height', `${(data.value / 100) * maxHeight}px`);
+                formation.style.background = `linear-gradient(to top, ${data.color}88, ${data.color}44)`;
+                formation.style.boxShadow = `0 -10px 20px ${data.color}33, 0 0 20px ${data.color}22`;
+
+                // Add label
+                const label = document.createElement('div');
+                label.style.position = 'absolute';
+                label.style.bottom = '-25px';
+                label.style.left = '50%';
+                label.style.transform = 'translateX(-50%)';
+                label.style.color = '#b19cd9';
+                label.style.fontSize = '0.9rem';
+                label.textContent = data.label;
+                formation.appendChild(label);
+
+                // Add value tooltip
+                formation.addEventListener('mouseenter', () => {
+                    showTreasureDiscovered(`${data.type.charAt(0).toUpperCase() + data.type.slice(1)} Formation: ${data.value}% completion`);
+                });
+
+                chartContainer.appendChild(formation);
+            });
+        }
+
+        // Filter functionality
+        document.querySelectorAll('.crystal-filter').forEach(filter => {
+            filter.addEventListener('click', () => {
+                // Update active state
+                document.querySelectorAll('.crystal-filter').forEach(f => f.classList.remove('active'));
+                filter.classList.add('active');
+
+                // Filter formations
+                const filterType = filter.dataset.type;
+                const formations = document.querySelectorAll('.crystal-formation');
+                
+                formations.forEach(formation => {
+                    if (filterType === 'all' || formation.classList.contains(`formation-${filterType}`)) {
+                        formation.style.display = 'block';
+                        formation.style.animation = 'crystalGrowth 0.6s ease-out';
+                    } else {
+                        formation.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Show treasure discovered notification
+        function showTreasureDiscovered(message) {
+            // Remove existing notification
+            const existing = document.querySelector('.treasure-discovered');
+            if (existing) existing.remove();
+
+            const notification = document.createElement('div');
+            notification.className = 'treasure-discovered';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 2000);
+        }
+
+        // Export functionality
+        function exportTreasure(type) {
+            const messages = {
+                crystal: 'Crystal data extracted and crystallized! 💎✨',
+                geological: 'Geological survey compiled into mineral archives! 🗿📊'
+            };
+            
+            showTreasureDiscovered(messages[type]);
+            
+            // Simulate export process
+            setTimeout(() => {
+                const dataToExport = {
+                    timestamp: new Date().toISOString(),
+                    type: type,
+                    formations: formationData,
+                    insights: {
+                        totalExcavated: 47392,
+                        rareDiscoveries: 1847,
+                        caveDepth: '2,341m'
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `crystal-cave-${type}-data.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }, 1000);
+        }
+
+        // Add prismatic light effects
+        function createPrismaticEffects() {
+            const container = document.querySelector('.crystal-cave-container');
+            
+            setInterval(() => {
+                const lightSparkle = document.createElement('div');
+                lightSparkle.style.position = 'absolute';
+                lightSparkle.style.width = '4px';
+                lightSparkle.style.height = '4px';
+                lightSparkle.style.background = `hsl(${Math.random() * 360}, 70%, 80%)`;
+                lightSparkle.style.borderRadius = '50%';
+                lightSparkle.style.left = Math.random() * 100 + '%';
+                lightSparkle.style.top = Math.random() * 100 + '%';
+                lightSparkle.style.pointerEvents = 'none';
+                lightSparkle.style.animation = 'sparkle 2s ease-out forwards';
+                
+                container.appendChild(lightSparkle);
+                
+                setTimeout(() => lightSparkle.remove(), 2000);
+            }, 800);
+        }
+
+        // Add sparkle animation
+        const sparkleStyle = document.createElement('style');
+        sparkleStyle.textContent = `
+            @keyframes sparkle {
+                0% { opacity: 0; transform: scale(0); }
+                50% { opacity: 1; transform: scale(1); }
+                100% { opacity: 0; transform: scale(0); }
+            }
+        `;
+        document.head.appendChild(sparkleStyle);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            generateCrystalChart();
+            createPrismaticEffects();
+            
+            // Welcome message
+            setTimeout(() => {
+                showTreasureDiscovered('Welcome to the Crystal Cave Analytics! 🔮');
+            }, 1000);
+        });
+
+        // Add interactive crystal formations
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('crystal-formation')) {
+                const rect = e.target.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                // Create crystal burst effect
+                for (let i = 0; i < 8; i++) {
+                    const particle = document.createElement('div');
+                    particle.style.position = 'fixed';
+                    particle.style.left = centerX + 'px';
+                    particle.style.top = centerY + 'px';
+                    particle.style.width = '6px';
+                    particle.style.height = '6px';
+                    particle.style.background = getComputedStyle(e.target).background;
+                    particle.style.borderRadius = '50%';
+                    particle.style.pointerEvents = 'none';
+                    particle.style.zIndex = '1000';
+                    
+                    const angle = (i / 8) * Math.PI * 2;
+                    const distance = 100;
+                    const endX = centerX + Math.cos(angle) * distance;
+                    const endY = centerY + Math.sin(angle) * distance;
+                    
+                    particle.style.animation = `crystalBurst 1s ease-out forwards`;
+                    particle.style.setProperty('--endX', endX + 'px');
+                    particle.style.setProperty('--endY', endY + 'px');
+                    
+                    document.body.appendChild(particle);
+                    setTimeout(() => particle.remove(), 1000);
+                }
+            }
+        });
+
+        // Add crystal burst animation
+        const burstStyle = document.createElement('style');
+        burstStyle.textContent = `
+            @keyframes crystalBurst {
+                0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+                100% { 
+                    transform: translate(calc(var(--endX) - 50%), calc(var(--endY) - 50%)) scale(0); 
+                    opacity: 0; 
+                }
+            }
+        `;
+        document.head.appendChild(burstStyle);
+    </script>
+</body>
+</html>

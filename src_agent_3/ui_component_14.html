@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desert Caravan Command - Travel Planner</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Amiri:wght@400;700&display=swap');
+        
+        :root {
+            --sand-light: #F4E4BC;
+            --sand-medium: #E6D299;
+            --sand-dark: #D4B896;
+            --sunset-orange: #FF8C42;
+            --sunset-red: #D2691E;
+            --oasis-blue: #4682B4;
+            --oasis-teal: #20B2AA;
+            --cactus-green: #9CAF88;
+            --mirage-purple: #8A2BE2;
+            --canvas-beige: #F5F5DC;
+            --rope-brown: #8B4513;
+            --heat-yellow: #FFD700;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Amiri', serif;
+            background: linear-gradient(135deg, var(--sand-light) 0%, var(--sand-medium) 50%, var(--sunset-orange) 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Sand Particle Animation */
+        .sand-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .sand-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--sand-dark);
+            border-radius: 50%;
+            animation: sandBlow 8s infinite linear;
+        }
+
+        @keyframes sandBlow {
+            0% {
+                transform: translateX(-10px) translateY(-10px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(100vw) translateY(50px);
+                opacity: 0;
+            }
+        }
+
+        /* Heat Shimmer Effect */
+        .heat-shimmer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                0deg,
+                transparent 0%,
+                rgba(255, 215, 0, 0.1) 30%,
+                rgba(255, 140, 66, 0.1) 50%,
+                rgba(255, 215, 0, 0.1) 70%,
+                transparent 100%
+            );
+            animation: heatWave 3s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @keyframes heatWave {
+            0%, 100% {
+                transform: skewX(0deg) translateY(0px);
+                opacity: 0.3;
+            }
+            50% {
+                transform: skewX(1deg) translateY(-2px);
+                opacity: 0.7;
+            }
+        }
+
+        /* Main Container */
+        .desert-command {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(245, 245, 220, 0.15);
+            backdrop-filter: blur(10px);
+            border: 3px solid var(--rope-brown);
+            border-radius: 20px;
+            box-shadow: 
+                0 0 30px rgba(139, 69, 19, 0.3),
+                inset 0 0 30px rgba(244, 228, 188, 0.2);
+        }
+
+        /* Tent Header */
+        .tent-header {
+            background: linear-gradient(45deg, var(--canvas-beige), var(--sand-light));
+            border: 2px solid var(--rope-brown);
+            border-radius: 15px 15px 5px 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tent-header::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 20%;
+            right: 20%;
+            height: 20px;
+            background: var(--rope-brown);
+            border-radius: 0 0 50% 50%;
+        }
+
+        .tent-header::after {
+            content: '🐪 Desert Caravan Command 🐪';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Aref Ruqaa', cursive;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--rope-brown);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Main Grid Layout */
+        .command-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            min-height: 600px;
+        }
+
+        /* Individual Panels */
+        .command-panel {
+            background: rgba(245, 245, 220, 0.9);
+            border: 2px solid var(--rope-brown);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 25px rgba(0,0,0,0.2),
+                inset 0 0 20px rgba(244, 228, 188, 0.3);
+        }
+
+        .command-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--sunset-orange), var(--sunset-red), var(--sunset-orange));
+        }
+
+        .panel-title {
+            font-family: 'Aref Ruqaa', cursive;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--rope-brown);
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Travel Planner */
+        .travel-planner {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        .route-map {
+            width: 100%;
+            height: 200px;
+            background: 
+                radial-gradient(circle at 30% 20%, var(--oasis-teal) 8px, transparent 8px),
+                radial-gradient(circle at 70% 80%, var(--cactus-green) 6px, transparent 6px),
+                linear-gradient(45deg, var(--sand-light) 0%, var(--sand-medium) 100%);
+            border: 2px solid var(--rope-brown);
+            border-radius: 10px;
+            position: relative;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .route-path {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background: dashed;
+            background-image: repeating-linear-gradient(
+                90deg,
+                var(--rope-brown) 0px,
+                var(--rope-brown) 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            animation: pathMove 4s linear infinite;
+        }
+
+        @keyframes pathMove {
+            0% { background-position: 0px 0px; }
+            100% { background-position: 40px 0px; }
+        }
+
+        .waypoint {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--sunset-red);
+            border: 2px solid var(--rope-brown);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .waypoint.start { top: 50%; left: 10%; }
+        .waypoint.middle { top: 30%; left: 50%; }
+        .waypoint.end { top: 50%; left: 90%; }
+
+        .destination-list {
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .destination-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: var(--sand-light);
+            border: 1px solid var(--sand-dark);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .destination-item:hover {
+            background: var(--sand-medium);
+            transform: translateX(5px);
+            transition: all 0.3s ease;
+        }
+
+        /* Route Finder */
+        .route-finder {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .compass {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: radial-gradient(circle, var(--heat-yellow) 30%, var(--sunset-orange) 70%);
+            border: 3px solid var(--rope-brown);
+            border-radius: 50%;
+            position: relative;
+            animation: compassSpin 8s linear infinite;
+        }
+
+        @keyframes compassSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .compass::before {
+            content: 'N';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            color: var(--rope-brown);
+        }
+
+        .compass::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 30px;
+            background: var(--rope-brown);
+            transform: translate(-50%, -50%);
+        }
+
+        .route-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .route-option {
+            padding: 10px;
+            background: var(--sand-light);
+            border: 1px solid var(--sand-dark);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .route-option:hover {
+            background: var(--oasis-blue);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .route-option.active {
+            background: var(--sunset-red);
+            color: white;
+        }
+
+        .distance-marker {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--rope-brown);
+            margin-top: 10px;
+        }
+
+        /* Weather Conditions */
+        .weather-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .weather-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .weather-main {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--heat-yellow), var(--sunset-orange));
+            border-radius: 10px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .temp-display {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .weather-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .weather-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .weather-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: var(--sand-light);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .sandstorm-alert {
+            padding: 10px;
+            background: linear-gradient(45deg, var(--sunset-red), var(--mirage-purple));
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            animation: alertPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes alertPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Resource Tracker */
+        .resource-tracker {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .resource-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .resource-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--sand-light);
+            border: 2px solid var(--sand-dark);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resource-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .resource-meter {
+            width: 100%;
+            height: 8px;
+            background: var(--sand-dark);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .resource-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .water-fill { 
+            background: linear-gradient(90deg, var(--oasis-blue), var(--oasis-teal));
+            width: 75%; 
+        }
+        
+        .supplies-fill { 
+            background: linear-gradient(90deg, var(--cactus-green), var(--sand-medium));
+            width: 60%; 
+        }
+        
+        .stamina-fill { 
+            background: linear-gradient(90deg, var(--sunset-orange), var(--sunset-red));
+            width: 85%; 
+        }
+        
+        .fuel-fill { 
+            background: linear-gradient(90deg, var(--heat-yellow), var(--sunset-orange));
+            width: 40%; 
+        }
+
+        .resource-value {
+            font-weight: bold;
+            color: var(--rope-brown);
+        }
+
+        .camel-status {
+            text-align: center;
+            padding: 12px;
+            background: linear-gradient(45deg, var(--canvas-beige), var(--sand-light));
+            border: 2px solid var(--rope-brown);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        /* Mirage Effects */
+        .mirage-oasis {
+            position: absolute;
+            top: 20%;
+            right: 10%;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, var(--oasis-teal), transparent);
+            border-radius: 50%;
+            opacity: 0;
+            animation: mirageAppear 6s ease-in-out infinite;
+        }
+
+        @keyframes mirageAppear {
+            0%, 70%, 100% { opacity: 0; transform: scale(0.8); }
+            30%, 60% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        /* Interactive Elements */
+        .action-button {
+            background: linear-gradient(45deg, var(--sunset-orange), var(--sunset-red));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Aref Ruqaa', cursive;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        .journey-progress {
+            width: 100%;
+            height: 6px;
+            background: var(--sand-dark);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--oasis-blue), var(--oasis-teal));
+            width: 35%;
+            animation: progressMove 3s ease-in-out infinite;
+        }
+
+        @keyframes progressMove {
+            0%, 100% { width: 35%; }
+            50% { width: 40%; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .command-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(4, auto);
+            }
+            
+            .travel-planner { grid-column: 1; grid-row: 1; }
+            .route-finder { grid-column: 1; grid-row: 2; }
+            .weather-panel { grid-column: 1; grid-row: 3; }
+            .resource-tracker { grid-column: 1; grid-row: 4; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sand Particles -->
+    <div class="sand-particles" id="sandParticles"></div>
+    
+    <!-- Heat Shimmer -->
+    <div class="heat-shimmer"></div>
+    
+    <!-- Mirage Oasis -->
+    <div class="mirage-oasis"></div>
+
+    <div class="desert-command">
+        <!-- Tent Header -->
+        <div class="tent-header"></div>
+
+        <!-- Main Command Grid -->
+        <div class="command-grid">
+            <!-- Travel Planner -->
+            <div class="command-panel travel-planner">
+                <h3 class="panel-title">🗺️ Caravan Route Planner</h3>
+                
+                <div class="route-map">
+                    <div class="route-path"></div>
+                    <div class="waypoint start" title="Al-Miraj Oasis"></div>
+                    <div class="waypoint middle" title="Sahara Crossing"></div>
+                    <div class="waypoint end" title="Marrakech Markets"></div>
+                </div>
+
+                <div class="destination-list">
+                    <div class="destination-item">
+                        <span>🏜️ Al-Miraj Oasis</span>
+                        <span>0 km</span>
+                    </div>
+                    <div class="destination-item">
+                        <span>⛰️ Atlas Pass</span>
+                        <span>45 km</span>
+                    </div>
+                    <div class="destination-item">
+                        <span>🌵 Cactus Valley</span>
+                        <span>78 km</span>
+                    </div>
+                    <div class="destination-item">
+                        <span>🏛️ Ancient Ruins</span>
+                        <span>120 km</span>
+                    </div>
+                    <div class="destination-item">
+                        <span>🕌 Marrakech Markets</span>
+                        <span>185 km</span>
+                    </div>
+                </div>
+
+                <div class="journey-progress">
+                    <div class="progress-fill"></div>
+                </div>
+                
+                <button class="action-button" onclick="planRoute()">📍 Update Route</button>
+            </div>
+
+            <!-- Route Finder -->
+            <div class="command-panel route-finder">
+                <h3 class="panel-title">🧭 Desert Navigation</h3>
+                
+                <div class="compass"></div>
+                
+                <div class="route-options">
+                    <div class="route-option active" onclick="selectRoute(this)">
+                        <div>🐪 Caravan Path</div>
+                        <small>Safe & Scenic</small>
+                    </div>
+                    <div class="route-option" onclick="selectRoute(this)">
+                        <div>⚡ Express Route</div>
+                        <small>Fast & Direct</small>
+                    </div>
+                    <div class="route-option" onclick="selectRoute(this)">
+                        <div>🌊 Oasis Trail</div>
+                        <small>Water Stops</small>
+                    </div>
+                    <div class="route-option" onclick="selectRoute(this)">
+                        <div>🌙 Night Journey</div>
+                        <small>Cool Travel</small>
+                    </div>
+                </div>
+
+                <div class="distance-marker">
+                    <div>📏 Next Destination</div>
+                    <div style="font-size: 24px; color: var(--sunset-red);">45.2 km</div>
+                    <div style="font-size: 14px;">⏱️ 3.5 hours estimated</div>
+                </div>
+                
+                <button class="action-button" onclick="findRoute()">🔄 Recalculate</button>
+            </div>
+
+            <!-- Weather Conditions -->
+            <div class="command-panel weather-panel">
+                <h3 class="panel-title">🌡️ Desert Conditions</h3>
+                
+                <div class="weather-display">
+                    <div class="weather-main">
+                        <div class="weather-icon">☀️</div>
+                        <div class="temp-display">47°C</div>
+                        <div>Scorching Sun</div>
+                    </div>
+                    
+                    <div class="weather-details">
+                        <div class="weather-stat">
+                            <span>💨 Wind Speed</span>
+                            <span>18 km/h NE</span>
+                        </div>
+                        <div class="weather-stat">
+                            <span>💧 Humidity</span>
+                            <span>12%</span>
+                        </div>
+                        <div class="weather-stat">
+                            <span>👁️ Visibility</span>
+                            <span>25 km</span>
+                        </div>
+                        <div class="weather-stat">
+                            <span>🌅 UV Index</span>
+                            <span>Extreme</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sandstorm-alert">
+                    ⚠️ Sandstorm Warning: Expected at 15:30
+                </div>
+                
+                <button class="action-button" onclick="updateWeather()">🔄 Refresh Weather</button>
+            </div>
+
+            <!-- Resource Tracker -->
+            <div class="command-panel resource-tracker">
+                <h3 class="panel-title">📦 Caravan Resources</h3>
+                
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <div class="resource-icon">💧</div>
+                        <div>Water Supply</div>
+                        <div class="resource-meter">
+                            <div class="resource-fill water-fill"></div>
+                        </div>
+                        <div class="resource-value">750L / 1000L</div>
+                    </div>
+                    
+                    <div class="resource-item">
+                        <div class="resource-icon">🥘</div>
+                        <div>Food Supplies</div>
+                        <div class="resource-meter">
+                            <div class="resource-fill supplies-fill"></div>
+                        </div>
+                        <div class="resource-value">60%</div>
+                    </div>
+                    
+                    <div class="resource-item">
+                        <div class="resource-icon">🐪</div>
+                        <div>Camel Stamina</div>
+                        <div class="resource-meter">
+                            <div class="resource-fill stamina-fill"></div>
+                        </div>
+                        <div class="resource-value">Excellent</div>
+                    </div>
+                    
+                    <div class="resource-item">
+                        <div class="resource-icon">⛽</div>
+                        <div>Vehicle Fuel</div>
+                        <div class="resource-meter">
+                            <div class="resource-fill fuel-fill"></div>
+                        </div>
+                        <div class="resource-value">40%</div>
+                    </div>
+                </div>
+
+                <div class="camel-status">
+                    <strong>🐪 Caravan Status:</strong><br>
+                    12 Camels • 8 Riders • 4 Vehicles<br>
+                    <em>Ready for next leg of journey</em>
+                </div>
+                
+                <button class="action-button" onclick="manageResources()">⚙️ Manage Supplies</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create sand particles
+        function createSandParticles() {
+            const particleContainer = document.getElementById('sandParticles');
+            
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'sand-particle';
+                particle.style.left = '-10px';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (8 + Math.random() * 4) + 's';
+                particleContainer.appendChild(particle);
+            }
+        }
+
+        // Interactive functions
+        function selectRoute(element) {
+            document.querySelectorAll('.route-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            // Update distance based on route
+            const distances = {
+                'Caravan Path': '45.2 km',
+                'Express Route': '38.7 km',
+                'Oasis Trail': '52.1 km',
+                'Night Journey': '45.2 km'
+            };
+            
+            const routeName = element.querySelector('div').textContent;
+            const distanceMarker = document.querySelector('.distance-marker div:nth-child(2)');
+            if (distances[routeName]) {
+                distanceMarker.textContent = distances[routeName];
+            }
+        }
+
+        function planRoute() {
+            // Simulate route planning
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '🔄 Planning...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.disabled = false;
+                showNotification('Route updated successfully!');
+            }, 2000);
+        }
+
+        function findRoute() {
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '🔄 Calculating...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.disabled = false;
+                showNotification('New route calculated!');
+            }, 1500);
+        }
+
+        function updateWeather() {
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '🔄 Updating...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.disabled = false;
+                
+                // Randomly update temperature
+                const tempDisplay = document.querySelector('.temp-display');
+                const newTemp = 42 + Math.floor(Math.random() * 10);
+                tempDisplay.textContent = newTemp + '°C';
+                
+                showNotification('Weather data refreshed!');
+            }, 1800);
+        }
+
+        function manageResources() {
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '⚙️ Managing...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.disabled = false;
+                showNotification('Resources optimized!');
+            }, 2200);
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(45deg, var(--sunset-orange), var(--sunset-red));
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-weight: bold;
+                z-index: 1000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Add dynamic CSS for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Simulate real-time updates
+        function simulateRealTimeUpdates() {
+            // Update progress bar
+            setInterval(() => {
+                const progressFill = document.querySelector('.progress-fill');
+                const currentWidth = parseInt(progressFill.style.width) || 35;
+                const newWidth = currentWidth + (Math.random() - 0.5) * 2;
+                progressFill.style.width = Math.max(30, Math.min(45, newWidth)) + '%';
+            }, 5000);
+            
+            // Update resource meters occasionally
+            setInterval(() => {
+                const meters = document.querySelectorAll('.resource-fill');
+                meters.forEach(meter => {
+                    const currentWidth = parseInt(meter.style.width) || 
+                                       parseInt(getComputedStyle(meter).width) / 
+                                       parseInt(getComputedStyle(meter.parentElement).width) * 100;
+                    const change = (Math.random() - 0.5) * 5;
+                    const newWidth = Math.max(10, Math.min(95, currentWidth + change));
+                    meter.style.width = newWidth + '%';
+                });
+            }, 10000);
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', () => {
+            createSandParticles();
+            simulateRealTimeUpdates();
+            
+            // Add some initial animation delays for a staggered effect
+            const panels = document.querySelectorAll('.command-panel');
+            panels.forEach((panel, index) => {
+                panel.style.animationDelay = (index * 0.2) + 's';
+                panel.style.animation = 'fadeInUp 0.6s ease-out forwards';
+            });
+        });
+
+        // Add fade in animation
+        const fadeInStyle = document.createElement('style');
+        fadeInStyle.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .command-panel {
+                opacity: 0;
+            }
+        `;
+        document.head.appendChild(fadeInStyle);
+    </script>
+</body>
+</html>

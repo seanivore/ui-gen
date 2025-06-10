@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Minimalism - Data Table Hybrid</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #fafafa;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+
+        .header {
+            margin-bottom: 80px;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            font-weight: 400;
+            color: #666;
+            letter-spacing: 0.01em;
+        }
+
+        .data-interface {
+            background: #ffffff;
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .controls {
+            padding: 40px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 48px;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 300;
+            letter-spacing: -0.01em;
+            outline: none;
+            border-bottom: 1px solid #e0e0e0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .search-input:focus {
+            border-bottom-color: #1a1a1a;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+            font-weight: 300;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0.4;
+            transition: opacity 0.3s ease;
+        }
+
+        .search-input:focus + .search-icon {
+            opacity: 0.8;
+        }
+
+        .filter-section {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .filter-select {
+            appearance: none;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 400;
+            color: #1a1a1a;
+            cursor: pointer;
+            padding: 8px 0;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-select:hover {
+            border-bottom-color: #e0e0e0;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-bottom-color: #1a1a1a;
+        }
+
+        .export-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            border-radius: 1px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .export-button:hover {
+            background: #f8f8f8;
+            color: #1a1a1a;
+        }
+
+        .export-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .export-button:hover .export-icon {
+            opacity: 1;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-header {
+            background: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .table-header th {
+            padding: 24px 40px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
+        }
+
+        .table-header th:first-child {
+            padding-left: 40px;
+        }
+
+        .table-header th:last-child {
+            padding-right: 40px;
+        }
+
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.3s ease;
+        }
+
+        .sortable:hover {
+            color: #666;
+        }
+
+        .sortable::after {
+            content: '';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-right: 1px solid currentColor;
+            border-bottom: 1px solid currentColor;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sortable:hover::after {
+            opacity: 0.4;
+        }
+
+        .table-body tr {
+            border-bottom: 1px solid #f8f8f8;
+            transition: background-color 0.2s ease;
+        }
+
+        .table-body tr:hover {
+            background: #fcfcfc;
+        }
+
+        .table-body tr:last-child {
+            border-bottom: none;
+        }
+
+        .table-body td {
+            padding: 24px 40px;
+            font-size: 14px;
+            font-weight: 300;
+            color: #1a1a1a;
+            vertical-align: middle;
+        }
+
+        .table-body td:first-child {
+            padding-left: 40px;
+            font-weight: 400;
+        }
+
+        .table-body td:last-child {
+            padding-right: 40px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 1px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-active {
+            background: #f0f9f0;
+            color: #2d7d2d;
+        }
+
+        .status-pending {
+            background: #fff9e6;
+            color: #b8860b;
+        }
+
+        .status-inactive {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .table-footer {
+            padding: 40px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-info {
+            font-size: 13px;
+            font-weight: 300;
+            color: #666;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .pagination-dots {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pagination-dot.active {
+            background: #1a1a1a;
+            transform: scale(1.2);
+        }
+
+        .pagination-dot:hover:not(.active) {
+            background: #ccc;
+            transform: scale(1.1);
+        }
+
+        .pagination-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination-button {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .pagination-button:hover:not(:disabled) {
+            background: #f8f8f8;
+        }
+
+        .pagination-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .pagination-arrow {
+            width: 12px;
+            height: 12px;
+            border-right: 1px solid #666;
+            border-bottom: 1px solid #666;
+            transform: rotate(-45deg);
+        }
+
+        .pagination-arrow.prev {
+            transform: rotate(135deg);
+        }
+
+        .empty-state {
+            padding: 80px 40px;
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            font-weight: 300;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .table-body tr {
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 24px;
+            }
+
+            .filter-section {
+                justify-content: space-between;
+            }
+
+            .table-header th,
+            .table-body td {
+                padding: 16px 20px;
+            }
+
+            .table-footer {
+                flex-direction: column;
+                gap: 20px;
+                align-items: stretch;
+            }
+
+            .pagination {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Data Overview</h1>
+            <p class="subtitle">Clean interface for complex data management</p>
+        </div>
+
+        <div class="data-interface">
+            <div class="controls">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search records..." id="searchInput">
+                    <svg class="search-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select class="filter-select" id="statusFilter">
+                            <option value="">All</option>
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Type</label>
+                        <select class="filter-select" id="typeFilter">
+                            <option value="">All</option>
+                            <option value="project">Project</option>
+                            <option value="task">Task</option>
+                            <option value="milestone">Milestone</option>
+                        </select>
+                    </div>
+
+                    <button class="export-button" id="exportButton">
+                        <svg class="export-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="sortable" data-sort="name">Name</th>
+                            <th class="sortable" data-sort="type">Type</th>
+                            <th class="sortable" data-sort="status">Status</th>
+                            <th class="sortable" data-sort="progress">Progress</th>
+                            <th class="sortable" data-sort="date">Last Updated</th>
+                            <th class="sortable" data-sort="owner">Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-body" id="tableBody">
+                        <tr data-status="active" data-type="project">
+                            <td>Digital Platform Redesign</td>
+                            <td>Project</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>78%</td>
+                            <td>2 hours ago</td>
+                            <td>Sarah Chen</td>
+                        </tr>
+                        <tr data-status="pending" data-type="task">
+                            <td>User Research Analysis</td>
+                            <td>Task</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>45%</td>
+                            <td>1 day ago</td>
+                            <td>Marcus Williams</td>
+                        </tr>
+                        <tr data-status="active" data-type="milestone">
+                            <td>Q4 Product Launch</td>
+                            <td>Milestone</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>92%</td>
+                            <td>3 hours ago</td>
+                            <td>Elena Rodriguez</td>
+                        </tr>
+                        <tr data-status="inactive" data-type="project">
+                            <td>Legacy System Migration</td>
+                            <td>Project</td>
+                            <td><span class="status-badge status-inactive">Inactive</span></td>
+                            <td>15%</td>
+                            <td>5 days ago</td>
+                            <td>David Kim</td>
+                        </tr>
+                        <tr data-status="active" data-type="task">
+                            <td>API Documentation Update</td>
+                            <td>Task</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>67%</td>
+                            <td>6 hours ago</td>
+                            <td>Anna Thompson</td>
+                        </tr>
+                        <tr data-status="pending" data-type="project">
+                            <td>Mobile App Development</td>
+                            <td>Project</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>23%</td>
+                            <td>2 days ago</td>
+                            <td>James Wilson</td>
+                        </tr>
+                        <tr data-status="active" data-type="milestone">
+                            <td>Beta Testing Complete</td>
+                            <td>Milestone</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>88%</td>
+                            <td>1 hour ago</td>
+                            <td>Lisa Garcia</td>
+                        </tr>
+                        <tr data-status="inactive" data-type="task">
+                            <td>Database Optimization</td>
+                            <td>Task</td>
+                            <td><span class="status-badge status-inactive">Inactive</span></td>
+                            <td>34%</td>
+                            <td>1 week ago</td>
+                            <td>Robert Brown</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-footer">
+                <div class="table-info">
+                    <span id="recordCount">Showing 8 of 8 records</span>
+                </div>
+
+                <div class="pagination">
+                    <div class="pagination-nav">
+                        <button class="pagination-button" id="prevButton" disabled>
+                            <div class="pagination-arrow prev"></div>
+                        </button>
+                    </div>
+
+                    <div class="pagination-dots">
+                        <div class="pagination-dot active" data-page="1"></div>
+                        <div class="pagination-dot" data-page="2"></div>
+                        <div class="pagination-dot" data-page="3"></div>
+                    </div>
+
+                    <div class="pagination-nav">
+                        <button class="pagination-button" id="nextButton">
+                            <div class="pagination-arrow"></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data management
+        const originalRows = Array.from(document.querySelectorAll('#tableBody tr'));
+        let filteredRows = [...originalRows];
+        let currentPage = 1;
+        const rowsPerPage = 8;
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', handleSearch);
+
+        function handleSearch() {
+            const searchTerm = searchInput.value.toLowerCase();
+            filteredRows = originalRows.filter(row => {
+                const text = row.textContent.toLowerCase();
+                return text.includes(searchTerm);
+            });
+            applyFilters();
+            updateDisplay();
+        }
+
+        // Filter functionality
+        const statusFilter = document.getElementById('statusFilter');
+        const typeFilter = document.getElementById('typeFilter');
+
+        statusFilter.addEventListener('change', applyFilters);
+        typeFilter.addEventListener('change', applyFilters);
+
+        function applyFilters() {
+            const statusValue = statusFilter.value;
+            const typeValue = typeFilter.value;
+            const searchTerm = searchInput.value.toLowerCase();
+
+            filteredRows = originalRows.filter(row => {
+                const matchesSearch = row.textContent.toLowerCase().includes(searchTerm);
+                const matchesStatus = !statusValue || row.dataset.status === statusValue;
+                const matchesType = !typeValue || row.dataset.type === typeValue;
+                
+                return matchesSearch && matchesStatus && matchesType;
+            });
+
+            currentPage = 1;
+            updateDisplay();
+        }
+
+        // Display update
+        function updateDisplay() {
+            const tableBody = document.getElementById('tableBody');
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const pageRows = filteredRows.slice(startIndex, endIndex);
+
+            // Clear table
+            tableBody.innerHTML = '';
+
+            if (pageRows.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="empty-state">No records found</td></tr>';
+            } else {
+                pageRows.forEach(row => {
+                    tableBody.appendChild(row.cloneNode(true));
+                });
+            }
+
+            updatePagination();
+            updateRecordCount();
+        }
+
+        // Pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            const dots = document.querySelectorAll('.pagination-dot');
+
+            prevButton.disabled = currentPage === 1;
+            nextButton.disabled = currentPage === totalPages || totalPages === 0;
+
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index + 1 === currentPage);
+                dot.style.display = index + 1 <= totalPages ? 'block' : 'none';
+            });
+        }
+
+        function updateRecordCount() {
+            const recordCount = document.getElementById('recordCount');
+            const total = filteredRows.length;
+            const startIndex = (currentPage - 1) * rowsPerPage + 1;
+            const endIndex = Math.min(currentPage * rowsPerPage, total);
+
+            if (total === 0) {
+                recordCount.textContent = 'No records found';
+            } else {
+                recordCount.textContent = `Showing ${startIndex}-${endIndex} of ${total} records`;
+            }
+        }
+
+        // Pagination event listeners
+        document.getElementById('prevButton').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                updateDisplay();
+            }
+        });
+
+        document.getElementById('nextButton').addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateDisplay();
+            }
+        });
+
+        document.querySelectorAll('.pagination-dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                currentPage = parseInt(dot.dataset.page);
+                updateDisplay();
+            });
+        });
+
+        // Sorting functionality
+        document.querySelectorAll('.sortable').forEach(header => {
+            header.addEventListener('click', () => {
+                const sortBy = header.dataset.sort;
+                sortTable(sortBy);
+            });
+        });
+
+        function sortTable(sortBy) {
+            const columnIndex = {
+                'name': 0,
+                'type': 1,
+                'status': 2,
+                'progress': 3,
+                'date': 4,
+                'owner': 5
+            }[sortBy];
+
+            filteredRows.sort((a, b) => {
+                const aValue = a.cells[columnIndex].textContent.trim();
+                const bValue = b.cells[columnIndex].textContent.trim();
+
+                if (sortBy === 'progress') {
+                    return parseInt(aValue) - parseInt(bValue);
+                }
+
+                return aValue.localeCompare(bValue);
+            });
+
+            updateDisplay();
+        }
+
+        // Export functionality
+        document.getElementById('exportButton').addEventListener('click', () => {
+            const data = filteredRows.map(row => {
+                return Array.from(row.cells).map(cell => 
+                    cell.textContent.trim().replace(/\s+/g, ' ')
+                );
+            });
+
+            const csvContent = [
+                ['Name', 'Type', 'Status', 'Progress', 'Last Updated', 'Owner'],
+                ...data
+            ].map(row => row.join(',')).join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data-export.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Initialize
+        updateDisplay();
+    </script>
+</body>
+</html>

@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industrial Control Panel - Multi-Function Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        
+        .control-panel {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            border-radius: 12px;
+            box-shadow: 
+                inset 0 0 20px rgba(0,0,0,0.5),
+                0 10px 30px rgba(0,0,0,0.3),
+                0 0 0 2px #555;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .control-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, transparent 98%, rgba(255,255,255,0.1) 99%, transparent 100%),
+                linear-gradient(0deg, transparent 98%, rgba(255,255,255,0.1) 99%, transparent 100%);
+            background-size: 40px 40px, 40px 40px, 20px 20px, 20px 20px;
+            pointer-events: none;
+        }
+        
+        .panel-header {
+            background: linear-gradient(90deg, #4a4a4a, #3a3a3a);
+            padding: 20px;
+            border-bottom: 3px solid #666;
+            position: relative;
+        }
+        
+        .panel-header::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            width: 8px;
+            height: 8px;
+            background: #ff6b35;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 10px #ff6b35,
+                16px 0 0 #4caf50,
+                16px 0 10px #4caf50,
+                32px 0 0 #2196f3,
+                32px 0 10px #2196f3;
+            animation: statusBlink 2s infinite;
+        }
+        
+        @keyframes statusBlink {
+            0%, 50% { opacity: 1; }
+            25%, 75% { opacity: 0.3; }
+        }
+        
+        .panel-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e0e0e0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+        
+        .panel-subtitle {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        .control-section {
+            background: linear-gradient(145deg, #404040, #2e2e2e);
+            border-radius: 8px;
+            padding: 25px;
+            border: 2px solid #555;
+            position: relative;
+        }
+        
+        .control-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b35, #ffa726, #ff6b35);
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ff6b35;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #ff6b35;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #ff6b35;
+        }
+        
+        /* Precision Sliders */
+        .slider-group {
+            margin-bottom: 25px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #ccc;
+        }
+        
+        .slider-value {
+            background: #1a1a1a;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #666;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: #4caf50;
+        }
+        
+        .slider-container {
+            position: relative;
+            height: 40px;
+            background: linear-gradient(90deg, #2a2a2a, #1a1a1a, #2a2a2a);
+            border-radius: 20px;
+            border: 2px solid #555;
+            overflow: hidden;
+        }
+        
+        .slider-track {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            right: 10px;
+            height: 4px;
+            background: linear-gradient(90deg, #333, #555, #333);
+            transform: translateY(-50%);
+            border-radius: 2px;
+        }
+        
+        .slider-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b35, #ffa726);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .slider-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .slider-handle {
+            position: absolute;
+            top: 50%;
+            width: 24px;
+            height: 24px;
+            background: radial-gradient(circle, #666, #444);
+            border: 2px solid #888;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        
+        .slider-handle:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            border-color: #ff6b35;
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.5);
+        }
+        
+        .slider-handle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: #ff6b35;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Industrial Toggle Switches */
+        .toggle-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .toggle-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 32px;
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border: 2px solid #555;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background: linear-gradient(145deg, #4caf50, #2e7d32);
+            border-color: #4caf50;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .toggle-handle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: radial-gradient(circle, #888, #555);
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .toggle-switch.active .toggle-handle {
+            left: 30px;
+            background: radial-gradient(circle, #fff, #e0e0e0);
+        }
+        
+        .toggle-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+        
+        /* Analog Meters */
+        .meter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .analog-meter {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+        
+        .meter-face {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, #2a2a2a, #1a1a1a);
+            border: 3px solid #555;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .meter-face::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            right: 10%;
+            bottom: 10%;
+            border-radius: 50%;
+            border: 1px solid #666;
+        }
+        
+        .meter-scale {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .scale-mark {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            width: 2px;
+            height: 15px;
+            background: #999;
+            transform-origin: bottom center;
+            transform: translateX(-50%);
+        }
+        
+        .scale-mark.major {
+            height: 20px;
+            width: 3px;
+            background: #ff6b35;
+        }
+        
+        .meter-needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(to top, #ff6b35, #fff);
+            transform-origin: bottom center;
+            transform: translate(-50%, -100%) rotate(var(--needle-angle, -90deg));
+            transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-radius: 1px;
+        }
+        
+        .meter-needle::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: #333;
+            border: 2px solid #666;
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .meter-label {
+            position: absolute;
+            bottom: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .meter-value {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: 600;
+            color: #4caf50;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        /* Calibration Controls */
+        .calibration-panel {
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+            border: 1px solid #666;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .calibration-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .calibration-button {
+            background: linear-gradient(145deg, #555, #333);
+            border: 1px solid #777;
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: #e0e0e0;
+            font-family: inherit;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .calibration-button:hover {
+            background: linear-gradient(145deg, #666, #444);
+            border-color: #ff6b35;
+            color: #ff6b35;
+        }
+        
+        .calibration-display {
+            background: #000;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #4caf50;
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        /* System Status */
+        .system-status {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border: 1px solid #555;
+            border-radius: 6px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--status-color, #666);
+            box-shadow: 0 0 8px var(--status-color, #666);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .status-text {
+            font-size: 11px;
+            color: #ccc;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-value {
+            margin-left: auto;
+            font-weight: 600;
+            color: #4caf50;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .control-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .meter-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .toggle-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .system-status {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="control-panel">
+        <div class="panel-header">
+            <div class="panel-title">Industrial Control System</div>
+            <div class="panel-subtitle">Multi-Function Interface Panel v5.2.1</div>
+        </div>
+        
+        <div class="control-grid">
+            <!-- Precision Control Section -->
+            <div class="control-section">
+                <div class="section-title">Precision Controls</div>
+                
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Motor Speed (RPM)</span>
+                        <span class="slider-value" id="motorSpeed">2450</span>
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-track">
+                            <div class="slider-progress" style="width: 65%"></div>
+                        </div>
+                        <div class="slider-handle" style="left: 65%"></div>
+                    </div>
+                </div>
+                
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Pressure (PSI)</span>
+                        <span class="slider-value" id="pressure">847</span>
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-track">
+                            <div class="slider-progress" style="width: 42%"></div>
+                        </div>
+                        <div class="slider-handle" style="left: 42%"></div>
+                    </div>
+                </div>
+                
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Temperature (°C)</span>
+                        <span class="slider-value" id="temperature">78.5</span>
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-track">
+                            <div class="slider-progress" style="width: 31%"></div>
+                        </div>
+                        <div class="slider-handle" style="left: 31%"></div>
+                    </div>
+                </div>
+                
+                <div class="calibration-panel">
+                    <div class="calibration-controls">
+                        <button class="calibration-button" onclick="calibrate('zero')">Zero Cal</button>
+                        <div class="calibration-display">CAL: 0.003</div>
+                        <button class="calibration-button" onclick="calibrate('span')">Span Cal</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Switches Section -->
+            <div class="control-section">
+                <div class="section-title">System Switches</div>
+                
+                <div class="toggle-group">
+                    <div class="toggle-item">
+                        <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                            <div class="toggle-handle"></div>
+                        </div>
+                        <div class="toggle-label">Main Power</div>
+                    </div>
+                    
+                    <div class="toggle-item">
+                        <div class="toggle-switch" onclick="toggleSwitch(this)">
+                            <div class="toggle-handle"></div>
+                        </div>
+                        <div class="toggle-label">Cooling Sys</div>
+                    </div>
+                    
+                    <div class="toggle-item">
+                        <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                            <div class="toggle-handle"></div>
+                        </div>
+                        <div class="toggle-label">Auto Mode</div>
+                    </div>
+                    
+                    <div class="toggle-item">
+                        <div class="toggle-switch" onclick="toggleSwitch(this)">
+                            <div class="toggle-handle"></div>
+                        </div>
+                        <div class="toggle-label">Safety Lock</div>
+                    </div>
+                </div>
+                
+                <div class="meter-grid">
+                    <div class="analog-meter">
+                        <div class="meter-face">
+                            <div class="meter-scale">
+                                <!-- Scale marks will be generated by JavaScript -->
+                            </div>
+                            <div class="meter-needle" style="--needle-angle: 25deg"></div>
+                            <div class="meter-label">Voltage</div>
+                            <div class="meter-value">240V</div>
+                        </div>
+                    </div>
+                    
+                    <div class="analog-meter">
+                        <div class="meter-face">
+                            <div class="meter-scale">
+                                <!-- Scale marks will be generated by JavaScript -->
+                            </div>
+                            <div class="meter-needle" style="--needle-angle: -15deg"></div>
+                            <div class="meter-label">Current</div>
+                            <div class="meter-value">15.7A</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Status Section -->
+            <div class="system-status">
+                <div class="status-item">
+                    <div class="status-indicator" style="--status-color: #4caf50"></div>
+                    <div class="status-text">System Ready</div>
+                    <div class="status-value">OK</div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-indicator" style="--status-color: #ff6b35"></div>
+                    <div class="status-text">Maintenance Due</div>
+                    <div class="status-value">72H</div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-indicator" style="--status-color: #2196f3"></div>
+                    <div class="status-text">Network Status</div>
+                    <div class="status-value">CONN</div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-indicator" style="--status-color: #4caf50"></div>
+                    <div class="status-text">Safety Systems</div>
+                    <div class="status-value">ACTIVE</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize meter scales
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMeters();
+            startSystemSimulation();
+        });
+        
+        function initializeMeters() {
+            const meterScales = document.querySelectorAll('.meter-scale');
+            
+            meterScales.forEach(scale => {
+                for (let i = 0; i < 12; i++) {
+                    const mark = document.createElement('div');
+                    mark.className = 'scale-mark';
+                    if (i % 3 === 0) {
+                        mark.classList.add('major');
+                    }
+                    mark.style.transform = `translateX(-50%) rotate(${i * 15 - 90}deg)`;
+                    scale.appendChild(mark);
+                }
+            });
+        }
+        
+        function toggleSwitch(switchElement) {
+            switchElement.classList.toggle('active');
+            
+            // Add mechanical click feedback
+            switchElement.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                switchElement.style.transform = '';
+            }, 100);
+            
+            // Play click sound (if audio context is available)
+            playClickSound();
+        }
+        
+        function playClickSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'square';
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } catch (e) {
+                // Fallback for environments without Web Audio API
+                console.log('Click sound played');
+            }
+        }
+        
+        function calibrate(type) {
+            const display = document.querySelector('.calibration-display');
+            display.textContent = `CAL: ${type.toUpperCase()}...`;
+            
+            setTimeout(() => {
+                const randomValue = (Math.random() * 0.01).toFixed(3);
+                display.textContent = `CAL: ${randomValue}`;
+            }, 1500);
+        }
+        
+        function startSystemSimulation() {
+            // Simulate real-time meter updates
+            setInterval(() => {
+                updateMeters();
+                updateSliderValues();
+            }, 2000);
+        }
+        
+        function updateMeters() {
+            const needles = document.querySelectorAll('.meter-needle');
+            const values = document.querySelectorAll('.meter-value');
+            
+            needles.forEach((needle, index) => {
+                const randomAngle = Math.random() * 180 - 90;
+                needle.style.setProperty('--needle-angle', `${randomAngle}deg`);
+                
+                if (index === 0) {
+                    const voltage = 220 + Math.random() * 40;
+                    values[index].textContent = `${voltage.toFixed(1)}V`;
+                } else {
+                    const current = 10 + Math.random() * 15;
+                    values[index].textContent = `${current.toFixed(1)}A`;
+                }
+            });
+        }
+        
+        function updateSliderValues() {
+            const motorSpeed = document.getElementById('motorSpeed');
+            const pressure = document.getElementById('pressure');
+            const temperature = document.getElementById('temperature');
+            
+            if (motorSpeed) {
+                const speed = 2400 + Math.random() * 100;
+                motorSpeed.textContent = Math.round(speed);
+            }
+            
+            if (pressure) {
+                const psi = 800 + Math.random() * 100;
+                pressure.textContent = Math.round(psi);
+            }
+            
+            if (temperature) {
+                const temp = 75 + Math.random() * 10;
+                temperature.textContent = temp.toFixed(1);
+            }
+        }
+        
+        // Add interactive slider functionality
+        document.querySelectorAll('.slider-container').forEach(container => {
+            const handle = container.querySelector('.slider-handle');
+            const progress = container.querySelector('.slider-progress');
+            let isDragging = false;
+            
+            handle.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+            });
+            
+            function handleMouseMove(e) {
+                if (!isDragging) return;
+                
+                const rect = container.getBoundingClientRect();
+                const percentage = Math.max(0, Math.min(100, 
+                    ((e.clientX - rect.left) / rect.width) * 100));
+                
+                handle.style.left = `${percentage}%`;
+                progress.style.width = `${percentage}%`;
+            }
+            
+            function handleMouseUp() {
+                isDragging = false;
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+            }
+        });
+        
+        // Add keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                // Emergency stop simulation
+                document.querySelectorAll('.toggle-switch.active').forEach(toggle => {
+                    if (!toggle.closest('.toggle-item').querySelector('.toggle-label').textContent.includes('Safety')) {
+                        toggle.classList.remove('active');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

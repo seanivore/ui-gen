@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Cyberpunk Command Center - Hybrid UI Component</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-pink: #ff0080;
+            --neon-blue: #00ffff;
+            --neon-green: #39ff14;
+            --neon-purple: #8a2be2;
+            --electric-blue: #0066ff;
+            --dark-bg: #0a0a0f;
+            --darker-bg: #050508;
+            --grid-color: rgba(0, 255, 255, 0.1);
+            --terminal-green: #00ff41;
+            --warning-orange: #ff9500;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            color: var(--neon-blue);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Digital Grid Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(0deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridPulse 4s ease-in-out infinite;
+            z-index: -2;
+        }
+
+        /* Animated particles */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 25% 25%, rgba(255, 0, 128, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(57, 255, 20, 0.05) 0%, transparent 50%);
+            animation: particleFloat 6s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes particleFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(10px, -10px) scale(1.1); }
+            66% { transform: translate(-10px, 10px) scale(0.9); }
+        }
+
+        /* Scanlines effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(transparent 0%, rgba(0, 255, 255, 0.03) 50%, transparent 100%);
+            background-size: 100% 4px;
+            animation: scanlineMove 2s linear infinite;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes scanlineMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100vh; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Main cyberpunk panel */
+        .cyberpunk-panel {
+            background: linear-gradient(135deg, 
+                rgba(10, 10, 15, 0.95) 0%,
+                rgba(5, 5, 8, 0.98) 50%,
+                rgba(10, 10, 15, 0.95) 100%);
+            border: 2px solid var(--neon-blue);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 
+                0 0 50px rgba(0, 255, 255, 0.3),
+                inset 0 0 50px rgba(0, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyberpunk-panel::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                var(--neon-pink), 
+                var(--neon-blue), 
+                var(--neon-green), 
+                var(--neon-purple));
+            border-radius: 22px;
+            z-index: -1;
+            opacity: 0;
+            animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Header with holographic title */
+        .cyber-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .cyber-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 
+                0 0 10px var(--neon-blue),
+                0 0 20px var(--neon-blue),
+                0 0 30px var(--neon-blue);
+            animation: titleGlow 2s ease-in-out infinite alternate;
+            position: relative;
+        }
+
+        .cyber-title::after {
+            content: 'COMMAND CENTER';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: holographicSweep 4s linear infinite;
+        }
+
+        @keyframes titleGlow {
+            0% { filter: brightness(1) saturate(1); }
+            100% { filter: brightness(1.3) saturate(1.5); }
+        }
+
+        @keyframes holographicSweep {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .cyber-subtitle {
+            color: var(--neon-green);
+            font-size: 1.2rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        /* Main content grid */
+        .cyber-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        /* User Profile Section */
+        .profile-section {
+            grid-column: 1;
+            grid-row: 1;
+            background: rgba(255, 0, 128, 0.1);
+            border: 1px solid var(--neon-pink);
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.2);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 15px;
+            box-shadow: 0 0 30px rgba(255, 0, 128, 0.5);
+            animation: avatarPulse 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .profile-avatar::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px solid var(--neon-pink);
+            border-radius: 50%;
+            animation: avatarRing 2s linear infinite;
+        }
+
+        @keyframes avatarPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes avatarRing {
+            0% { transform: rotate(0deg); opacity: 1; }
+            100% { transform: rotate(360deg); opacity: 0.5; }
+        }
+
+        .profile-info {
+            color: var(--neon-pink);
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .profile-status {
+            font-size: 0.9rem;
+            color: var(--neon-green);
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .profile-metrics {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: rgba(0, 255, 255, 0.7);
+            text-transform: uppercase;
+        }
+
+        /* Stats Dashboard */
+        .stats-section {
+            grid-column: 2;
+            grid-row: 1;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .stats-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .stat-bar {
+            margin-bottom: 15px;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .stat-name {
+            color: var(--neon-blue);
+        }
+
+        .stat-value {
+            color: var(--neon-green);
+            font-weight: 600;
+        }
+
+        .stat-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stat-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            border-radius: 4px;
+            transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            animation: statGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes statGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.8); }
+        }
+
+        /* Notifications Section */
+        .notifications-section {
+            grid-column: 1;
+            grid-row: 2;
+            background: rgba(57, 255, 20, 0.1);
+            border: 1px solid var(--neon-green);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notifications-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--neon-green);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--neon-green);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-badge {
+            background: var(--neon-pink);
+            color: var(--dark-bg);
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            animation: badgePulse 1s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .notification {
+            background: rgba(57, 255, 20, 0.05);
+            border-left: 3px solid var(--neon-green);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            animation: notificationSlide 0.5s ease-out;
+            position: relative;
+        }
+
+        .notification.critical {
+            border-left-color: var(--neon-pink);
+            background: rgba(255, 0, 128, 0.05);
+            animation: criticalAlert 1s ease-in-out infinite;
+        }
+
+        @keyframes notificationSlide {
+            0% { transform: translateX(-100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes criticalAlert {
+            0%, 100% { box-shadow: 0 0 5px rgba(255, 0, 128, 0.3); }
+            50% { box-shadow: 0 0 15px rgba(255, 0, 128, 0.6); }
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            color: rgba(57, 255, 20, 0.7);
+            margin-bottom: 5px;
+        }
+
+        .notification-message {
+            font-size: 0.9rem;
+            color: var(--neon-green);
+        }
+
+        /* Chat Interface */
+        .chat-section {
+            grid-column: 2;
+            grid-row: 2;
+            background: rgba(138, 43, 226, 0.1);
+            border: 1px solid var(--neon-purple);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
+            display: flex;
+            flex-direction: column;
+            max-height: 300px;
+        }
+
+        .chat-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--neon-purple);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--neon-purple);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding-right: 10px;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            animation: messageAppear 0.5s ease-out;
+        }
+
+        .chat-message.user {
+            text-align: right;
+        }
+
+        .chat-message.system {
+            text-align: left;
+        }
+
+        @keyframes messageAppear {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-bubble {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 80%;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .message-bubble.user {
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            color: white;
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+        }
+
+        .message-bubble.system {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            background: rgba(138, 43, 226, 0.1);
+            border: 2px solid var(--neon-purple);
+            border-radius: 25px;
+            color: var(--neon-purple);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.3);
+            background: rgba(255, 0, 128, 0.05);
+        }
+
+        .chat-input::placeholder {
+            color: rgba(138, 43, 226, 0.6);
+        }
+
+        .chat-send {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.4);
+        }
+
+        .chat-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(138, 43, 226, 0.6);
+        }
+
+        /* Activity Feed */
+        .activity-section {
+            grid-column: 1 / -1;
+            grid-row: 3;
+            background: rgba(0, 102, 255, 0.1);
+            border: 1px solid var(--electric-blue);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .activity-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--electric-blue);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--electric-blue);
+        }
+
+        .activity-timeline {
+            position: relative;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .activity-timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--electric-blue), transparent);
+        }
+
+        .activity-item {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 20px;
+            animation: activitySlide 0.6s ease-out;
+        }
+
+        .activity-item::before {
+            content: '';
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: var(--electric-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--electric-blue);
+            animation: activityPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes activitySlide {
+            0% { opacity: 0; transform: translateX(-50px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes activityPulse {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.3); }
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: rgba(0, 102, 255, 0.7);
+            margin-bottom: 5px;
+        }
+
+        .activity-text {
+            color: var(--electric-blue);
+            font-size: 0.9rem;
+        }
+
+        .activity-highlight {
+            color: var(--neon-green);
+            font-weight: 600;
+        }
+
+        /* Terminal Command Input */
+        .terminal-section {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--terminal-green);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--terminal-green);
+        }
+
+        .terminal-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-button.close { background: #ff5f56; }
+        .terminal-button.minimize { background: #ffbd2e; }
+        .terminal-button.maximize { background: #27ca3f; }
+
+        .terminal-title {
+            color: var(--terminal-green);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .terminal-output {
+            color: var(--terminal-green);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+
+        .terminal-line {
+            margin-bottom: 5px;
+            animation: terminalType 0.05s ease-out;
+        }
+
+        @keyframes terminalType {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .terminal-prompt {
+            color: var(--terminal-green);
+            font-weight: 600;
+        }
+
+        .terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--terminal-green);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .terminal-cursor {
+            width: 8px;
+            height: 14px;
+            background: var(--terminal-green);
+            animation: cursorBlink 1s infinite;
+        }
+
+        @keyframes cursorBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Sound Visualizer */
+        .sound-visualizer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 100px;
+            height: 60px;
+            display: flex;
+            align-items: end;
+            gap: 3px;
+        }
+
+        .sound-bar {
+            width: 4px;
+            background: linear-gradient(to top, var(--neon-pink), var(--neon-blue));
+            border-radius: 2px;
+            animation: soundWave 0.5s ease-in-out infinite;
+        }
+
+        .sound-bar:nth-child(1) { animation-delay: 0s; }
+        .sound-bar:nth-child(2) { animation-delay: 0.1s; }
+        .sound-bar:nth-child(3) { animation-delay: 0.2s; }
+        .sound-bar:nth-child(4) { animation-delay: 0.3s; }
+        .sound-bar:nth-child(5) { animation-delay: 0.4s; }
+        .sound-bar:nth-child(6) { animation-delay: 0.5s; }
+        .sound-bar:nth-child(7) { animation-delay: 0.6s; }
+        .sound-bar:nth-child(8) { animation-delay: 0.7s; }
+
+        @keyframes soundWave {
+            0%, 100% { height: 10px; }
+            50% { height: 40px; }
+        }
+
+        /* Matrix data stream */
+        .matrix-stream {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: var(--terminal-green);
+            animation: matrixFall 10s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes matrixFall {
+            0% { top: -100%; }
+            100% { top: 100%; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .cyber-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(4, auto);
+            }
+            
+            .profile-section { grid-column: 1; grid-row: 1; }
+            .stats-section { grid-column: 1; grid-row: 2; }
+            .notifications-section { grid-column: 1; grid-row: 3; }
+            .chat-section { grid-column: 1; grid-row: 4; }
+            .activity-section { grid-column: 1; grid-row: 5; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .cyberpunk-panel {
+                padding: 20px;
+            }
+            
+            .cyber-title {
+                font-size: 2rem;
+            }
+            
+            .sound-visualizer {
+                display: none;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--neon-blue), var(--neon-purple));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, var(--neon-pink), var(--neon-blue));
+        }
+    </style>
+</head>
+<body>
+    <!-- Scanlines effect -->
+    <div class="scanlines"></div>
+    
+    <!-- Matrix data stream -->
+    <div class="matrix-stream" id="matrixStream"></div>
+
+    <div class="container">
+        <div class="cyberpunk-panel">
+            <!-- Sound visualizer -->
+            <div class="sound-visualizer">
+                <div class="sound-bar"></div>
+                <div class="sound-bar"></div>
+                <div class="sound-bar"></div>
+                <div class="sound-bar"></div>
+                <div class="sound-bar"></div>
+                <div class="sound-bar"></div>
+                <div class="sound-bar"></div>
+                <div class="sound-bar"></div>
+            </div>
+
+            <!-- Header -->
+            <div class="cyber-header">
+                <h1 class="cyber-title">COMMAND CENTER</h1>
+                <p class="cyber-subtitle">Neural Interface Protocol Active</p>
+            </div>
+
+            <!-- Main content grid -->
+            <div class="cyber-grid">
+                <!-- User Profile Section -->
+                <div class="profile-section">
+                    <div class="profile-avatar">
+                        <span>👤</span>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name">Neo-Operative_7</div>
+                        <div class="profile-status">◉ Online • Level 42</div>
+                        <div class="profile-metrics">
+                            <div class="metric">
+                                <div class="metric-value">1,337</div>
+                                <div class="metric-label">XP</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">98%</div>
+                                <div class="metric-label">Sync</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">42</div>
+                                <div class="metric-label">Rank</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Dashboard -->
+                <div class="stats-section">
+                    <div class="stats-title">System Status</div>
+                    <div class="stat-bar">
+                        <div class="stat-label">
+                            <span class="stat-name">CPU Usage</span>
+                            <span class="stat-value">73%</span>
+                        </div>
+                        <div class="stat-progress">
+                            <div class="stat-progress-fill" style="width: 73%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-bar">
+                        <div class="stat-label">
+                            <span class="stat-name">Memory</span>
+                            <span class="stat-value">85%</span>
+                        </div>
+                        <div class="stat-progress">
+                            <div class="stat-progress-fill" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-bar">
+                        <div class="stat-label">
+                            <span class="stat-name">Network</span>
+                            <span class="stat-value">91%</span>
+                        </div>
+                        <div class="stat-progress">
+                            <div class="stat-progress-fill" style="width: 91%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-bar">
+                        <div class="stat-label">
+                            <span class="stat-name">Neural Link</span>
+                            <span class="stat-value">100%</span>
+                        </div>
+                        <div class="stat-progress">
+                            <div class="stat-progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Section -->
+                <div class="notifications-section">
+                    <div class="notifications-title">
+                        Alerts <span class="notification-badge">3</span>
+                    </div>
+                    <div class="notification critical">
+                        <div class="notification-time">23:47:12</div>
+                        <div class="notification-message">CRITICAL: Firewall breach detected in Sector 7</div>
+                    </div>
+                    <div class="notification">
+                        <div class="notification-time">23:42:08</div>
+                        <div class="notification-message">System backup completed successfully</div>
+                    </div>
+                    <div class="notification">
+                        <div class="notification-time">23:38:45</div>
+                        <div class="notification-message">New neural link established: User_3309</div>
+                    </div>
+                    <div class="notification">
+                        <div class="notification-time">23:35:22</div>
+                        <div class="notification-message">Data sync complete. 1.2TB transferred</div>
+                    </div>
+                </div>
+
+                <!-- Chat Interface -->
+                <div class="chat-section">
+                    <div class="chat-title">Neural Comm</div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-message system">
+                            <div class="message-bubble system">Neural link established. Welcome to the Grid.</div>
+                        </div>
+                        <div class="chat-message user">
+                            <div class="message-bubble user">Status report requested</div>
+                        </div>
+                        <div class="chat-message system">
+                            <div class="message-bubble system">All systems operational. Threat level: Minimal</div>
+                        </div>
+                        <div class="chat-message user">
+                            <div class="message-bubble user">Acknowledged. Maintain surveillance</div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Enter neural command...">
+                        <button class="chat-send" id="chatSend">SEND</button>
+                    </div>
+                </div>
+
+                <!-- Activity Feed -->
+                <div class="activity-section">
+                    <div class="activity-title">Recent Activity</div>
+                    <div class="activity-timeline">
+                        <div class="activity-item">
+                            <div class="activity-time">23:47:12</div>
+                            <div class="activity-text">
+                                User <span class="activity-highlight">Neo-Operative_7</span> accessed encrypted files
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-time">23:45:33</div>
+                            <div class="activity-text">
+                                Neural sync completed with <span class="activity-highlight">MainFrame_Alpha</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-time">23:43:21</div>
+                            <div class="activity-text">
+                                Security protocol <span class="activity-highlight">updated</span> to version 2.4.7
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-time">23:41:09</div>
+                            <div class="activity-text">
+                                Data stream initiated from <span class="activity-highlight">Node_88</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-time">23:39:44</div>
+                            <div class="activity-text">
+                                Cybersecurity scan completed. <span class="activity-highlight">0 threats</span> detected
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terminal Command Interface -->
+            <div class="terminal-section">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <div class="terminal-button close"></div>
+                        <div class="terminal-button minimize"></div>
+                        <div class="terminal-button maximize"></div>
+                    </div>
+                    <div class="terminal-title">NeuroShell v2.4.7</div>
+                </div>
+                <div class="terminal-output" id="terminalOutput">
+                    <div class="terminal-line">Welcome to NeuroShell v2.4.7</div>
+                    <div class="terminal-line">Neural interface initialized...</div>
+                    <div class="terminal-line">Type 'help' for available commands</div>
+                </div>
+                <div class="terminal-input-line">
+                    <span class="terminal-prompt">root@neuralnet:~$</span>
+                    <input type="text" class="terminal-input" id="terminalInput" autocomplete="off">
+                    <div class="terminal-cursor"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class CyberpunkCommandCenter {
+            constructor() {
+                this.terminalCommands = {
+                    'help': 'Available commands: status, scan, encrypt, decrypt, neural-link, matrix, exit',
+                    'status': 'System Status: All neural networks operational. CPU: 73% | Memory: 85% | Network: 91%',
+                    'scan': 'Scanning for threats... [████████████████████] 100% Complete. 0 threats detected.',
+                    'encrypt': 'Encryption protocol activated. Data stream secured with quantum encryption.',
+                    'decrypt': 'Decryption in progress... Access granted. Neural pathways unlocked.',
+                    'neural-link': 'Neural link established. Consciousness transfer protocol initiated.',
+                    'matrix': 'Accessing the Matrix... Reality.exe has stopped responding.',
+                    'hack': 'Initiating hack sequence... [████████████] Access denied. Nice try.',
+                    'exit': 'Connection terminated. Neural link severed.'
+                };
+                
+                this.matrixChars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.startMatrixEffect();
+                this.startStatAnimations();
+                this.startNotificationSystem();
+                this.animateActivityFeed();
+            }
+
+            setupEventListeners() {
+                // Chat functionality
+                const chatInput = document.getElementById('chatInput');
+                const chatSend = document.getElementById('chatSend');
+                const chatMessages = document.getElementById('chatMessages');
+
+                chatSend.addEventListener('click', () => this.sendChatMessage());
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendChatMessage();
+                });
+
+                // Terminal functionality
+                const terminalInput = document.getElementById('terminalInput');
+                terminalInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.processTerminalCommand();
+                });
+            }
+
+            sendChatMessage() {
+                const chatInput = document.getElementById('chatInput');
+                const chatMessages = document.getElementById('chatMessages');
+                const message = chatInput.value.trim();
+
+                if (!message) return;
+
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'chat-message user';
+                userMessage.innerHTML = `<div class="message-bubble user">${message}</div>`;
+                chatMessages.appendChild(userMessage);
+
+                // Simulate system response
+                setTimeout(() => {
+                    const responses = [
+                        'Command acknowledged. Executing...',
+                        'Neural link stable. Proceeding with operation.',
+                        'Threat assessment complete. Status: Secure',
+                        'Data transmission successful. Awaiting next command.',
+                        'System optimization in progress...',
+                        'Cybersecurity protocols updated.',
+                        'Neural interface functioning within normal parameters.'
+                    ];
+                    
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    const systemMessage = document.createElement('div');
+                    systemMessage.className = 'chat-message system';
+                    systemMessage.innerHTML = `<div class="message-bubble system">${randomResponse}</div>`;
+                    chatMessages.appendChild(systemMessage);
+                    
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+
+                chatInput.value = '';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            processTerminalCommand() {
+                const terminalInput = document.getElementById('terminalInput');
+                const terminalOutput = document.getElementById('terminalOutput');
+                const command = terminalInput.value.trim().toLowerCase();
+
+                if (!command) return;
+
+                // Add command to output
+                const commandLine = document.createElement('div');
+                commandLine.className = 'terminal-line';
+                commandLine.textContent = `root@neuralnet:~$ ${command}`;
+                terminalOutput.appendChild(commandLine);
+
+                // Process command
+                setTimeout(() => {
+                    const responseLine = document.createElement('div');
+                    responseLine.className = 'terminal-line';
+                    
+                    if (this.terminalCommands[command]) {
+                        responseLine.textContent = this.terminalCommands[command];
+                    } else {
+                        responseLine.textContent = `Command '${command}' not found. Type 'help' for available commands.`;
+                    }
+                    
+                    terminalOutput.appendChild(responseLine);
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                }, 500);
+
+                terminalInput.value = '';
+            }
+
+            startMatrixEffect() {
+                const matrixStream = document.getElementById('matrixStream');
+                
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        this.createMatrixColumn(matrixStream);
+                    }, i * 1000);
+                }
+
+                setInterval(() => {
+                    this.createMatrixColumn(matrixStream);
+                }, 2000);
+            }
+
+            createMatrixColumn(container) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.left = Math.random() * 180 + 'px';
+                column.style.animationDuration = (Math.random() * 5 + 5) + 's';
+
+                let matrixText = '';
+                for (let i = 0; i < 20; i++) {
+                    matrixText += this.matrixChars[Math.floor(Math.random() * this.matrixChars.length)] + '<br>';
+                }
+                column.innerHTML = matrixText;
+
+                container.appendChild(column);
+
+                setTimeout(() => {
+                    if (column.parentNode) {
+                        column.parentNode.removeChild(column);
+                    }
+                }, 15000);
+            }
+
+            startStatAnimations() {
+                const statBars = document.querySelectorAll('.stat-progress-fill');
+                
+                // Animate stat bars on load
+                setTimeout(() => {
+                    statBars.forEach((bar, index) => {
+                        setTimeout(() => {
+                            bar.style.width = bar.style.width;
+                        }, index * 200);
+                    });
+                }, 1000);
+
+                // Update stats periodically
+                setInterval(() => {
+                    statBars.forEach(bar => {
+                        const currentWidth = parseInt(bar.style.width);
+                        const variation = Math.random() * 10 - 5; // ±5%
+                        const newWidth = Math.max(0, Math.min(100, currentWidth + variation));
+                        bar.style.width = newWidth + '%';
+                        
+                        // Update the corresponding stat value
+                        const statValue = bar.closest('.stat-bar').querySelector('.stat-value');
+                        statValue.textContent = Math.round(newWidth) + '%';
+                    });
+                }, 3000);
+            }
+
+            startNotificationSystem() {
+                const notifications = [
+                    { type: 'normal', message: 'Neural sync pulse detected', time: this.getCurrentTime() },
+                    { type: 'critical', message: 'Unauthorized access attempt blocked', time: this.getCurrentTime() },
+                    { type: 'normal', message: 'Data compression algorithm optimized', time: this.getCurrentTime() },
+                    { type: 'normal', message: 'Quantum encryption keys rotated', time: this.getCurrentTime() },
+                    { type: 'critical', message: 'Memory leak detected in Sector 12', time: this.getCurrentTime() }
+                ];
+
+                setInterval(() => {
+                    this.addRandomNotification(notifications);
+                }, 15000);
+            }
+
+            addRandomNotification(notifications) {
+                const notificationsSection = document.querySelector('.notifications-section');
+                const notificationsList = notificationsSection.children;
+                const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
+
+                const notification = document.createElement('div');
+                notification.className = `notification ${randomNotification.type}`;
+                notification.innerHTML = `
+                    <div class="notification-time">${this.getCurrentTime()}</div>
+                    <div class="notification-message">${randomNotification.message}</div>
+                `;
+
+                // Insert at the beginning (after title)
+                notificationsSection.insertBefore(notification, notificationsList[1]);
+
+                // Update notification badge
+                const badge = document.querySelector('.notification-badge');
+                const currentCount = parseInt(badge.textContent);
+                badge.textContent = currentCount + 1;
+
+                // Remove old notifications to keep list manageable
+                const allNotifications = notificationsSection.querySelectorAll('.notification');
+                if (allNotifications.length > 6) {
+                    allNotifications[allNotifications.length - 1].remove();
+                }
+            }
+
+            animateActivityFeed() {
+                const activities = [
+                    'Data stream initialized from Node_',
+                    'Neural pathway calibrated for User_',
+                    'Encryption protocol updated to level ',
+                    'Cybersecurity scan completed on Sector ',
+                    'Quantum sync established with Terminal_',
+                    'Firewall parameters adjusted for Zone ',
+                    'Memory allocation optimized in Block '
+                ];
+
+                setInterval(() => {
+                    const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+                    const randomNumber = Math.floor(Math.random() * 999) + 1;
+                    const activityText = randomActivity + randomNumber;
+
+                    this.addActivityItem(activityText);
+                }, 10000);
+            }
+
+            addActivityItem(text) {
+                const timeline = document.querySelector('.activity-timeline');
+                const activity = document.createElement('div');
+                activity.className = 'activity-item';
+                activity.innerHTML = `
+                    <div class="activity-time">${this.getCurrentTime()}</div>
+                    <div class="activity-text">${text}</div>
+                `;
+
+                timeline.insertBefore(activity, timeline.firstChild);
+
+                // Remove old activities
+                const activities = timeline.querySelectorAll('.activity-item');
+                if (activities.length > 8) {
+                    activities[activities.length - 1].remove();
+                }
+            }
+
+            getCurrentTime() {
+                const now = new Date();
+                return now.toTimeString().split(' ')[0];
+            }
+        }
+
+        // Initialize the cyberpunk command center when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new CyberpunkCommandCenter();
+        });
+
+        // Add some dynamic visual effects
+        document.addEventListener('mousemove', (e) => {
+            const particles = document.querySelectorAll('.sound-bar');
+            particles.forEach((particle, index) => {
+                const speed = (index + 1) * 0.01;
+                const x = (e.clientX * speed) % 100;
+                const y = (e.clientY * speed) % 100;
+                particle.style.transform = `translateY(${Math.sin(x + y) * 2}px)`;
+            });
+        });
+
+        // Glitch effect on hover
+        document.querySelectorAll('.cyber-title').forEach(title => {
+            title.addEventListener('mouseenter', () => {
+                title.style.animation = 'none';
+                title.offsetHeight; // Trigger reflow
+                title.style.animation = 'titleGlow 0.1s ease-in-out 10';
+            });
+        });
+    </script>
+</body>
+</html>

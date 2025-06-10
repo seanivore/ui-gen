@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organic Nature UI - Growth Form Component</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, 
+                #2d5016 0%,
+                #1a3009 25%, 
+                #3d6b20 50%,
+                #2d5016 75%,
+                #0f1f05 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Organic texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(139, 199, 74, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(104, 159, 56, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(76, 133, 41, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            animation: organicShimmer 8s ease-in-out infinite;
+        }
+
+        @keyframes organicShimmer {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .growth-form {
+            background: rgba(45, 80, 22, 0.9);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(139, 199, 74, 0.2);
+            border: 2px solid rgba(139, 199, 74, 0.3);
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .growth-form::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, 
+                rgba(139, 199, 74, 0.3), 
+                rgba(76, 133, 41, 0.3), 
+                rgba(104, 159, 56, 0.3));
+            border-radius: 35px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .growth-form:hover::before {
+            opacity: 1;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-title {
+            color: #8bc74a;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(139, 199, 74, 0.3);
+        }
+
+        .form-subtitle {
+            color: rgba(139, 199, 74, 0.8);
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+
+        /* Season Progress Tracker */
+        .season-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .season-progress::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                rgba(139, 199, 74, 0.3) 0%,
+                rgba(139, 199, 74, 0.6) var(--progress, 0%),
+                rgba(76, 133, 41, 0.2) var(--progress, 0%),
+                rgba(76, 133, 41, 0.1) 100%);
+            border-radius: 10px;
+            z-index: 1;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .season {
+            width: 60px;
+            height: 60px;
+            borderRadius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 2;
+            transition: all 0.5s ease;
+            cursor: pointer;
+        }
+
+        .season.spring {
+            background: radial-gradient(circle, #8bc74a, #689f38);
+            box-shadow: 0 4px 20px rgba(139, 199, 74, 0.4);
+        }
+
+        .season.summer {
+            background: radial-gradient(circle, #4caf50, #2e7d32);
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .season.autumn {
+            background: radial-gradient(circle, #ff9800, #e65100);
+            box-shadow: 0 4px 20px rgba(255, 152, 0, 0.4);
+        }
+
+        .season.winter {
+            background: radial-gradient(circle, #607d8b, #37474f);
+            box-shadow: 0 4px 20px rgba(96, 125, 139, 0.4);
+        }
+
+        .season.active {
+            transform: scale(1.2);
+            animation: seasonPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes seasonPulse {
+            0%, 100% { transform: scale(1.2); }
+            50% { transform: scale(1.3); }
+        }
+
+        /* Growing Input Field */
+        .input-section {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .vine-input-container {
+            position: relative;
+            overflow: visible;
+        }
+
+        .vine-input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 3px solid rgba(139, 199, 74, 0.4);
+            border-radius: 20px;
+            background: rgba(26, 48, 9, 0.8);
+            color: #8bc74a;
+            font-size: 1.1rem;
+            font-family: inherit;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+        }
+
+        .vine-input:focus {
+            border-color: #8bc74a;
+            box-shadow: 
+                0 0 0 4px rgba(139, 199, 74, 0.2),
+                0 8px 32px rgba(139, 199, 74, 0.3);
+            background: rgba(26, 48, 9, 0.9);
+        }
+
+        .vine-input::placeholder {
+            color: rgba(139, 199, 74, 0.6);
+            font-style: italic;
+        }
+
+        /* Growing vine decoration */
+        .vine-growth {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            transform: scale(0);
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .vine-growth.growing {
+            transform: scale(1);
+        }
+
+        .vine-growth::before {
+            content: '🌱';
+            font-size: 1.5rem;
+            position: absolute;
+            animation: vineGrow 3s ease-in-out infinite;
+        }
+
+        @keyframes vineGrow {
+            0%, 100% { transform: rotate(-10deg) scale(1); }
+            50% { transform: rotate(10deg) scale(1.1); }
+        }
+
+        /* Validation Flowers */
+        .validation-garden {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            min-height: 30px;
+        }
+
+        .flower {
+            font-size: 1.2rem;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .flower.bloom {
+            opacity: 1;
+            transform: scale(1);
+            animation: flowerDance 2s ease-in-out infinite;
+        }
+
+        .flower.wilt {
+            opacity: 1;
+            transform: scale(1);
+            animation: flowerWilt 1s ease-in-out;
+        }
+
+        @keyframes flowerDance {
+            0%, 100% { transform: scale(1) rotate(-2deg); }
+            50% { transform: scale(1.05) rotate(2deg); }
+        }
+
+        @keyframes flowerWilt {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(0.8) rotate(-15deg); opacity: 0.6; }
+        }
+
+        .validation-message {
+            color: rgba(139, 199, 74, 0.9);
+            font-size: 0.9rem;
+            font-style: italic;
+            margin-left: 10px;
+        }
+
+        .validation-message.error {
+            color: rgba(244, 67, 54, 0.9);
+        }
+
+        /* File Upload Seed Planting */
+        .seed-planting-zone {
+            border: 3px dashed rgba(139, 199, 74, 0.4);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(26, 48, 9, 0.3);
+            transition: all 0.4s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .seed-planting-zone:hover {
+            border-color: #8bc74a;
+            background: rgba(26, 48, 9, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .seed-planting-zone.dragover {
+            border-color: #8bc74a;
+            background: rgba(139, 199, 74, 0.1);
+            transform: scale(1.02);
+        }
+
+        .seed-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .seed-planting-zone:hover .seed-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .planting-text {
+            color: rgba(139, 199, 74, 0.9);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .planting-subtext {
+            color: rgba(139, 199, 74, 0.7);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Growing plant visualization for uploaded files */
+        .planted-seeds {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .planted-seed {
+            background: rgba(139, 199, 74, 0.2);
+            border: 2px solid rgba(139, 199, 74, 0.4);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.4s ease;
+            animation: seedGerminate 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes seedGerminate {
+            0% { transform: scale(0) rotate(180deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .seed-growth-stage {
+            font-size: 1.5rem;
+            animation: plantGrowth 3s ease-in-out infinite;
+        }
+
+        @keyframes plantGrowth {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .seed-name {
+            color: #8bc74a;
+            font-weight: 500;
+        }
+
+        .seed-size {
+            color: rgba(139, 199, 74, 0.7);
+            font-size: 0.8rem;
+        }
+
+        /* Water loading animation */
+        .water-loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(45, 80, 22, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .water-drops {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .water-drop {
+            width: 20px;
+            height: 20px;
+            background: #64b5f6;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            animation: waterDrop 1.5s ease-in-out infinite;
+        }
+
+        .water-drop:nth-child(2) { animation-delay: 0.3s; }
+        .water-drop:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes waterDrop {
+            0%, 100% { transform: rotate(-45deg) scale(1); opacity: 0.7; }
+            50% { transform: rotate(-45deg) scale(1.2); opacity: 1; }
+        }
+
+        .loading-text {
+            color: #8bc74a;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        /* Root system visualization */
+        .root-network {
+            position: absolute;
+            bottom: -20px;
+            left: 20%;
+            right: 20%;
+            height: 40px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .root-network.visible {
+            opacity: 0.6;
+        }
+
+        .root-network::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to top, rgba(139, 199, 74, 0.8), transparent);
+            transform: translateX(-50%);
+        }
+
+        .root-network::after {
+            content: '';
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(139, 199, 74, 0.4) 20%, 
+                rgba(139, 199, 74, 0.6) 50%, 
+                rgba(139, 199, 74, 0.4) 80%, 
+                transparent);
+        }
+
+        /* Submit button with organic styling */
+        .nature-submit {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #8bc74a, #689f38);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(139, 199, 74, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nature-submit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .nature-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(139, 199, 74, 0.4);
+        }
+
+        .nature-submit:hover::before {
+            left: 100%;
+        }
+
+        .nature-submit:active {
+            transform: translateY(-1px);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .growth-form {
+                margin: 10px;
+                padding: 30px 20px;
+            }
+            
+            .form-title {
+                font-size: 2rem;
+            }
+            
+            .season-progress {
+                margin: 20px 0;
+            }
+            
+            .season {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="growth-form">
+            <!-- Root network visualization -->
+            <div class="root-network" id="rootNetwork"></div>
+            
+            <!-- Form header -->
+            <div class="form-header">
+                <h1 class="form-title">Organic Growth Form</h1>
+                <p class="form-subtitle">Watch your input flourish through the seasons</p>
+            </div>
+
+            <!-- Season progress tracker -->
+            <div class="season-progress" id="seasonProgress">
+                <div class="season spring active" data-season="spring" title="Spring - New Growth">🌱</div>
+                <div class="season summer" data-season="summer" title="Summer - Full Bloom">🌻</div>
+                <div class="season autumn" data-season="autumn" title="Autumn - Harvest">🍂</div>
+                <div class="season winter" data-season="winter" title="Winter - Rest">❄️</div>
+            </div>
+
+            <!-- Growing input field -->
+            <div class="input-section">
+                <div class="vine-input-container">
+                    <input 
+                        type="text" 
+                        class="vine-input" 
+                        id="vineInput"
+                        placeholder="Plant your thoughts and watch them grow..."
+                        autocomplete="off"
+                    >
+                    <div class="vine-growth" id="vineGrowth"></div>
+                </div>
+                
+                <!-- Validation garden -->
+                <div class="validation-garden" id="validationGarden">
+                    <div class="validation-message" id="validationMessage"></div>
+                </div>
+            </div>
+
+            <!-- File upload seed planting zone -->
+            <div class="seed-planting-zone" id="seedZone">
+                <div class="seed-icon">🌱</div>
+                <div class="planting-text">Drop your seeds here to plant them</div>
+                <div class="planting-subtext">Or click to select files from your garden</div>
+                <input type="file" class="file-input" id="fileInput" multiple accept="*/*">
+            </div>
+
+            <!-- Planted seeds display -->
+            <div class="planted-seeds" id="plantedSeeds"></div>
+
+            <!-- Submit button -->
+            <button class="nature-submit" id="submitBtn">
+                🌿 Cultivate Growth 🌿
+            </button>
+        </div>
+    </div>
+
+    <!-- Water loading overlay -->
+    <div class="water-loading" id="waterLoading">
+        <div class="water-drops">
+            <div class="water-drop"></div>
+            <div class="water-drop"></div>
+            <div class="water-drop"></div>
+        </div>
+        <div class="loading-text">Nurturing your digital garden...</div>
+    </div>
+
+    <script>
+        class OrganicNatureUI {
+            constructor() {
+                this.currentSeason = 0;
+                this.seasons = ['spring', 'summer', 'autumn', 'winter'];
+                this.growthStages = ['🌱', '🌿', '🌳', '🌲'];
+                this.flowerTypes = ['🌸', '🌺', '🌻', '🌹', '🌷', '🌼'];
+                this.wiltedTypes = ['🥀', '🍂'];
+                this.validationRules = {
+                    minLength: 3,
+                    hasNumbers: /\d/,
+                    hasLetters: /[a-zA-Z]/,
+                    hasSpecialChars: /[!@#$%^&*(),.?":{}|<>]/
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.startSeasonCycle();
+                this.setupFileUpload();
+                this.initializeValidation();
+            }
+
+            setupEventListeners() {
+                const vineInput = document.getElementById('vineInput');
+                const submitBtn = document.getElementById('submitBtn');
+                const seasonElements = document.querySelectorAll('.season');
+
+                vineInput.addEventListener('input', (e) => this.handleInputGrowth(e));
+                vineInput.addEventListener('focus', () => this.showRootNetwork());
+                vineInput.addEventListener('blur', () => this.hideRootNetwork());
+                
+                submitBtn.addEventListener('click', (e) => this.handleSubmit(e));
+                
+                seasonElements.forEach(season => {
+                    season.addEventListener('click', (e) => this.jumpToSeason(e));
+                });
+            }
+
+            handleInputGrowth(e) {
+                const input = e.target;
+                const value = input.value;
+                const vineGrowth = document.getElementById('vineGrowth');
+                
+                // Show vine growth based on input length
+                if (value.length > 0) {
+                    vineGrowth.classList.add('growing');
+                } else {
+                    vineGrowth.classList.remove('growing');
+                }
+
+                // Trigger validation
+                this.validateInput(value);
+                
+                // Update progress based on input quality
+                this.updateSeasonProgress(value);
+            }
+
+            validateInput(value) {
+                const garden = document.getElementById('validationGarden');
+                const message = document.getElementById('validationMessage');
+                
+                // Clear existing flowers
+                const existingFlowers = garden.querySelectorAll('.flower');
+                existingFlowers.forEach(flower => flower.remove());
+
+                let validationResults = [];
+                let hasErrors = false;
+
+                // Check minimum length
+                if (value.length >= this.validationRules.minLength) {
+                    this.addValidationFlower(garden, this.getRandomFlower(), 'bloom');
+                    validationResults.push('Length ✓');
+                } else if (value.length > 0) {
+                    this.addValidationFlower(garden, this.getRandomWilted(), 'wilt');
+                    validationResults.push('Too short');
+                    hasErrors = true;
+                }
+
+                // Check for numbers
+                if (this.validationRules.hasNumbers.test(value)) {
+                    this.addValidationFlower(garden, this.getRandomFlower(), 'bloom');
+                    validationResults.push('Numbers ✓');
+                } else if (value.length > 0) {
+                    this.addValidationFlower(garden, this.getRandomWilted(), 'wilt');
+                    validationResults.push('Needs numbers');
+                    hasErrors = true;
+                }
+
+                // Check for letters
+                if (this.validationRules.hasLetters.test(value)) {
+                    this.addValidationFlower(garden, this.getRandomFlower(), 'bloom');
+                    validationResults.push('Letters ✓');
+                } else if (value.length > 0) {
+                    this.addValidationFlower(garden, this.getRandomWilted(), 'wilt');
+                    validationResults.push('Needs letters');
+                    hasErrors = true;
+                }
+
+                // Update validation message
+                if (validationResults.length > 0) {
+                    message.textContent = validationResults.join(' • ');
+                    message.className = hasErrors ? 'validation-message error' : 'validation-message';
+                } else {
+                    message.textContent = '';
+                }
+            }
+
+            addValidationFlower(container, emoji, type) {
+                const flower = document.createElement('div');
+                flower.className = `flower ${type}`;
+                flower.textContent = emoji;
+                container.appendChild(flower);
+                
+                // Trigger animation
+                setTimeout(() => flower.classList.add(type), 10);
+            }
+
+            getRandomFlower() {
+                return this.flowerTypes[Math.floor(Math.random() * this.flowerTypes.length)];
+            }
+
+            getRandomWilted() {
+                return this.wiltedTypes[Math.floor(Math.random() * this.wiltedTypes.length)];
+            }
+
+            updateSeasonProgress(value) {
+                const progress = document.querySelector('.season-progress');
+                let progressPercent = 0;
+                
+                // Calculate progress based on input quality
+                if (value.length >= this.validationRules.minLength) progressPercent += 25;
+                if (this.validationRules.hasNumbers.test(value)) progressPercent += 25;
+                if (this.validationRules.hasLetters.test(value)) progressPercent += 25;
+                if (this.validationRules.hasSpecialChars.test(value)) progressPercent += 25;
+                
+                progress.style.setProperty('--progress', `${progressPercent}%`);
+                
+                // Update active season based on progress
+                const targetSeason = Math.floor(progressPercent / 25);
+                if (targetSeason !== this.currentSeason && targetSeason < 4) {
+                    this.setActiveSeason(targetSeason);
+                }
+            }
+
+            startSeasonCycle() {
+                // Auto-advance seasons every 10 seconds if no user interaction
+                this.seasonInterval = setInterval(() => {
+                    const vineInput = document.getElementById('vineInput');
+                    if (!vineInput.value) {
+                        this.advanceToNextSeason();
+                    }
+                }, 10000);
+            }
+
+            advanceToNextSeason() {
+                this.currentSeason = (this.currentSeason + 1) % 4;
+                this.setActiveSeason(this.currentSeason);
+            }
+
+            setActiveSeason(seasonIndex) {
+                const seasons = document.querySelectorAll('.season');
+                seasons.forEach((season, index) => {
+                    season.classList.toggle('active', index === seasonIndex);
+                });
+                this.currentSeason = seasonIndex;
+            }
+
+            jumpToSeason(e) {
+                const seasonIndex = Array.from(e.target.parentNode.children).indexOf(e.target);
+                this.setActiveSeason(seasonIndex);
+                clearInterval(this.seasonInterval);
+                // Restart auto-cycle after user interaction
+                setTimeout(() => this.startSeasonCycle(), 5000);
+            }
+
+            setupFileUpload() {
+                const seedZone = document.getElementById('seedZone');
+                const fileInput = document.getElementById('fileInput');
+
+                seedZone.addEventListener('click', () => fileInput.click());
+                
+                seedZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    seedZone.classList.add('dragover');
+                });
+                
+                seedZone.addEventListener('dragleave', () => {
+                    seedZone.classList.remove('dragover');
+                });
+                
+                seedZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    seedZone.classList.remove('dragover');
+                    this.handleFileUpload(e.dataTransfer.files);
+                });
+                
+                fileInput.addEventListener('change', (e) => {
+                    this.handleFileUpload(e.target.files);
+                });
+            }
+
+            handleFileUpload(files) {
+                const plantedSeeds = document.getElementById('plantedSeeds');
+                
+                Array.from(files).forEach((file, index) => {
+                    setTimeout(() => {
+                        const seedElement = this.createSeedElement(file);
+                        plantedSeeds.appendChild(seedElement);
+                    }, index * 200);
+                });
+                
+                this.showRootNetwork();
+            }
+
+            createSeedElement(file) {
+                const seed = document.createElement('div');
+                seed.className = 'planted-seed';
+                
+                const growthStage = this.growthStages[Math.floor(Math.random() * this.growthStages.length)];
+                const fileSize = this.formatFileSize(file.size);
+                
+                seed.innerHTML = `
+                    <div class="seed-growth-stage">${growthStage}</div>
+                    <div>
+                        <div class="seed-name">${file.name}</div>
+                        <div class="seed-size">${fileSize}</div>
+                    </div>
+                `;
+                
+                return seed;
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            showRootNetwork() {
+                const rootNetwork = document.getElementById('rootNetwork');
+                rootNetwork.classList.add('visible');
+            }
+
+            hideRootNetwork() {
+                const rootNetwork = document.getElementById('rootNetwork');
+                setTimeout(() => {
+                    rootNetwork.classList.remove('visible');
+                }, 2000);
+            }
+
+            initializeValidation() {
+                // Add some demo validation flowers on page load
+                setTimeout(() => {
+                    const garden = document.getElementById('validationGarden');
+                    const message = document.getElementById('validationMessage');
+                    message.textContent = 'Start typing to see your garden bloom...';
+                }, 1000);
+            }
+
+            handleSubmit(e) {
+                e.preventDefault();
+                const vineInput = document.getElementById('vineInput');
+                const waterLoading = document.getElementById('waterLoading');
+                
+                if (!vineInput.value.trim()) {
+                    this.showValidationError('Please plant some thoughts before cultivating!');
+                    return;
+                }
+                
+                // Show water loading animation
+                waterLoading.style.display = 'flex';
+                
+                // Simulate processing time
+                setTimeout(() => {
+                    waterLoading.style.display = 'none';
+                    this.showSuccessMessage();
+                }, 3000);
+            }
+
+            showValidationError(message) {
+                const validationMessage = document.getElementById('validationMessage');
+                validationMessage.textContent = message;
+                validationMessage.className = 'validation-message error';
+                
+                // Add wilted flower
+                const garden = document.getElementById('validationGarden');
+                this.addValidationFlower(garden, '🥀', 'wilt');
+            }
+
+            showSuccessMessage() {
+                const validationMessage = document.getElementById('validationMessage');
+                validationMessage.textContent = '🌟 Your digital garden is thriving! 🌟';
+                validationMessage.className = 'validation-message';
+                
+                // Add celebration flowers
+                const garden = document.getElementById('validationGarden');
+                ['🌸', '🌺', '🌻'].forEach((flower, index) => {
+                    setTimeout(() => {
+                        this.addValidationFlower(garden, flower, 'bloom');
+                    }, index * 200);
+                });
+                
+                // Set all seasons to active briefly
+                const seasons = document.querySelectorAll('.season');
+                seasons.forEach(season => season.classList.add('active'));
+                setTimeout(() => {
+                    seasons.forEach((season, index) => {
+                        season.classList.toggle('active', index === 0);
+                    });
+                    this.currentSeason = 0;
+                }, 2000);
+            }
+        }
+
+        // Initialize the organic nature UI when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new OrganicNatureUI();
+        });
+    </script>
+</body>
+</html>

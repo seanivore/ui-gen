@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Deco Event Venue - The Grand Ballroom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold-primary: #FFD700;
+            --gold-dark: #B8860B;
+            --gold-light: #FFF8DC;
+            --black-primary: #0A0A0A;
+            --black-soft: #1A1A1A;
+            --ivory: #FFFFF0;
+            --emerald: #50C878;
+            --emerald-dark: #2E8B57;
+            --shadow-gold: 0 4px 20px rgba(255, 215, 0, 0.3);
+            --shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(135deg, var(--black-primary) 0%, var(--black-soft) 100%);
+            color: var(--ivory);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .art-deco-container {
+            position: relative;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: var(--black-primary);
+        }
+
+        /* Art Deco Background Pattern */
+        .art-deco-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(80, 200, 120, 0.1) 0%, transparent 50%),
+                linear-gradient(45deg, transparent 40%, rgba(255, 215, 0, 0.02) 50%, transparent 60%),
+                linear-gradient(-45deg, transparent 40%, rgba(255, 215, 0, 0.02) 50%, transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0 60px 0;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+        }
+
+        .venue-title {
+            font-family: 'Cinzel', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .venue-subtitle {
+            font-size: 1.2rem;
+            color: var(--ivory);
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.9), rgba(10, 10, 10, 0.9));
+            border: 2px solid var(--gold-primary);
+            border-radius: 0;
+            padding: 30px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-deep);
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--gold-primary), var(--emerald), var(--gold-primary));
+            z-index: -1;
+            border-radius: 0;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .panel-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gold-primary);
+            color: var(--black-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .panel-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gold-primary);
+            letter-spacing: 1px;
+        }
+
+        /* Calendar Styles */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--ivory);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .calendar-day:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.05);
+        }
+
+        .calendar-day.event {
+            background: var(--gold-primary);
+            color: var(--black-primary);
+            font-weight: 700;
+            box-shadow: var(--shadow-gold);
+        }
+
+        .calendar-day.selected {
+            background: var(--emerald);
+            color: var(--ivory);
+            border-color: var(--emerald-dark);
+        }
+
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .calendar-header-day {
+            text-align: center;
+            padding: 10px 0;
+            font-weight: 600;
+            color: var(--gold-primary);
+            letter-spacing: 1px;
+        }
+
+        /* Event Details */
+        .event-card {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold-primary);
+            padding: 20px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .event-card:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: translateX(5px);
+        }
+
+        .event-card.selected {
+            background: rgba(80, 200, 120, 0.2);
+            border-color: var(--emerald);
+        }
+
+        .event-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            margin-bottom: 8px;
+        }
+
+        .event-details {
+            font-size: 0.9rem;
+            color: var(--ivory);
+            opacity: 0.8;
+        }
+
+        /* Booking Form */
+        .booking-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            color: var(--gold-primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .form-input {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold-primary);
+            color: var(--ivory);
+            padding: 12px 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3);
+        }
+
+        .ticket-options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .ticket-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ticket-option:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .ticket-option.selected {
+            background: rgba(80, 200, 120, 0.2);
+            border-color: var(--emerald);
+        }
+
+        .ticket-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+        }
+
+        /* Seating Chart */
+        .seating-chart {
+            margin-top: 20px;
+        }
+
+        .stage {
+            background: linear-gradient(45deg, var(--gold-primary), var(--gold-dark));
+            color: var(--black-primary);
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            box-shadow: var(--shadow-gold);
+        }
+
+        .seating-sections {
+            display: grid;
+            gap: 20px;
+        }
+
+        .seating-section {
+            text-align: center;
+        }
+
+        .section-label {
+            color: var(--gold-primary);
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .seats-row {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        .seat {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--gold-primary);
+            background: rgba(255, 215, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .seat:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: scale(1.1);
+        }
+
+        .seat.occupied {
+            background: rgba(255, 0, 0, 0.3);
+            border-color: #ff0000;
+            cursor: not-allowed;
+        }
+
+        .seat.selected {
+            background: var(--emerald);
+            border-color: var(--emerald-dark);
+            box-shadow: 0 0 10px rgba(80, 200, 120, 0.5);
+        }
+
+        /* Venue Details */
+        .venue-details {
+            grid-column: 1 / -1;
+        }
+
+        .venue-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .info-icon {
+            font-size: 2rem;
+            color: var(--gold-primary);
+            margin-bottom: 10px;
+        }
+
+        .info-title {
+            font-weight: 700;
+            color: var(--gold-primary);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .info-description {
+            color: var(--ivory);
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: 2px solid var(--gold-primary);
+            background: transparent;
+            color: var(--gold-primary);
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gold-primary);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            left: 0;
+        }
+
+        .btn:hover {
+            color: var(--black-primary);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .btn-primary {
+            background: var(--gold-primary);
+            color: var(--black-primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--gold-dark);
+        }
+
+        /* Decorative Elements */
+        .deco-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+            margin: 20px 0;
+        }
+
+        .geometric-accent {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--gold-primary);
+            transform: rotate(45deg);
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .venue-title {
+                font-size: 2.5rem;
+            }
+            
+            .calendar-grid {
+                gap: 4px;
+            }
+            
+            .seats-row {
+                gap: 3px;
+            }
+            
+            .seat {
+                width: 15px;
+                height: 15px;
+            }
+        }
+
+        /* Animation Effects */
+        @keyframes goldPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .animate-pulse {
+            animation: goldPulse 2s infinite;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="art-deco-container">
+        <header class="header">
+            <h1 class="venue-title">THE GRAND BALLROOM</h1>
+            <p class="venue-subtitle">An Art Deco Experience • Jazz Age Elegance</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Event Calendar Panel -->
+            <div class="panel slide-in">
+                <div class="panel-header">
+                    <div class="panel-icon">📅</div>
+                    <h2 class="panel-title">Event Calendar</h2>
+                </div>
+                
+                <div class="calendar-header">
+                    <div class="calendar-header-day">SUN</div>
+                    <div class="calendar-header-day">MON</div>
+                    <div class="calendar-header-day">TUE</div>
+                    <div class="calendar-header-day">WED</div>
+                    <div class="calendar-header-day">THU</div>
+                    <div class="calendar-header-day">FRI</div>
+                    <div class="calendar-header-day">SAT</div>
+                </div>
+                
+                <div class="calendar-grid" id="calendar">
+                    <!-- Calendar days will be generated by JavaScript -->
+                </div>
+
+                <div class="deco-line"></div>
+
+                <div class="event-card selected" data-event="1">
+                    <div class="event-title">Gatsby's New Year Gala</div>
+                    <div class="event-details">Dec 31, 2024 • 8:00 PM • Jazz Orchestra</div>
+                </div>
+                
+                <div class="event-card" data-event="2">
+                    <div class="event-title">Roaring Twenties Revival</div>
+                    <div class="event-details">Jan 15, 2025 • 7:30 PM • Charleston Contest</div>
+                </div>
+                
+                <div class="event-card" data-event="3">
+                    <div class="event-title">Speakeasy Saturday</div>
+                    <div class="event-details">Jan 22, 2025 • 9:00 PM • Live Band</div>
+                </div>
+
+                <div class="geometric-accent"></div>
+            </div>
+
+            <!-- Ticket Booking Panel -->
+            <div class="panel slide-in">
+                <div class="panel-header">
+                    <div class="panel-icon">🎫</div>
+                    <h2 class="panel-title">Ticket Booking</h2>
+                </div>
+                
+                <div class="booking-form">
+                    <div class="form-group">
+                        <label class="form-label">Guest Name</label>
+                        <input type="text" class="form-input" placeholder="Enter your name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" placeholder="your@email.com">
+                    </div>
+
+                    <div class="deco-line"></div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Ticket Options</label>
+                        <div class="ticket-options">
+                            <div class="ticket-option selected" data-ticket="vip">
+                                <div>
+                                    <strong>VIP Table Service</strong><br>
+                                    <small>Premium seating with champagne service</small>
+                                </div>
+                                <div class="ticket-price">$250</div>
+                            </div>
+                            
+                            <div class="ticket-option" data-ticket="premium">
+                                <div>
+                                    <strong>Premium Admission</strong><br>
+                                    <small>Priority seating and complimentary cocktail</small>
+                                </div>
+                                <div class="ticket-price">$125</div>
+                            </div>
+                            
+                            <div class="ticket-option" data-ticket="general">
+                                <div>
+                                    <strong>General Admission</strong><br>
+                                    <small>Standard entry with dance floor access</small>
+                                </div>
+                                <div class="ticket-price">$75</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="geometric-accent"></div>
+            </div>
+
+            <!-- Seating Chart Panel -->
+            <div class="panel slide-in">
+                <div class="panel-header">
+                    <div class="panel-icon">🎭</div>
+                    <h2 class="panel-title">Seating Chart</h2>
+                </div>
+                
+                <div class="seating-chart">
+                    <div class="stage">🎺 JAZZ ORCHESTRA STAGE 🎺</div>
+                    
+                    <div class="seating-sections">
+                        <div class="seating-section">
+                            <div class="section-label">VIP TABLES</div>
+                            <div class="seats-row">
+                                <div class="seat selected" data-seat="vip-1"></div>
+                                <div class="seat" data-seat="vip-2"></div>
+                                <div class="seat occupied" data-seat="vip-3"></div>
+                                <div class="seat" data-seat="vip-4"></div>
+                                <div class="seat" data-seat="vip-5"></div>
+                                <div class="seat" data-seat="vip-6"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="seating-section">
+                            <div class="section-label">PREMIUM SEATING</div>
+                            <div class="seats-row">
+                                <div class="seat" data-seat="p-1"></div>
+                                <div class="seat" data-seat="p-2"></div>
+                                <div class="seat" data-seat="p-3"></div>
+                                <div class="seat occupied" data-seat="p-4"></div>
+                                <div class="seat" data-seat="p-5"></div>
+                                <div class="seat" data-seat="p-6"></div>
+                                <div class="seat" data-seat="p-7"></div>
+                                <div class="seat" data-seat="p-8"></div>
+                            </div>
+                            <div class="seats-row">
+                                <div class="seat" data-seat="p-9"></div>
+                                <div class="seat occupied" data-seat="p-10"></div>
+                                <div class="seat" data-seat="p-11"></div>
+                                <div class="seat" data-seat="p-12"></div>
+                                <div class="seat" data-seat="p-13"></div>
+                                <div class="seat" data-seat="p-14"></div>
+                                <div class="seat" data-seat="p-15"></div>
+                                <div class="seat" data-seat="p-16"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="seating-section">
+                            <div class="section-label">DANCE FLOOR GENERAL</div>
+                            <div class="seats-row">
+                                <div class="seat" data-seat="g-1"></div>
+                                <div class="seat" data-seat="g-2"></div>
+                                <div class="seat" data-seat="g-3"></div>
+                                <div class="seat" data-seat="g-4"></div>
+                                <div class="seat" data-seat="g-5"></div>
+                                <div class="seat" data-seat="g-6"></div>
+                                <div class="seat" data-seat="g-7"></div>
+                                <div class="seat" data-seat="g-8"></div>
+                                <div class="seat" data-seat="g-9"></div>
+                                <div class="seat" data-seat="g-10"></div>
+                            </div>
+                            <div class="seats-row">
+                                <div class="seat" data-seat="g-11"></div>
+                                <div class="seat" data-seat="g-12"></div>
+                                <div class="seat occupied" data-seat="g-13"></div>
+                                <div class="seat" data-seat="g-14"></div>
+                                <div class="seat" data-seat="g-15"></div>
+                                <div class="seat" data-seat="g-16"></div>
+                                <div class="seat" data-seat="g-17"></div>
+                                <div class="seat occupied" data-seat="g-18"></div>
+                                <div class="seat" data-seat="g-19"></div>
+                                <div class="seat" data-seat="g-20"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="geometric-accent"></div>
+            </div>
+
+            <!-- Venue Details Panel -->
+            <div class="panel venue-details slide-in">
+                <div class="panel-header">
+                    <div class="panel-icon">🏛️</div>
+                    <h2 class="panel-title">Venue Details</h2>
+                </div>
+                
+                <div class="venue-info">
+                    <div class="info-item">
+                        <div class="info-icon">🍸</div>
+                        <div class="info-title">Prohibition Bar</div>
+                        <div class="info-description">Authentic 1920s cocktails and vintage spirits served in crystal glassware</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">🎵</div>
+                        <div class="info-title">Live Jazz Orchestra</div>
+                        <div class="info-description">Professional musicians performing classic jazz standards and Charleston favorites</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">🏢</div>
+                        <div class="info-title">Historic Ballroom</div>
+                        <div class="info-description">Restored 1925 Art Deco ballroom with original geometric patterns and gold leaf details</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">🚗</div>
+                        <div class="info-title">Valet Parking</div>
+                        <div class="info-description">Complimentary valet service available for all guests with vintage car display</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">👔</div>
+                        <div class="info-title">Dress Code</div>
+                        <div class="info-description">1920s formal attire encouraged - tuxedos, flapper dresses, feathers, and pearls</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">📱</div>
+                        <div class="info-title">Photography</div>
+                        <div class="info-description">Professional vintage-style photography available with Art Deco themed backdrops</div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="bookTicket()">Complete Booking</button>
+                    <button class="btn" onclick="shareEvent()">Share Event</button>
+                    <button class="btn" onclick="downloadDetails()">Download Details</button>
+                </div>
+
+                <div class="geometric-accent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Calendar Generation
+        function generateCalendar() {
+            const calendar = document.getElementById('calendar');
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            // Event dates (example)
+            const eventDates = [15, 22, 31];
+            
+            // Add empty cells for days before month starts
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                calendar.appendChild(emptyDay);
+            }
+            
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                
+                if (eventDates.includes(day)) {
+                    dayElement.classList.add('event');
+                }
+                
+                if (day === today.getDate()) {
+                    dayElement.classList.add('selected');
+                }
+                
+                dayElement.addEventListener('click', function() {
+                    // Remove previous selection
+                    document.querySelectorAll('.calendar-day.selected').forEach(el => {
+                        if (!el.classList.contains('event')) {
+                            el.classList.remove('selected');
+                        }
+                    });
+                    // Add selection to clicked day
+                    this.classList.add('selected');
+                });
+                
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        // Event Card Selection
+        document.querySelectorAll('.event-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.event-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Ticket Option Selection
+        document.querySelectorAll('.ticket-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.ticket-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Seat Selection
+        document.querySelectorAll('.seat:not(.occupied)').forEach(seat => {
+            seat.addEventListener('click', function() {
+                if (this.classList.contains('selected')) {
+                    this.classList.remove('selected');
+                } else {
+                    this.classList.add('selected');
+                }
+            });
+        });
+
+        // Action Functions
+        function bookTicket() {
+            const selectedSeats = document.querySelectorAll('.seat.selected').length;
+            const selectedTicket = document.querySelector('.ticket-option.selected');
+            const ticketType = selectedTicket ? selectedTicket.dataset.ticket : 'none';
+            const price = selectedTicket ? selectedTicket.querySelector('.ticket-price').textContent : '$0';
+            
+            alert(`Booking Confirmed!\n\nTicket Type: ${ticketType.toUpperCase()}\nPrice: ${price}\nSeats Selected: ${selectedSeats}\n\nThank you for choosing The Grand Ballroom!\nPreparation instructions will be sent via email.`);
+        }
+
+        function shareEvent() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'The Grand Ballroom - Art Deco Events',
+                    text: 'Join us for an unforgettable Jazz Age experience!',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                const shareData = `The Grand Ballroom - Art Deco Events\n\nJoin us for an unforgettable Jazz Age experience!\n\n${window.location.href}`;
+                navigator.clipboard.writeText(shareData).then(() => {
+                    alert('Event details copied to clipboard!');
+                });
+            }
+        }
+
+        function downloadDetails() {
+            const eventDetails = `
+THE GRAND BALLROOM
+An Art Deco Experience
+
+UPCOMING EVENTS:
+• Gatsby's New Year Gala - Dec 31, 2024 at 8:00 PM
+• Roaring Twenties Revival - Jan 15, 2025 at 7:30 PM  
+• Speakeasy Saturday - Jan 22, 2025 at 9:00 PM
+
+VENUE FEATURES:
+• Prohibition Era Bar with Vintage Cocktails
+• Live Jazz Orchestra
+• Historic 1925 Art Deco Ballroom
+• Complimentary Valet Parking
+• Professional Vintage Photography
+• 1920s Formal Dress Code Encouraged
+
+TICKET OPTIONS:
+• VIP Table Service: $250 (Premium seating with champagne)
+• Premium Admission: $125 (Priority seating with cocktail)
+• General Admission: $75 (Dance floor access)
+
+For more information, visit our website or call (555) JAZZ-AGE
+            `;
+            
+            const blob = new Blob([eventDetails], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Grand_Ballroom_Event_Details.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Animation on scroll
+        function handleScroll() {
+            const elements = document.querySelectorAll('.panel');
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('slide-in');
+                }
+            });
+        }
+
+        // Add golden pulse effect to selected elements
+        function addPulseEffect() {
+            const selectedElements = document.querySelectorAll('.selected, .event');
+            selectedElements.forEach(el => {
+                if (!el.classList.contains('animate-pulse')) {
+                    el.classList.add('animate-pulse');
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            generateCalendar();
+            handleScroll();
+            
+            // Add scroll event listener
+            window.addEventListener('scroll', handleScroll);
+            
+            // Add pulse effect every 3 seconds
+            setInterval(addPulseEffect, 3000);
+            
+            // Add hover effects to geometric accents
+            document.querySelectorAll('.geometric-accent').forEach(accent => {
+                accent.addEventListener('mouseenter', function() {
+                    this.style.transform = 'rotate(45deg) scale(1.2)';
+                    this.style.opacity = '1';
+                });
+                
+                accent.addEventListener('mouseleave', function() {
+                    this.style.transform = 'rotate(45deg) scale(1)';
+                    this.style.opacity = '0.5';
+                });
+            });
+        });
+
+        // Add sparkle effect on ticket selection
+        document.querySelectorAll('.ticket-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Create temporary sparkle effect
+                const sparkle = document.createElement('div');
+                sparkle.style.position = 'absolute';
+                sparkle.style.top = '50%';
+                sparkle.style.left = '50%';
+                sparkle.style.transform = 'translate(-50%, -50%)';
+                sparkle.style.color = 'var(--gold-primary)';
+                sparkle.style.fontSize = '2rem';
+                sparkle.style.pointerEvents = 'none';
+                sparkle.style.zIndex = '1000';
+                sparkle.textContent = '✨';
+                sparkle.style.animation = 'sparkleEffect 1s ease-out forwards';
+                
+                this.style.position = 'relative';
+                this.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    if (sparkle.parentNode) {
+                        sparkle.parentNode.removeChild(sparkle);
+                    }
+                }, 1000);
+            });
+        });
+
+        // Add CSS for sparkle animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes sparkleEffect {
+                0% {
+                    opacity: 0;
+                    transform: translate(-50%, -50%) scale(0.5);
+                }
+                50% {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1.2);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translate(-50%, -50%) scale(0.8) translateY(-20px);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

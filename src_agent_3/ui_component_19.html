@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurora Borealis Studio - Northern Lights Photography Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0f1c 0%, #1a2347 50%, #2d1b69 100%);
+            color: #e0f7fa;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Aurora Background Animation */
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .aurora-wave {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(0, 255, 127, 0.1) 25%, 
+                rgba(138, 43, 226, 0.15) 50%, 
+                rgba(0, 191, 255, 0.1) 75%, 
+                transparent 100%);
+            animation: auroraFlow 20s ease-in-out infinite;
+        }
+
+        .aurora-wave:nth-child(2) {
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(32, 178, 170, 0.1) 25%, 
+                rgba(147, 0, 211, 0.15) 50%, 
+                rgba(0, 250, 154, 0.1) 75%, 
+                transparent 100%);
+            animation-delay: -7s;
+            animation-duration: 25s;
+        }
+
+        .aurora-wave:nth-child(3) {
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(72, 209, 204, 0.08) 25%, 
+                rgba(123, 104, 238, 0.12) 50%, 
+                rgba(0, 255, 255, 0.08) 75%, 
+                transparent 100%);
+            animation-delay: -14s;
+            animation-duration: 30s;
+        }
+
+        @keyframes auroraFlow {
+            0%, 100% { transform: translateX(-50%) translateY(0) rotate(0deg); opacity: 0.3; }
+            25% { transform: translateX(-40%) translateY(-10px) rotate(1deg); opacity: 0.6; }
+            50% { transform: translateX(-45%) translateY(10px) rotate(-1deg); opacity: 0.8; }
+            75% { transform: translateX(-35%) translateY(-5px) rotate(0.5deg); opacity: 0.5; }
+        }
+
+        /* Stars Background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Main Container */
+        .aurora-studio {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .studio-header {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 127, 0.1) 0%, rgba(138, 43, 226, 0.1) 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 127, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 255, 127, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .studio-title {
+            font-size: 3em;
+            font-weight: 300;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #00ff7f, #8a2be2, #00bfff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 127, 0.5);
+        }
+
+        .studio-subtitle {
+            font-size: 1.2em;
+            opacity: 0.8;
+            color: #b0e0e6;
+        }
+
+        /* Main Content Area */
+        .main-workspace {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Photo Gallery */
+        .photo-gallery {
+            background: linear-gradient(135deg, rgba(25, 25, 112, 0.3) 0%, rgba(72, 61, 139, 0.3) 100%);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(0, 255, 127, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+        }
+
+        .gallery-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #00ff7f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .photo-item {
+            position: relative;
+            aspect-ratio: 4/3;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            background: linear-gradient(45deg, rgba(0, 255, 127, 0.1), rgba(138, 43, 226, 0.1));
+        }
+
+        .photo-item:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: #00ff7f;
+            box-shadow: 0 15px 40px rgba(0, 255, 127, 0.4);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.4s ease;
+        }
+
+        .photo-item:hover img {
+            filter: brightness(1.2) contrast(1.1) saturate(1.3);
+        }
+
+        .photo-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(0, 255, 127, 0.2) 0%, rgba(138, 43, 226, 0.2) 100%);
+            opacity: 0;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-item:hover .photo-overlay {
+            opacity: 1;
+        }
+
+        .photo-info {
+            text-align: center;
+            color: white;
+            padding: 10px;
+        }
+
+        /* Photo Editor Panel */
+        .editor-panel {
+            background: linear-gradient(135deg, rgba(25, 25, 112, 0.4) 0%, rgba(72, 61, 139, 0.4) 100%);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            box-shadow: 0 8px 32px rgba(138, 43, 226, 0.2);
+            backdrop-filter: blur(15px);
+        }
+
+        .editor-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #8a2be2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .current-photo {
+            width: 100%;
+            aspect-ratio: 16/10;
+            border-radius: 15px;
+            background: linear-gradient(45deg, rgba(0, 0, 0, 0.5), rgba(25, 25, 112, 0.3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            border: 2px solid rgba(0, 255, 127, 0.3);
+            overflow: hidden;
+        }
+
+        .current-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 13px;
+        }
+
+        .editor-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-size: 0.9em;
+            color: #b0e0e6;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .aurora-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, rgba(0, 255, 127, 0.3), rgba(138, 43, 226, 0.3));
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .aurora-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ff7f, #8a2be2);
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 255, 127, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .aurora-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 25px rgba(0, 255, 127, 0.8);
+        }
+
+        .filter-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .aurora-btn {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, rgba(0, 255, 127, 0.2), rgba(138, 43, 226, 0.2));
+            color: #e0f7fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            border: 1px solid rgba(0, 255, 127, 0.3);
+        }
+
+        .aurora-btn:hover {
+            background: linear-gradient(45deg, rgba(0, 255, 127, 0.4), rgba(138, 43, 226, 0.4));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 255, 127, 0.3);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Location Map */
+        .location-map {
+            background: linear-gradient(135deg, rgba(0, 191, 255, 0.2) 0%, rgba(32, 178, 170, 0.2) 100%);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(0, 191, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 191, 255, 0.2);
+            backdrop-filter: blur(15px);
+        }
+
+        .map-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #00bfff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 250px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(25, 25, 112, 0.3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            border: 2px solid rgba(0, 191, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 40%, rgba(0, 255, 127, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(138, 43, 226, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 80%, rgba(0, 191, 255, 0.3) 0%, transparent 50%);
+            animation: geomagneticPulse 6s ease-in-out infinite;
+        }
+
+        @keyframes geomagneticPulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .aurora-locations {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .location-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(0, 191, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 191, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .location-item:hover {
+            background: rgba(0, 191, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .kp-index {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .kp-high { background: rgba(255, 69, 0, 0.3); color: #ff4500; }
+        .kp-medium { background: rgba(255, 165, 0, 0.3); color: #ffa500; }
+        .kp-low { background: rgba(0, 255, 127, 0.3); color: #00ff7f; }
+
+        /* Share Panel */
+        .share-panel {
+            background: linear-gradient(135deg, rgba(32, 178, 170, 0.2) 0%, rgba(0, 250, 154, 0.2) 100%);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(32, 178, 170, 0.3);
+            box-shadow: 0 8px 32px rgba(32, 178, 170, 0.2);
+            backdrop-filter: blur(15px);
+        }
+
+        .share-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #20b2aa;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .share-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(45deg, rgba(32, 178, 170, 0.3), rgba(0, 250, 154, 0.3));
+            color: #e0f7fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            border: 1px solid rgba(32, 178, 170, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .share-btn:hover {
+            background: linear-gradient(45deg, rgba(32, 178, 170, 0.5), rgba(0, 250, 154, 0.5));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(32, 178, 170, 0.3);
+        }
+
+        .aurora-burst {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 127, 0.6) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0;
+            animation: auroraBurst 1s ease-out;
+        }
+
+        @keyframes auroraBurst {
+            0% { opacity: 1; transform: scale(0); }
+            100% { opacity: 0; transform: scale(3); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .aurora-studio {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            
+            .sidebar {
+                grid-row: 3;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .studio-title {
+                font-size: 2em;
+            }
+            
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .share-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Particle Effects */
+        .cosmic-particle {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: cosmicDrift 15s linear infinite;
+        }
+
+        @keyframes cosmicDrift {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) translateX(100px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Aurora Background -->
+    <div class="aurora-bg">
+        <div class="aurora-wave"></div>
+        <div class="aurora-wave"></div>
+        <div class="aurora-wave"></div>
+    </div>
+
+    <!-- Stars Background -->
+    <div class="stars" id="starsContainer"></div>
+
+    <!-- Main Application -->
+    <div class="aurora-studio">
+        <!-- Header -->
+        <div class="studio-header">
+            <h1 class="studio-title">Aurora Borealis Studio</h1>
+            <p class="studio-subtitle">Capture, Edit & Share the Magic of Northern Lights</p>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="main-workspace">
+            <!-- Photo Gallery -->
+            <div class="photo-gallery">
+                <h2 class="gallery-title">
+                    <span>🌌</span> Aurora Photo Collection
+                </h2>
+                <div class="gallery-grid">
+                    <div class="photo-item" onclick="selectPhoto('aurora1')">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIyNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImF1cm9yYTEiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIHN0b3AtY29sb3I9IiMwMGZmN2YiIHN0b3Atb3BhY2l0eT0iMC44Ii8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiM4YTJiZTIiIHN0b3Atb3BhY2l0eT0iMC42Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDA5MWZmIiBzdG9wLW9wYWNpdHk9IjAuOCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjMGEwZjFjIi8+PGVsbGlwc2UgY3g9IjE1MCIgY3k9IjgwIiByeD0iMTIwIiByeT0iNDAiIGZpbGw9InVybCgjYXVyb3JhMSkiIG9wYWNpdHk9IjAuNyIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNlMGY3ZmEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkljZWxhbmQgQXVyb3JhPC90ZXh0Pjx0ZXh0IHg9IjE1MCIgeT0iMjAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiNiMGUwZTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPktQIDctIFN0cm9uZzwvdGV4dD48L3N2Zz4=" alt="Iceland Aurora">
+                        <div class="photo-overlay">
+                            <div class="photo-info">
+                                <h3>Iceland Aurora</h3>
+                                <p>KP 7 - Strong</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="photo-item" onclick="selectPhoto('aurora2')">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIyNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImF1cm9yYTIiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIHN0b3AtY29sb3I9IiMyMGIyYWEiIHN0b3Atb3BhY2l0eT0iMC45Ii8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiM0ODQxOGIiIHN0b3Atb3BhY2l0eT0iMC43Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDBmZjlhIiBzdG9wLW9wYWNpdHk9IjAuOCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjMWEyMzQ3Ii8+PGVsbGlwc2UgY3g9IjEwMCIgY3k9IjYwIiByeD0iODAiIHJ5PSIzMCIgZmlsbD0idXJsKCNhdXJvcmEyKSIgb3BhY2l0eT0iMC44Ii8+PGVsbGlwc2UgY3g9IjIwMCIgY3k9IjEwMCIgcng9IjEwMCIgcnk9IjI1IiBmaWxsPSJ1cmwoI2F1cm9yYTIpIiBvcGFjaXR5PSIwLjYiLz48dGV4dCB4PSIxNTAiIHk9IjE4MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjZTBmN2ZhIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Ob3J3YXkgRGFuY2U8L3RleHQ+PHRleHQgeD0iMTUwIiB5PSIyMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI2IwZTBlNiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+S1AgNSAtIE1vZGVyYXRlPC90ZXh0Pjwvc3ZnPg==" alt="Norway Aurora Dance">
+                        <div class="photo-overlay">
+                            <div class="photo-info">
+                                <h3>Norway Dance</h3>
+                                <p>KP 5 - Moderate</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="photo-item" onclick="selectPhoto('aurora3')">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIyNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImF1cm9yYTMiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIHN0b3AtY29sb3I9IiM5MzAwZDMiIHN0b3Atb3BhY2l0eT0iMC45Ii8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiMwMGZmN2YiIHN0b3Atb3BhY2l0eT0iMC43Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDBiZmZmIiBzdG9wLW9wYWNpdHk9IjAuOCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjMmQxYjY5Ii8+PGVsbGlwc2UgY3g9IjE1MCIgY3k9IjUwIiByeD0iMTQwIiByeT0iMzUiIGZpbGw9InVybCgjYXVyb3JhMykiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNlMGY3ZmEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZpbmxhbmQgU3Rvcm08L3RleHQ+PHRleHQgeD0iMTUwIiB5PSIyMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI2IwZTBlNiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+S1AgOS0gRXh0cmVtZTwvdGV4dD48L3N2Zz4=" alt="Finland Aurora Storm">
+                        <div class="photo-overlay">
+                            <div class="photo-info">
+                                <h3>Finland Storm</h3>
+                                <p>KP 9 - Extreme</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="photo-item" onclick="selectPhoto('aurora4')">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIyNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImF1cm9yYTQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIHN0b3AtY29sb3I9IiMwMGZmOWEiIHN0b3Atb3BhY2l0eT0iMC44Ii8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiM0ODQxOGIiIHN0b3Atb3BhY2l0eT0iMC42Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjOWEwMGZmIiBzdG9wLW9wYWNpdHk9IjAuNyIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjMGEwZjFjIi8+PGVsbGlwc2UgY3g9IjEyMCIgY3k9IjcwIiByeD0iOTAiIHJ5PSIyNSIgZmlsbD0idXJsKCNhdXJvcmE0KSIgb3BhY2l0eT0iMC43Ii8+PGVsbGlwc2UgY3g9IjE4MCIgY3k9IjExMCIgcng9IjgwIiByeT0iMjAiIGZpbGw9InVybCgjYXVyb3JhNCkiIG9wYWNpdHk9IjAuNSIvPjx0ZXh0IHg9IjE1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNlMGY3ZmEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNhbmFkYSBNaXN0PC90ZXh0Pjx0ZXh0IHg9IjE1MCIgeT0iMjAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiNiMGUwZTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPktQIDMgLSBNaW5vcjwvdGV4dD48L3N2Zz4=" alt="Canada Aurora Mist">
+                        <div class="photo-overlay">
+                            <div class="photo-info">
+                                <h3>Canada Mist</h3>
+                                <p>KP 3 - Minor</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Photo Editor -->
+            <div class="editor-panel">
+                <h2 class="editor-title">
+                    <span>✨</span> Aurora Enhancement Suite
+                </h2>
+                <div class="current-photo" id="currentPhoto">
+                    <img id="selectedImage" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImRlZmF1bHQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIHN0b3AtY29sb3I9IiMwYTBmMWMiIHN0b3Atb3BhY2l0eT0iMC44Ii8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiMxYTIzNDciIHN0b3Atb3BhY2l0eT0iMC42Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMmQxYjY5IiBzdG9wLW9wYWNpdHk9IjAuOCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSJ1cmwoI2RlZmF1bHQpIi8+PHRleHQgeD0iMjAwIiB5PSIxMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iI2UwZjdmYSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+U2VsZWN0IGFuIGF1cm9yYSBwaG90byB0byBlZGl0PC90ZXh0Pjwvc3ZnPg==" alt="Select photo to edit">
+                </div>
+                
+                <div class="editor-controls">
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>Aurora Intensity</span>
+                            <span id="intensityValue">50%</span>
+                        </div>
+                        <input type="range" class="aurora-slider" id="intensity" min="0" max="100" value="50" oninput="updateValue('intensity')">
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>Ethereal Glow</span>
+                            <span id="glowValue">30%</span>
+                        </div>
+                        <input type="range" class="aurora-slider" id="glow" min="0" max="100" value="30" oninput="updateValue('glow')">
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>Cosmic Clarity</span>
+                            <span id="clarityValue">60%</span>
+                        </div>
+                        <input type="range" class="aurora-slider" id="clarity" min="0" max="100" value="60" oninput="updateValue('clarity')">
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>Stellar Brightness</span>
+                            <span id="brightnessValue">45%</span>
+                        </div>
+                        <input type="range" class="aurora-slider" id="brightness" min="0" max="100" value="45" oninput="updateValue('brightness')">
+                    </div>
+                </div>
+                
+                <div class="filter-buttons">
+                    <button class="aurora-btn" onclick="applyFilter('northern')">Northern Lights</button>
+                    <button class="aurora-btn" onclick="applyFilter('cosmic')">Cosmic Dance</button>
+                    <button class="aurora-btn" onclick="applyFilter('ethereal')">Ethereal Mist</button>
+                    <button class="aurora-btn" onclick="applyFilter('stellar')">Stellar Storm</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Location Map -->
+            <div class="location-map">
+                <h2 class="map-title">
+                    <span>🌍</span> Aurora Locations
+                </h2>
+                <div class="map-container">
+                    <div class="map-overlay"></div>
+                    <div style="color: #00bfff; text-align: center; z-index: 2; position: relative;">
+                        <div>🗺️</div>
+                        <div style="margin-top: 10px; font-size: 0.9em;">Geomagnetic Activity Map</div>
+                    </div>
+                </div>
+                
+                <div class="aurora-locations">
+                    <div class="location-item">
+                        <div>
+                            <div style="font-weight: bold;">Tromsø, Norway</div>
+                            <div style="font-size: 0.8em; opacity: 0.7;">69.6492° N, 18.9553° E</div>
+                        </div>
+                        <div class="kp-index kp-high">KP 7</div>
+                    </div>
+                    
+                    <div class="location-item">
+                        <div>
+                            <div style="font-weight: bold;">Reykjavik, Iceland</div>
+                            <div style="font-size: 0.8em; opacity: 0.7;">64.1466° N, 21.9426° W</div>
+                        </div>
+                        <div class="kp-index kp-medium">KP 5</div>
+                    </div>
+                    
+                    <div class="location-item">
+                        <div>
+                            <div style="font-weight: bold;">Fairbanks, Alaska</div>
+                            <div style="font-size: 0.8em; opacity: 0.7;">64.8378° N, 147.7164° W</div>
+                        </div>
+                        <div class="kp-index kp-high">KP 8</div>
+                    </div>
+                    
+                    <div class="location-item">
+                        <div>
+                            <div style="font-weight: bold;">Yellowknife, Canada</div>
+                            <div style="font-size: 0.8em; opacity: 0.7;">62.4540° N, 114.3718° W</div>
+                        </div>
+                        <div class="kp-index kp-low">KP 4</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Share Panel -->
+            <div class="share-panel">
+                <h2 class="share-title">
+                    <span>💫</span> Share Aurora Magic
+                </h2>
+                
+                <div class="share-options">
+                    <button class="share-btn" onclick="shareAurora('social')">
+                        <span>📱</span> Social Media
+                    </button>
+                    <button class="share-btn" onclick="shareAurora('email')">
+                        <span>✉️</span> Email
+                    </button>
+                    <button class="share-btn" onclick="shareAurora('print')">
+                        <span>🖨️</span> Print
+                    </button>
+                    <button class="share-btn" onclick="shareAurora('download')">
+                        <span>⬇️</span> Download
+                    </button>
+                </div>
+                
+                <div style="margin-top: 15px; padding: 15px; background: rgba(32, 178, 170, 0.1); border-radius: 10px; border: 1px solid rgba(32, 178, 170, 0.2);">
+                    <div style="font-size: 0.9em; margin-bottom: 8px; color: #20b2aa;">Recent Shares:</div>
+                    <div style="font-size: 0.8em; opacity: 0.7;">Iceland Aurora → Instagram (2 min ago)</div>
+                    <div style="font-size: 0.8em; opacity: 0.7;">Finland Storm → Twitter (5 min ago)</div>
+                    <div style="font-size: 0.8em; opacity: 0.7;">Norway Dance → Email (12 min ago)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize stars
+        function createStars() {
+            const starsContainer = document.getElementById('starsContainer');
+            const numStars = 100;
+            
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Create cosmic particles
+        function createCosmicParticles() {
+            setInterval(() => {
+                const particle = document.createElement('div');
+                particle.className = 'cosmic-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = '0s';
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 15000);
+            }, 2000);
+        }
+
+        // Photo selection
+        function selectPhoto(photoId) {
+            const photoMap = {
+                'aurora1': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImF1cm9yYTEiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIHN0b3AtY29sb3I9IiMwMGZmN2YiIHN0b3Atb3BhY2l0eT0iMC44Ii8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiM4YTJiZTIiIHN0b3Atb3BhY2l0eT0iMC42Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDA5MWZmIiBzdG9wLW9wYWNpdHk9IjAuOCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjMGEwZjFjIi8+PGVsbGlwc2UgY3g9IjIwMCIgY3k9IjEwMCIgcng9IjE2MCIgcnk9IjUwIiBmaWxsPSJ1cmwoI2F1cm9yYTEpIiBvcGFjaXR5PSIwLjciLz48dGV4dCB4PSIyMDAiIHk9IjIyMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE2IiBmaWxsPSIjZTBmN2ZhIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5JY2VsYW5kIEF1cm9yYSAtIFNlbGVjdGVkPC90ZXh0Pjwvc3ZnPg==',
+                'aurora2': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImF1cm9yYTIiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIHN0b3AtY29sb3I9IiMyMGIyYWEiIHN0b3Atb3BhY2l0eT0iMC45Ii8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiM0ODQxOGIiIHN0b3Atb3BhY2l0eT0iMC43Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDBmZjlhIiBzdG9wLW9wYWNpdHk9IjAuOCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjMWEyMzQ3Ii8+PGVsbGlwc2UgY3g9IjEzMCIgY3k9IjgwIiByeD0iMTAwIiByeT0iNDAiIGZpbGw9InVybCgjYXVyb3JhMikiIG9wYWNpdHk9IjAuOCIvPjxlbGxpcHNlIGN4PSIyNzAiIGN5PSIxMzAiIHJ4PSIxMjAiIHJ5PSIzNSIgZmlsbD0idXJsKCNhdXJvcmEyKSIgb3BhY2l0eT0iMC42Ii8+PHRleHQgeD0iMjAwIiB5PSIyMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0iI2UwZjdmYSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Tm9yd2F5IEF1cm9yYSBEYW5jZSAtIFNlbGVjdGVkPC90ZXh0Pjwvc3ZnPg==',
+                'aurora3': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImF1cm9yYTMiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIHN0b3AtY29sb3I9IiM5MzAwZDMiIHN0b3Atb3BhY2l0eT0iMC45Ii8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiMwMGZmN2YiIHN0b3Atb3BhY2l0eT0iMC43Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDBiZmZmIiBzdG9wLW9wYWNpdHk9IjAuOCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjMmQxYjY5Ii8+PGVsbGlwc2UgY3g9IjIwMCIgY3k9IjYwIiByeD0iMTgwIiByeT0iNDUiIGZpbGw9InVybCgjYXVyb3JhMykiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjIwMCIgeT0iMjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiNlMGY3ZmEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZpbmxhbmQgQXVyb3JhIFN0b3JtIC0gU2VsZWN0ZWQ8L3RleHQ+PC9zdmc+',
+                'aurora4': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImF1cm9yYTQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIHN0b3AtY29sb3I9IiMwMGZmOWEiIHN0b3Atb3BhY2l0eT0iMC44Ii8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiM0ODQxOGIiIHN0b3Atb3BhY2l0eT0iMC42Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjOWEwMGZmIiBzdG9wLW9wYWNpdHk9IjAuNyIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjMGEwZjFjIi8+PGVsbGlwc2UgY3g9IjE2MCIgY3k9IjkwIiByeD0iMTIwIiByeT0iMzUiIGZpbGw9InVybCgjYXVyb3JhNCkiIG9wYWNpdHk9IjAuNyIvPjxlbGxpcHNlIGN4PSIyNDAiIGN5PSIxNDAiIHJ4PSIxMDAiIHJ5PSIyNSIgZmlsbD0idXJsKCNhdXJvcmE0KSIgb3BhY2l0eT0iMC41Ii8+PHRleHQgeD0iMjAwIiB5PSIyMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0iI2UwZjdmYSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Q2FuYWRhIEF1cm9yYSBNaXN0IC0gU2VsZWN0ZWQ8L3RleHQ+PC9zdmc+'
+            };
+            
+            const selectedImage = document.getElementById('selectedImage');
+            selectedImage.src = photoMap[photoId];
+            selectedImage.alt = photoId + ' - Selected for editing';
+        }
+
+        // Update slider values
+        function updateValue(sliderId) {
+            const slider = document.getElementById(sliderId);
+            const valueDisplay = document.getElementById(sliderId + 'Value');
+            valueDisplay.textContent = slider.value + '%';
+        }
+
+        // Apply aurora filters
+        function applyFilter(filterType) {
+            const currentPhoto = document.getElementById('selectedImage');
+            const filterMap = {
+                'northern': 'brightness(1.2) contrast(1.1) saturate(1.4) hue-rotate(10deg)',
+                'cosmic': 'brightness(1.1) contrast(1.3) saturate(1.6) hue-rotate(-20deg)',
+                'ethereal': 'brightness(1.3) contrast(0.9) saturate(1.2) blur(0.5px)',
+                'stellar': 'brightness(1.4) contrast(1.4) saturate(1.8) hue-rotate(30deg)'
+            };
+            
+            currentPhoto.style.filter = filterMap[filterType];
+            currentPhoto.style.transition = 'filter 0.8s ease';
+            
+            // Show filter applied notification
+            showNotification(`${filterType.charAt(0).toUpperCase() + filterType.slice(1)} filter applied!`);
+        }
+
+        // Share aurora functionality
+        function shareAurora(platform) {
+            const shareElement = event.target.closest('.share-btn');
+            const burst = document.createElement('div');
+            burst.className = 'aurora-burst';
+            
+            const rect = shareElement.getBoundingClientRect();
+            burst.style.left = (rect.left + rect.width / 2 - 50) + 'px';
+            burst.style.top = (rect.top + rect.height / 2 - 50) + 'px';
+            
+            document.body.appendChild(burst);
+            
+            setTimeout(() => {
+                burst.remove();
+            }, 1000);
+            
+            // Show share notification
+            const messages = {
+                'social': 'Shared to social media with aurora magic! ✨',
+                'email': 'Aurora photo sent via cosmic email! 📧',
+                'print': 'Aurora print job sent to stellar printer! 🖨️',
+                'download': 'Aurora photo downloaded with ethereal glow! ⬇️'
+            };
+            
+            showNotification(messages[platform]);
+        }
+
+        // Show notifications
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(45deg, rgba(0, 255, 127, 0.9), rgba(138, 43, 226, 0.9));
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                z-index: 1000;
+                animation: slideIn 0.5s ease-out;
+                box-shadow: 0 8px 32px rgba(0, 255, 127, 0.3);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(0, 255, 127, 0.3);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.5s ease-in forwards';
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
+
+        // Add animation styles
+        const animationStyles = document.createElement('style');
+        animationStyles.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(animationStyles);
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            createCosmicParticles();
+            
+            // Auto-select first photo
+            setTimeout(() => {
+                selectPhoto('aurora1');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

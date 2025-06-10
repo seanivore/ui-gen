@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetroTerm OS - Terminal Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(ellipse at center, #0d1117 0%, #000000 100%);
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            color: #00ff41;
+            overflow: hidden;
+            height: 100vh;
+            user-select: none;
+        }
+
+        /* CRT Monitor Frame */
+        .crt-monitor {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(45deg, #2a2a2a, #3a3a3a, #2a2a2a);
+            border-radius: 20px;
+            box-shadow: 
+                inset 0 10px 20px rgba(0,0,0,0.8),
+                0 0 100px rgba(0,255,65,0.1);
+        }
+
+        .crt-bezel {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            right: 40px;
+            bottom: 40px;
+            background: #000;
+            border-radius: 10px;
+            border: 3px solid #1a1a1a;
+            overflow: hidden;
+        }
+
+        /* CRT Screen Effects */
+        .crt-screen {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at center, #001a00 0%, #000000 70%),
+                linear-gradient(transparent 50%, rgba(0,255,65,0.03) 50%);
+            background-size: 100% 100%, 100% 4px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Scan Lines */
+        .crt-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                transparent 50%, 
+                rgba(0,255,65,0.05) 50%
+            );
+            background-size: 100% 2px;
+            pointer-events: none;
+            z-index: 100;
+            animation: scanlines 0.1s linear infinite;
+        }
+
+        /* Phosphor Glow */
+        .crt-screen::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, 
+                rgba(0,255,65,0.1) 0%, 
+                transparent 70%);
+            pointer-events: none;
+            z-index: 101;
+            animation: phosphorGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(2px); }
+        }
+
+        @keyframes phosphorGlow {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        /* Terminal Container */
+        .terminal-container {
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        /* Boot Sequence */
+        .boot-sequence {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .boot-sequence.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .boot-logo {
+            font-size: 2rem;
+            color: #00ff41;
+            text-shadow: 0 0 20px #00ff41;
+            margin-bottom: 30px;
+            animation: flicker 0.5s infinite alternate;
+        }
+
+        .boot-text {
+            font-size: 0.9rem;
+            color: #00aa33;
+            line-height: 1.4;
+            max-width: 600px;
+            text-align: left;
+        }
+
+        .boot-progress {
+            margin-top: 20px;
+            width: 400px;
+            height: 20px;
+            border: 1px solid #00ff41;
+            position: relative;
+        }
+
+        .boot-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff41, #00aa33);
+            width: 0%;
+            animation: bootProgress 3s ease-out forwards;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        @keyframes bootProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* System Header */
+        .system-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #00ff41;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .system-title {
+            font-size: 1.2rem;
+            color: #00ff41;
+            text-shadow: 0 0 10px #00ff41;
+        }
+
+        .system-time {
+            font-size: 0.9rem;
+            color: #00aa33;
+        }
+
+        /* Main Terminal Area */
+        .terminal-main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        /* Terminal Output */
+        .terminal-output {
+            background: rgba(0,26,0,0.3);
+            border: 1px solid #003300;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-y: auto;
+            max-height: 100%;
+        }
+
+        .output-line {
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            animation: typewriter 0.05s steps(1) forwards;
+            opacity: 0;
+        }
+
+        .output-line.visible {
+            opacity: 1;
+        }
+
+        .prompt-line {
+            color: #00ff41;
+        }
+
+        .command-line {
+            color: #ffff00;
+        }
+
+        .result-line {
+            color: #00aa33;
+        }
+
+        .error-line {
+            color: #ff4444;
+        }
+
+        .info-line {
+            color: #4488ff;
+        }
+
+        /* System Monitor */
+        .system-monitor {
+            background: rgba(0,26,0,0.3);
+            border: 1px solid #003300;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .monitor-section {
+            margin-bottom: 20px;
+        }
+
+        .monitor-title {
+            color: #00ff41;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-decoration: underline;
+        }
+
+        .monitor-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 0.8rem;
+        }
+
+        .monitor-label {
+            color: #00aa33;
+        }
+
+        .monitor-value {
+            color: #ffff00;
+        }
+
+        .ascii-graph {
+            font-family: monospace;
+            color: #00ff41;
+            line-height: 1;
+            margin-top: 5px;
+        }
+
+        /* Command Input Area */
+        .command-input-area {
+            margin-top: 20px;
+            border-top: 1px solid #00ff41;
+            padding-top: 15px;
+        }
+
+        .input-line {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .prompt {
+            color: #00ff41;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .command-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #ffff00;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            caret-color: #00ff41;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #00ff41;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Autocomplete */
+        .autocomplete {
+            background: rgba(0,0,0,0.9);
+            border: 1px solid #00ff41;
+            border-radius: 2px;
+            max-height: 120px;
+            overflow-y: auto;
+            margin-top: 5px;
+        }
+
+        .autocomplete-item {
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #00aa33;
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: rgba(0,255,65,0.2);
+            color: #00ff41;
+        }
+
+        /* Command History */
+        .command-history {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #003300;
+            border-radius: 2px;
+            max-height: 100px;
+            overflow-y: auto;
+            margin-top: 5px;
+            font-size: 0.8rem;
+        }
+
+        .history-item {
+            padding: 3px 8px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            background: rgba(0,255,65,0.1);
+            color: #00aa33;
+        }
+
+        /* Status Indicators */
+        .status-indicators {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 0.7rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-led {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff41;
+            box-shadow: 0 0 5px #00ff41;
+            animation: pulse 2s infinite;
+        }
+
+        .status-led.warning {
+            background: #ffaa00;
+            box-shadow: 0 0 5px #ffaa00;
+        }
+
+        .status-led.error {
+            background: #ff4444;
+            box-shadow: 0 0 5px #ff4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Network Activity Graph */
+        .network-graph {
+            height: 60px;
+            display: flex;
+            align-items: end;
+            gap: 1px;
+            margin-top: 5px;
+        }
+
+        .graph-bar {
+            width: 3px;
+            background: #00ff41;
+            opacity: 0.7;
+            animation: networkActivity 2s infinite ease-in-out;
+        }
+
+        @keyframes networkActivity {
+            0%, 100% { height: 10%; }
+            50% { height: 80%; }
+        }
+
+        /* Hidden elements */
+        .hidden {
+            display: none;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00ff41;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00aa33;
+        }
+    </style>
+</head>
+<body>
+    <div class="crt-monitor">
+        <div class="crt-bezel">
+            <div class="crt-screen">
+                <!-- Boot Sequence -->
+                <div class="boot-sequence" id="bootSequence">
+                    <div class="boot-logo">
+                        ██████╗ ███████╗████████╗██████╗  ██████╗ ████████╗███████╗██████╗ ███╗   ███╗
+                        ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██╔══██╗████╗ ████║
+                        ██████╔╝█████╗     ██║   ██████╔╝██║   ██║   ██║   █████╗  ██████╔╝██╔████╔██║
+                        ██╔══██╗██╔══╝     ██║   ██╔══██╗██║   ██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║
+                        ██║  ██║███████╗   ██║   ██║  ██║╚██████╔╝   ██║   ███████╗██║  ██║██║ ╚═╝ ██║
+                        ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝
+                    </div>
+                    <div class="boot-text" id="bootText">
+                        [  0.001] Initializing RetroTerm OS v2.1.3...<br>
+                        [  0.123] Loading kernel modules...<br>
+                        [  0.456] Mounting filesystems...<br>
+                        [  0.789] Starting network services...<br>
+                        [  1.234] Initializing terminal interface...<br>
+                        [  1.567] Loading command database...<br>
+                        [  1.890] Starting system monitor...<br>
+                        [  2.123] Boot sequence complete.<br>
+                    </div>
+                    <div class="boot-progress">
+                        <div class="boot-bar"></div>
+                    </div>
+                </div>
+
+                <!-- Main Terminal Interface -->
+                <div class="terminal-container">
+                    <div class="system-header">
+                        <div class="system-title">RetroTerm OS v2.1.3 - Terminal Interface</div>
+                        <div class="system-time" id="systemTime">00:00:00</div>
+                    </div>
+
+                    <div class="terminal-main">
+                        <div class="terminal-output" id="terminalOutput">
+                            <div class="output-line prompt-line">user@retroterm:~$</div>
+                            <div class="output-line command-line">help</div>
+                            <div class="output-line result-line">Available commands:</div>
+                            <div class="output-line result-line">  ls     - list directory contents</div>
+                            <div class="output-line result-line">  cat    - display file contents</div>
+                            <div class="output-line result-line">  ps     - show running processes</div>
+                            <div class="output-line result-line">  top    - display system monitor</div>
+                            <div class="output-line result-line">  ping   - test network connectivity</div>
+                            <div class="output-line result-line">  clear  - clear terminal screen</div>
+                            <div class="output-line result-line">  exit   - terminate session</div>
+                            <div class="output-line prompt-line">user@retroterm:~$</div>
+                            <div class="output-line command-line">ls -la</div>
+                            <div class="output-line result-line">total 42</div>
+                            <div class="output-line result-line">drwxr-xr-x 3 user user 4096 Dec 10 15:42 .</div>
+                            <div class="output-line result-line">drwxr-xr-x 3 root root 4096 Dec 10 15:41 ..</div>
+                            <div class="output-line result-line">-rw-r--r-- 1 user user  220 Dec 10 15:41 .profile</div>
+                            <div class="output-line result-line">-rw-r--r-- 1 user user 3394 Dec 10 15:42 data.txt</div>
+                            <div class="output-line result-line">drwxr-xr-x 2 user user 4096 Dec 10 15:42 documents</div>
+                            <div class="output-line result-line">-rwxr-xr-x 1 user user 8192 Dec 10 15:42 program</div>
+                        </div>
+
+                        <div class="system-monitor">
+                            <div class="monitor-section">
+                                <div class="monitor-title">SYSTEM STATUS</div>
+                                <div class="monitor-item">
+                                    <span class="monitor-label">CPU Usage:</span>
+                                    <span class="monitor-value" id="cpuUsage">23%</span>
+                                </div>
+                                <div class="monitor-item">
+                                    <span class="monitor-label">Memory:</span>
+                                    <span class="monitor-value" id="memUsage">1.2GB / 4.0GB</span>
+                                </div>
+                                <div class="monitor-item">
+                                    <span class="monitor-label">Disk:</span>
+                                    <span class="monitor-value" id="diskUsage">45.7GB / 100GB</span>
+                                </div>
+                                <div class="ascii-graph" id="cpuGraph">
+                                    CPU: [██████░░░░] 65%
+                                </div>
+                            </div>
+
+                            <div class="monitor-section">
+                                <div class="monitor-title">NETWORK</div>
+                                <div class="monitor-item">
+                                    <span class="monitor-label">Interface:</span>
+                                    <span class="monitor-value">eth0</span>
+                                </div>
+                                <div class="monitor-item">
+                                    <span class="monitor-label">IP Address:</span>
+                                    <span class="monitor-value">192.168.1.42</span>
+                                </div>
+                                <div class="monitor-item">
+                                    <span class="monitor-label">RX/TX:</span>
+                                    <span class="monitor-value" id="networkStats">1.2MB/856KB</span>
+                                </div>
+                                <div class="network-graph" id="networkGraph">
+                                    <!-- Network activity bars -->
+                                </div>
+                            </div>
+
+                            <div class="monitor-section">
+                                <div class="monitor-title">PROCESSES</div>
+                                <div class="monitor-item">
+                                    <span class="monitor-label">Total:</span>
+                                    <span class="monitor-value" id="processCount">127</span>
+                                </div>
+                                <div class="monitor-item">
+                                    <span class="monitor-label">Running:</span>
+                                    <span class="monitor-value">3</span>
+                                </div>
+                                <div class="monitor-item">
+                                    <span class="monitor-label">Sleeping:</span>
+                                    <span class="monitor-value">124</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="command-input-area">
+                        <div class="input-line">
+                            <span class="prompt">user@retroterm:~$</span>
+                            <input type="text" class="command-input" id="commandInput" autocomplete="off" spellcheck="false">
+                            <span class="cursor" id="cursor"></span>
+                        </div>
+                        
+                        <div class="autocomplete hidden" id="autocomplete"></div>
+                        <div class="command-history hidden" id="commandHistory"></div>
+
+                        <div class="status-indicators">
+                            <div class="status-item">
+                                <div class="status-led"></div>
+                                <span>SYSTEM</span>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-led warning"></div>
+                                <span>NETWORK</span>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-led"></div>
+                                <span>STORAGE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System state
+        let commandHistory = ['help', 'ls -la', 'ps aux', 'top', 'ping google.com', 'cat data.txt'];
+        let historyIndex = -1;
+        let currentCommands = [];
+        
+        // Available commands for autocomplete
+        const commands = [
+            'help', 'ls', 'cat', 'ps', 'top', 'ping', 'clear', 'exit',
+            'ls -la', 'ls -l', 'ps aux', 'ping google.com', 'cat data.txt'
+        ];
+
+        // System monitoring values
+        let cpuUsage = 23;
+        let memUsed = 1.2;
+        let diskUsed = 45.7;
+        let networkRx = 1200;
+        let networkTx = 856;
+
+        // Initialize system
+        document.addEventListener('DOMContentLoaded', function() {
+            // Boot sequence
+            setTimeout(() => {
+                document.getElementById('bootSequence').classList.add('hidden');
+                initializeTerminal();
+            }, 3500);
+
+            // Update system time
+            updateSystemTime();
+            setInterval(updateSystemTime, 1000);
+
+            // Start system monitoring
+            setInterval(updateSystemStats, 2000);
+            
+            // Initialize network graph
+            createNetworkGraph();
+            
+            // Show output lines gradually
+            setTimeout(showOutputLines, 4000);
+        });
+
+        function initializeTerminal() {
+            const input = document.getElementById('commandInput');
+            const autocomplete = document.getElementById('autocomplete');
+            
+            // Focus input
+            input.focus();
+            
+            // Command input handling
+            input.addEventListener('input', handleInput);
+            input.addEventListener('keydown', handleKeyDown);
+            
+            // Hide autocomplete when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!autocomplete.contains(e.target) && e.target !== input) {
+                    autocomplete.classList.add('hidden');
+                }
+            });
+        }
+
+        function handleInput(e) {
+            const input = e.target.value;
+            const autocomplete = document.getElementById('autocomplete');
+            
+            if (input.length > 0) {
+                const matches = commands.filter(cmd => 
+                    cmd.toLowerCase().startsWith(input.toLowerCase())
+                );
+                
+                if (matches.length > 0) {
+                    showAutocomplete(matches);
+                } else {
+                    autocomplete.classList.add('hidden');
+                }
+            } else {
+                autocomplete.classList.add('hidden');
+            }
+        }
+
+        function handleKeyDown(e) {
+            const input = document.getElementById('commandInput');
+            const autocomplete = document.getElementById('autocomplete');
+            
+            switch(e.key) {
+                case 'Enter':
+                    executeCommand(input.value);
+                    break;
+                    
+                case 'Tab':
+                    e.preventDefault();
+                    if (!autocomplete.classList.contains('hidden')) {
+                        const selected = autocomplete.querySelector('.selected') || 
+                                       autocomplete.querySelector('.autocomplete-item');
+                        if (selected) {
+                            input.value = selected.textContent;
+                            autocomplete.classList.add('hidden');
+                        }
+                    }
+                    break;
+                    
+                case 'ArrowUp':
+                    e.preventDefault();
+                    navigateHistory(-1);
+                    break;
+                    
+                case 'ArrowDown':
+                    e.preventDefault();
+                    navigateHistory(1);
+                    break;
+                    
+                case 'Escape':
+                    autocomplete.classList.add('hidden');
+                    break;
+            }
+        }
+
+        function showAutocomplete(matches) {
+            const autocomplete = document.getElementById('autocomplete');
+            autocomplete.innerHTML = '';
+            
+            matches.forEach((match, index) => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                if (index === 0) item.classList.add('selected');
+                item.textContent = match;
+                item.addEventListener('click', () => {
+                    document.getElementById('commandInput').value = match;
+                    autocomplete.classList.add('hidden');
+                });
+                autocomplete.appendChild(item);
+            });
+            
+            autocomplete.classList.remove('hidden');
+        }
+
+        function navigateHistory(direction) {
+            if (commandHistory.length === 0) return;
+            
+            historyIndex += direction;
+            
+            if (historyIndex < 0) {
+                historyIndex = 0;
+            } else if (historyIndex >= commandHistory.length) {
+                historyIndex = commandHistory.length - 1;
+            }
+            
+            document.getElementById('commandInput').value = commandHistory[historyIndex];
+        }
+
+        function executeCommand(command) {
+            if (!command.trim()) return;
+            
+            const output = document.getElementById('terminalOutput');
+            const input = document.getElementById('commandInput');
+            
+            // Add command to history
+            if (commandHistory[commandHistory.length - 1] !== command) {
+                commandHistory.push(command);
+            }
+            historyIndex = -1;
+            
+            // Add command to output
+            addOutputLine('prompt-line', 'user@retroterm:~$');
+            addOutputLine('command-line', command);
+            
+            // Process command
+            processCommand(command);
+            
+            // Clear input
+            input.value = '';
+            
+            // Hide autocomplete
+            document.getElementById('autocomplete').classList.add('hidden');
+        }
+
+        function processCommand(command) {
+            const cmd = command.toLowerCase().trim();
+            
+            switch(cmd) {
+                case 'help':
+                    addOutputLine('result-line', 'Available commands:');
+                    addOutputLine('result-line', '  ls     - list directory contents');
+                    addOutputLine('result-line', '  cat    - display file contents');
+                    addOutputLine('result-line', '  ps     - show running processes');
+                    addOutputLine('result-line', '  top    - display system monitor');
+                    addOutputLine('result-line', '  ping   - test network connectivity');
+                    addOutputLine('result-line', '  clear  - clear terminal screen');
+                    addOutputLine('result-line', '  exit   - terminate session');
+                    break;
+                    
+                case 'ls':
+                case 'ls -l':
+                case 'ls -la':
+                    addOutputLine('result-line', 'total 42');
+                    addOutputLine('result-line', 'drwxr-xr-x 3 user user 4096 Dec 10 15:42 .');
+                    addOutputLine('result-line', 'drwxr-xr-x 3 root root 4096 Dec 10 15:41 ..');
+                    addOutputLine('result-line', '-rw-r--r-- 1 user user  220 Dec 10 15:41 .profile');
+                    addOutputLine('result-line', '-rw-r--r-- 1 user user 3394 Dec 10 15:42 data.txt');
+                    addOutputLine('result-line', 'drwxr-xr-x 2 user user 4096 Dec 10 15:42 documents');
+                    addOutputLine('result-line', '-rwxr-xr-x 1 user user 8192 Dec 10 15:42 program');
+                    break;
+                    
+                case 'ps':
+                case 'ps aux':
+                    addOutputLine('result-line', 'USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND');
+                    addOutputLine('result-line', 'root         1  0.0  0.1   2384  1024 ?        Ss   15:41   0:01 /sbin/init');
+                    addOutputLine('result-line', 'user      1234  2.1  1.5  12384  6144 pts/0    S+   15:42   0:05 retroterm');
+                    addOutputLine('result-line', 'user      1235  0.5  0.8   8192  3072 pts/0    S+   15:42   0:01 system-monitor');
+                    break;
+                    
+                case 'top':
+                    addOutputLine('result-line', 'Tasks: 127 total,   3 running, 124 sleeping');
+                    addOutputLine('result-line', '%Cpu(s): 23.4 us,  3.2 sy,  0.0 ni, 73.1 id');
+                    addOutputLine('result-line', 'KiB Mem :  4194304 total,  2834432 free,  1229824 used');
+                    addOutputLine('result-line', 'KiB Swap:  1048576 total,  1048576 free,        0 used');
+                    break;
+                    
+                case 'ping google.com':
+                    addOutputLine('result-line', 'PING google.com (172.217.14.238) 56(84) bytes of data.');
+                    addOutputLine('result-line', '64 bytes from lga25s62-in-f14.1e100.net: icmp_seq=1 ttl=117 time=12.3 ms');
+                    addOutputLine('result-line', '64 bytes from lga25s62-in-f14.1e100.net: icmp_seq=2 ttl=117 time=11.8 ms');
+                    addOutputLine('result-line', '--- google.com ping statistics ---');
+                    addOutputLine('result-line', '2 packets transmitted, 2 received, 0% packet loss');
+                    break;
+                    
+                case 'cat data.txt':
+                    addOutputLine('result-line', 'RetroTerm OS Data File');
+                    addOutputLine('result-line', '=====================');
+                    addOutputLine('result-line', 'System initialized successfully.');
+                    addOutputLine('result-line', 'All subsystems operational.');
+                    addOutputLine('result-line', 'Terminal interface ready.');
+                    break;
+                    
+                case 'clear':
+                    document.getElementById('terminalOutput').innerHTML = '';
+                    break;
+                    
+                case 'exit':
+                    addOutputLine('info-line', 'Connection to retroterm closed.');
+                    setTimeout(() => {
+                        document.getElementById('bootSequence').classList.remove('hidden');
+                        document.getElementById('bootText').innerHTML = 'System shutdown initiated...<br>Goodbye.';
+                    }, 1000);
+                    break;
+                    
+                default:
+                    addOutputLine('error-line', `Command not found: ${command}`);
+                    addOutputLine('result-line', 'Type "help" for available commands.');
+            }
+        }
+
+        function addOutputLine(className, text) {
+            const output = document.getElementById('terminalOutput');
+            const line = document.createElement('div');
+            line.className = `output-line ${className}`;
+            line.textContent = text;
+            output.appendChild(line);
+            
+            // Auto-scroll to bottom
+            output.scrollTop = output.scrollHeight;
+            
+            // Animate line appearance
+            setTimeout(() => line.classList.add('visible'), 10);
+        }
+
+        function showOutputLines() {
+            const lines = document.querySelectorAll('.output-line');
+            lines.forEach((line, index) => {
+                setTimeout(() => {
+                    line.classList.add('visible');
+                }, index * 100);
+            });
+        }
+
+        function updateSystemTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+            document.getElementById('systemTime').textContent = timeString;
+        }
+
+        function updateSystemStats() {
+            // Simulate changing system stats
+            cpuUsage = Math.floor(Math.random() * 40) + 20;
+            memUsed = (Math.random() * 1.5 + 1).toFixed(1);
+            networkRx += Math.floor(Math.random() * 100);
+            networkTx += Math.floor(Math.random() * 50);
+            
+            document.getElementById('cpuUsage').textContent = cpuUsage + '%';
+            document.getElementById('memUsage').textContent = `${memUsed}GB / 4.0GB`;
+            document.getElementById('networkStats').textContent = `${(networkRx/1000).toFixed(1)}MB/${(networkTx/1000).toFixed(0)}KB`;
+            
+            // Update CPU graph
+            const bars = Math.floor(cpuUsage / 10);
+            const cpuBar = '█'.repeat(bars) + '░'.repeat(10 - bars);
+            document.getElementById('cpuGraph').textContent = `CPU: [${cpuBar}] ${cpuUsage}%`;
+        }
+
+        function createNetworkGraph() {
+            const graph = document.getElementById('networkGraph');
+            for (let i = 0; i < 20; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'graph-bar';
+                bar.style.height = Math.random() * 80 + 10 + '%';
+                bar.style.animationDelay = Math.random() * 2 + 's';
+                graph.appendChild(bar);
+            }
+        }
+
+        // Prevent context menu and text selection for authentic terminal feel
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        
+        // Keep input focused for terminal-like experience
+        document.addEventListener('click', () => {
+            setTimeout(() => {
+                document.getElementById('commandInput').focus();
+            }, 100);
+        });
+    </script>
+</body>
+</html>
