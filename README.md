@@ -5,17 +5,21 @@
 
 ## Overview
 
-- An experimental project demonstrating Infinite Agentic Loop in a two prompt system using Claude Code.
-- This project uses a custom Claude Code slash command (`/project:infinite`) 
-  - Orchestrate multiple AI agents in parallel 
-  - Generating evolving iterations of content based on specifications 
+- Project utilizing Claude Code's Infinite Agentic Loop 
+- Uses a two prompt system, to orchestrator and to agents 
+  - Carefully defined SPEC files defining best practices 
+  - A custom Claude Code slash command (`/project:infinite`) 
+    - Orchestrate multiple AI agents in parallel 
+    - Generating evolving iterations of content based on specifications 
 
-## Quick Start 
+### Quick Start 
 
-1. Read `.claude/settings.json` to see the permissions and commands allowed.
-2. Start Claude Code. 
-3. Type slash command to start the infinite agentic loop. 
-4. Generate new iterations using the UI specification and four command variants.
+1. Confirm permissions allowed in `.claude/settings.json` file 
+2. Start Claude Code by running `claude` in the terminal
+3. Confirm that the project structure reflects the structure below 
+4. Claude Code recognizes the custom command from the `.claude/commands/infinite.md` file 
+5. Type slash custom command to start the infinite agentic loop
+6. Add specifics to the command and generate new iterations  
 
 ```bash
 claude
@@ -23,13 +27,17 @@ claude
 /project:infinite spec_file output_dir count # Infinite command takes three arguments 
 ```
 
-## This Project 
-- **Goal**: Generate 3-30+ unique themed UI components using parallel subagents
-- **Cost**: ~30k tokens per UI (~$0.45 each) 
-- **Time**: 2-3 minutes per UI
-- **Method**: Controlled batches (not infinite looping)
+### Command Variants
 
-## Current Project Structure
+```bash
+/project:infinite specs/invent_new_ui_v3.md src 1 # Single Generation of 1 iteration
+/project:infinite specs/invent_new_ui_v3.md src_new 5 # Deploy 5 agents in parallel; generate 5 UI
+/project:infinite specs/invent_new_ui_v3.md src_new 20 # 20 agents, groups of 5, optimal resource management, generate 20 UI
+/project:infinite specs/invent_new_ui_v3.md infinite_src_new/ infinite # Continuous generation, stops with context limits 
+```
+
+### Project Structure
+
 ```
 /Users/seanivore/Development/infinite-ui-gen/
 ├── .claude/
@@ -45,14 +53,11 @@ claude
 └── src_agent_4/            # ← Output directory (empty, ready)
 ```
 
-### Four Command Variants
+## This Project 
 
-```bash
-/project:infinite specs/invent_new_ui_v3.md src 1 # Single Generation of 1 iteration
-/project:infinite specs/invent_new_ui_v3.md src_new 5 # Deploy 5 agents in parallel; generate 5 UI
-/project:infinite specs/invent_new_ui_v3.md src_new 20 # 20 agents, groups of 5, optimal resource management, generate 20 UI
-/project:infinite specs/invent_new_ui_v3.md infinite_src_new/ infinite # Continuous generation, stops with context limits 
-```
+- **Goal**: Generate 50+ unique themed UI components 
+- **Cost**: 30k tokens per UI (~$0.45 each) 
+- **Time**: 2-3 minutes per UI 
 
 ## How It Works
 
@@ -62,9 +67,4 @@ claude
 4. **Quality Assurance**: Ensures each iteration is unique and spec-compliant
 5. **Wave Management**: For infinite mode, manages successive waves of agents
 
-## Ideas for Enhancing the Pattern 
-
-- Apply this to a use case of your choice.
-- Build an MCP Server that enables reuse of the infinite agentic loop.
-- Get the `.claude/commands/infinite.md` into your `~/.claude/commands/` directory for global use.
-- Update `.claude/commands/infinite.md` to generate sets of files instead of a single file. 
+### Just use the command, define the spec, the output directory, and the number of iterations you want to generate. That's it. 
