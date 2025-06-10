@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Lover - Glass Morphism Chat UI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, 
+                #ff9a9e 0%, 
+                #fecfef 25%, 
+                #fecfef 75%, 
+                #ffd0d0 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background elements */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 192, 203, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(255, 228, 225, 0.2) 0%, transparent 50%);
+            animation: backgroundPulse 8s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes backgroundPulse {
+            0% { opacity: 0.8; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            gap: 20px;
+        }
+
+        /* Glass morphism base styles */
+        .glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(255, 182, 193, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Main chat area */
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b8a, #ffa07a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 107, 138, 0.4);
+            animation: heartbeat 2s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .chat-info h3 {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .mood-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .mood-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            position: relative;
+            animation: messageSlide 0.5s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, rgba(255, 107, 138, 0.8), rgba(255, 160, 122, 0.8));
+            backdrop-filter: blur(15px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .message-time {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .message.memory {
+            background: linear-gradient(135deg, rgba(255, 192, 203, 0.3), rgba(255, 228, 225, 0.3));
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .memory-gallery {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .memory-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .memory-photo:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 107, 138, 0.4);
+        }
+
+        /* Chat input area */
+        .chat-input {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            color: white;
+            backdrop-filter: blur(10px);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 107, 138, 0.5);
+            box-shadow: 0 0 20px rgba(255, 107, 138, 0.3);
+        }
+
+        .emotion-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .emotion-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .emotion-btn:hover {
+            background: rgba(255, 107, 138, 0.6);
+            transform: scale(1.1);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-section {
+            padding: 20px;
+            position: relative;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(45deg, #ff6b8a, #ffa07a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Mood sharing */
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .mood-card {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .mood-card:hover {
+            background: rgba(255, 107, 138, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 138, 0.2);
+        }
+
+        .mood-card.active {
+            background: linear-gradient(135deg, rgba(255, 107, 138, 0.6), rgba(255, 160, 122, 0.6));
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .mood-emoji {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .mood-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+        }
+
+        /* Relationship insights */
+        .insight-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .insight-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .insight-title {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .insight-desc {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .insight-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .metric-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin: 0 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b8a, #ffa07a);
+            border-radius: 2px;
+            animation: fillBar 2s ease-out;
+        }
+
+        @keyframes fillBar {
+            from { width: 0; }
+            to { width: var(--width); }
+        }
+
+        /* Memory gallery preview */
+        .memory-preview {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .memory-item {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, rgba(255, 160, 122, 0.3), rgba(255, 192, 203, 0.3));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .memory-item::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            opacity: 0;
+        }
+
+        .memory-item:hover::before {
+            opacity: 1;
+            animation: shine 0.6s ease-in-out;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .memory-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 107, 138, 0.3);
+        }
+
+        .memory-date {
+            position: absolute;
+            bottom: 5px;
+            right: 8px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+
+        /* AI assistant button */
+        .ai-assistant {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b8a, #ffa07a);
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 107, 138, 0.4);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+        }
+
+        .ai-assistant:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(255, 107, 138, 0.5);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: -1;
+            }
+            
+            .sidebar-section {
+                padding: 15px;
+            }
+            
+            .mood-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ff6b8a, #ffa07a);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #ff5a79, #ff9069);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Chat Area -->
+        <div class="chat-main glass">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="avatar">💖</div>
+                <div class="chat-info">
+                    <h3>My Beloved</h3>
+                    <div class="mood-indicator">
+                        <div class="mood-dot"></div>
+                        <span>Feeling romantic</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="chat-messages">
+                <div class="message received">
+                    <div>Good morning, my love! ☀️ How did you sleep?</div>
+                    <div class="message-time">9:42 AM</div>
+                </div>
+
+                <div class="message sent">
+                    <div>Like an angel beside you 💫 Ready for our coffee date?</div>
+                    <div class="message-time">9:45 AM</div>
+                </div>
+
+                <div class="message memory">
+                    <div>💕 Remember our first kiss under the stars?</div>
+                    <div class="memory-gallery">
+                        <div class="memory-photo">🌟</div>
+                        <div class="memory-photo">💋</div>
+                        <div class="memory-photo">🌙</div>
+                    </div>
+                    <div class="message-time">10:15 AM</div>
+                </div>
+
+                <div class="message received">
+                    <div>How could I forget? That was magical ✨ You make every moment special</div>
+                    <div class="message-time">10:18 AM</div>
+                </div>
+
+                <div class="message sent">
+                    <div>Your smile lights up my world 🌹 Can't wait to hold you tonight</div>
+                    <div class="message-time">10:22 AM</div>
+                </div>
+
+                <div class="message received">
+                    <div>You always know just what to say 💗 I'm the luckiest person alive</div>
+                    <div class="message-time">10:25 AM</div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input">
+                <input type="text" class="input-field" placeholder="Share your heart...">
+                <div class="emotion-buttons">
+                    <button class="emotion-btn" title="Send love">💕</button>
+                    <button class="emotion-btn" title="Send kiss">💋</button>
+                    <button class="emotion-btn" title="Share photo">📷</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Mood Sharing -->
+            <div class="sidebar-section glass">
+                <div class="section-title">
+                    <div class="section-icon">💭</div>
+                    Mood Sharing
+                </div>
+                <div class="mood-grid">
+                    <div class="mood-card active">
+                        <div class="mood-emoji">😍</div>
+                        <div class="mood-label">In Love</div>
+                    </div>
+                    <div class="mood-card">
+                        <div class="mood-emoji">🥰</div>
+                        <div class="mood-label">Adoring</div>
+                    </div>
+                    <div class="mood-card">
+                        <div class="mood-emoji">💫</div>
+                        <div class="mood-label">Dreamy</div>
+                    </div>
+                    <div class="mood-card">
+                        <div class="mood-emoji">🌹</div>
+                        <div class="mood-label">Romantic</div>
+                    </div>
+                    <div class="mood-card">
+                        <div class="mood-emoji">💖</div>
+                        <div class="mood-label">Passionate</div>
+                    </div>
+                    <div class="mood-card">
+                        <div class="mood-emoji">✨</div>
+                        <div class="mood-label">Magical</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Memory Gallery -->
+            <div class="sidebar-section glass">
+                <div class="section-title">
+                    <div class="section-icon">📸</div>
+                    Memory Gallery
+                </div>
+                <div class="memory-preview">
+                    <div class="memory-item">
+                        💑
+                        <div class="memory-date">Dec 14</div>
+                    </div>
+                    <div class="memory-item">
+                        🌅
+                        <div class="memory-date">Dec 10</div>
+                    </div>
+                    <div class="memory-item">
+                        🍷
+                        <div class="memory-date">Dec 8</div>
+                    </div>
+                    <div class="memory-item">
+                        🎭
+                        <div class="memory-date">Dec 5</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Relationship Insights -->
+            <div class="sidebar-section glass">
+                <div class="section-title">
+                    <div class="section-icon">💝</div>
+                    Relationship Insights
+                </div>
+                
+                <div class="insight-card">
+                    <div class="insight-title">Communication Harmony</div>
+                    <div class="insight-desc">Your conversations flow beautifully with 92% positive sentiment</div>
+                    <div class="insight-metric">
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.8)">92%</span>
+                        <div class="metric-bar">
+                            <div class="metric-fill" style="--width: 92%;"></div>
+                        </div>
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.8)">💕</span>
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-title">Shared Interests</div>
+                    <div class="insight-desc">You both love art, music, and sunset walks</div>
+                    <div class="insight-metric">
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.8)">87%</span>
+                        <div class="metric-bar">
+                            <div class="metric-fill" style="--width: 87%;"></div>
+                        </div>
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.8)">🎨</span>
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-title">Quality Time</div>
+                    <div class="insight-desc">Perfect balance of together time and personal space</div>
+                    <div class="insight-metric">
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.8)">95%</span>
+                        <div class="metric-bar">
+                            <div class="metric-fill" style="--width: 95%;"></div>
+                        </div>
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.8)">⏰</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Assistant Button -->
+    <button class="ai-assistant" title="AI Relationship Coach">🤖</button>
+
+    <script>
+        // Add interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mood cards interaction
+            const moodCards = document.querySelectorAll('.mood-card');
+            moodCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    moodCards.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update mood indicator
+                    const emoji = this.querySelector('.mood-emoji').textContent;
+                    const label = this.querySelector('.mood-label').textContent;
+                    document.querySelector('.mood-indicator span').textContent = `Feeling ${label.toLowerCase()}`;
+                });
+            });
+
+            // Memory items interaction
+            const memoryItems = document.querySelectorAll('.memory-item, .memory-photo');
+            memoryItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Create a gentle ripple effect
+                    const ripple = document.createElement('div');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.6);
+                        transform: scale(0);
+                        animation: ripple 0.6s linear;
+                        pointer-events: none;
+                    `;
+                    
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = (rect.width / 2 - size / 2) + 'px';
+                    ripple.style.top = (rect.height / 2 - size / 2) + 'px';
+                    
+                    this.style.position = 'relative';
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+
+            // Emotion buttons interaction
+            const emotionBtns = document.querySelectorAll('.emotion-btn');
+            emotionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const emoji = this.textContent;
+                    const input = document.querySelector('.input-field');
+                    input.value += emoji + ' ';
+                    input.focus();
+                    
+                    // Add a gentle glow effect
+                    this.style.boxShadow = '0 0 20px rgba(255, 107, 138, 0.8)';
+                    setTimeout(() => {
+                        this.style.boxShadow = '';
+                    }, 300);
+                });
+            });
+
+            // AI Assistant interaction
+            const aiBtn = document.querySelector('.ai-assistant');
+            aiBtn.addEventListener('click', function() {
+                // Simulate AI assistant activation
+                const suggestions = [
+                    "💡 Suggestion: Plan a surprise picnic for this weekend!",
+                    "💡 Insight: You both seem to love morning conversations",
+                    "💡 Reminder: Don't forget your anniversary next month!",
+                    "💡 Activity: Try cooking together tonight"
+                ];
+                
+                const suggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
+                
+                // Add AI message to chat
+                const messagesContainer = document.querySelector('.chat-messages');
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message received';
+                aiMessage.innerHTML = `
+                    <div style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(255, 20, 147, 0.3)); border-left: 3px solid #ff69b4; padding-left: 15px;">
+                        ${suggestion}
+                    </div>
+                    <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                `;
+                messagesContainer.appendChild(aiMessage);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            });
+
+            // Input field interaction
+            const inputField = document.querySelector('.input-field');
+            inputField.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && this.value.trim()) {
+                    // Add user message
+                    const messagesContainer = document.querySelector('.chat-messages');
+                    const userMessage = document.createElement('div');
+                    userMessage.className = 'message sent';
+                    userMessage.innerHTML = `
+                        <div>${this.value}</div>
+                        <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    `;
+                    messagesContainer.appendChild(userMessage);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    
+                    this.value = '';
+                }
+            });
+
+            // Add CSS animation for ripple effect
+            if (!document.querySelector('#ripple-style')) {
+                const style = document.createElement('style');
+                style.id = 'ripple-style';
+                style.textContent = `
+                    @keyframes ripple {
+                        to {
+                            transform: scale(4);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            // Animate metric bars on load
+            setTimeout(() => {
+                const metricFills = document.querySelectorAll('.metric-fill');
+                metricFills.forEach(fill => {
+                    const width = fill.style.getPropertyValue('--width');
+                    fill.style.width = width;
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

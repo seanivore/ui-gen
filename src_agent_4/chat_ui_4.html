@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Magician's Sanctum - Arcane Communication Portal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Creepster&family=UnifrakturMaguntia&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --midnight-black: #0a0a0a;
+            --shadow-purple: #2d1b4e;
+            --blood-red: #8b0000;
+            --silver-moon: #c0c0c0;
+            --ethereal-blue: #1e3a8a;
+            --mystic-gold: #ffd700;
+            --gothic-gray: #2a2a2a;
+            --spectral-white: #f8f8ff;
+        }
+        
+        body {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(135deg, var(--midnight-black) 0%, var(--shadow-purple) 50%, var(--midnight-black) 100%);
+            color: var(--silver-moon);
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+        
+        /* Mystical Background Animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, var(--shadow-purple) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, var(--ethereal-blue) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, var(--blood-red) 0%, transparent 30%);
+            opacity: 0.3;
+            animation: mysticalPulse 8s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+        
+        @keyframes mysticalPulse {
+            0% { opacity: 0.2; transform: scale(1); }
+            100% { opacity: 0.4; transform: scale(1.05); }
+        }
+        
+        /* Floating Arcane Symbols */
+        .arcane-symbols {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .symbol {
+            position: absolute;
+            font-size: 24px;
+            color: var(--mystic-gold);
+            opacity: 0.1;
+            animation: float 12s ease-in-out infinite;
+        }
+        
+        .symbol:nth-child(1) { top: 10%; left: 15%; animation-delay: 0s; }
+        .symbol:nth-child(2) { top: 20%; right: 20%; animation-delay: 2s; }
+        .symbol:nth-child(3) { bottom: 30%; left: 10%; animation-delay: 4s; }
+        .symbol:nth-child(4) { bottom: 15%; right: 15%; animation-delay: 6s; }
+        .symbol:nth-child(5) { top: 50%; left: 5%; animation-delay: 8s; }
+        .symbol:nth-child(6) { top: 70%; right: 5%; animation-delay: 10s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.3; }
+        }
+        
+        /* Main Container */
+        .sanctum-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 280px;
+            grid-template-rows: 80px 1fr 60px;
+            grid-template-areas: 
+                "sidebar header divination"
+                "sidebar main divination"
+                "sidebar input divination";
+            height: 100vh;
+            gap: 2px;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Gothic Header */
+        .gothic-header {
+            grid-area: header;
+            background: linear-gradient(135deg, var(--gothic-gray), var(--shadow-purple));
+            border-bottom: 2px solid var(--mystic-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gothic-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--mystic-gold), transparent);
+            opacity: 0.3;
+            animation: mysticalSweep 6s ease-in-out infinite;
+        }
+        
+        @keyframes mysticalSweep {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: -100%; }
+        }
+        
+        .sanctum-title {
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 28px;
+            color: var(--mystic-gold);
+            text-shadow: 2px 2px 4px var(--midnight-black);
+            z-index: 1;
+        }
+        
+        /* Mystical Sidebar */
+        .mystical-sidebar {
+            grid-area: sidebar;
+            background: linear-gradient(180deg, var(--gothic-gray), var(--midnight-black));
+            border-right: 2px solid var(--shadow-purple);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(45, 27, 78, 0.3);
+            border: 1px solid var(--shadow-purple);
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .section-title {
+            font-size: 16px;
+            color: var(--mystic-gold);
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .channel-item, .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: rgba(0,0,0,0.4);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .channel-item:hover, .contact-item:hover {
+            background: rgba(139, 0, 0, 0.3);
+            border-left-color: var(--blood-red);
+            transform: translateX(5px);
+        }
+        
+        .channel-item.active {
+            background: rgba(255, 215, 0, 0.2);
+            border-left-color: var(--mystic-gold);
+        }
+        
+        .channel-icon, .contact-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .channel-name, .contact-name {
+            font-size: 14px;
+            color: var(--silver-moon);
+        }
+        
+        .encryption-level {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--mystic-gold);
+        }
+        
+        /* Main Chat Area */
+        .chat-main {
+            grid-area: main;
+            background: rgba(10, 10, 10, 0.8);
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .chat-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(45deg, transparent 49%, var(--shadow-purple) 50%, transparent 51%),
+                linear-gradient(-45deg, transparent 49%, var(--shadow-purple) 50%, transparent 51%);
+            background-size: 20px 20px;
+            opacity: 0.03;
+            pointer-events: none;
+        }
+        
+        .message-group {
+            margin-bottom: 25px;
+        }
+        
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            animation: messageAppear 0.5s ease-out;
+        }
+        
+        @keyframes messageAppear {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.own {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 15px;
+            background: linear-gradient(135deg, var(--mystic-gold), var(--blood-red));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--midnight-black);
+            border: 2px solid var(--shadow-purple);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .message-content {
+            max-width: 70%;
+            background: linear-gradient(135deg, var(--gothic-gray), var(--shadow-purple));
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: 1px solid var(--mystic-gold);
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+        
+        .message.own .message-content {
+            background: linear-gradient(135deg, var(--blood-red), var(--shadow-purple));
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            color: var(--mystic-gold);
+            font-size: 14px;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            color: var(--silver-moon);
+            opacity: 0.7;
+        }
+        
+        .message-text {
+            color: var(--spectral-white);
+            line-height: 1.5;
+            font-size: 15px;
+        }
+        
+        .encrypted-badge {
+            display: inline-block;
+            background: var(--mystic-gold);
+            color: var(--midnight-black);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        /* Input Area */
+        .input-area {
+            grid-area: input;
+            background: linear-gradient(135deg, var(--gothic-gray), var(--midnight-black));
+            border-top: 2px solid var(--mystic-gold);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .spell-input {
+            flex: 1;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid var(--shadow-purple);
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: var(--spectral-white);
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .spell-input:focus {
+            border-color: var(--mystic-gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .spell-input::placeholder {
+            color: var(--silver-moon);
+            opacity: 0.6;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .mystical-button {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--mystic-gold), var(--blood-red));
+            border: none;
+            border-radius: 50%;
+            color: var(--midnight-black);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .mystical-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        /* Divination Panel */
+        .divination-panel {
+            grid-area: divination;
+            background: linear-gradient(180deg, var(--shadow-purple), var(--midnight-black));
+            border-left: 2px solid var(--mystic-gold);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .divination-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--shadow-purple);
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .divination-title {
+            font-size: 16px;
+            color: var(--mystic-gold);
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .tarot-card {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, var(--gothic-gray), var(--shadow-purple));
+            border: 2px solid var(--mystic-gold);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tarot-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+        }
+        
+        .card-symbol {
+            font-size: 36px;
+            color: var(--mystic-gold);
+            margin-bottom: 8px;
+        }
+        
+        .card-name {
+            font-size: 12px;
+            color: var(--spectral-white);
+            text-align: center;
+        }
+        
+        .prediction-text {
+            font-size: 12px;
+            color: var(--silver-moon);
+            line-height: 1.4;
+            font-style: italic;
+        }
+        
+        .knowledge-vault {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .knowledge-item {
+            padding: 8px 10px;
+            margin: 5px 0;
+            background: rgba(139, 0, 0, 0.2);
+            border-left: 3px solid var(--blood-red);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .knowledge-item:hover {
+            background: rgba(139, 0, 0, 0.4);
+            transform: translateX(5px);
+        }
+        
+        .knowledge-title {
+            font-size: 12px;
+            color: var(--mystic-gold);
+            font-weight: 600;
+        }
+        
+        .knowledge-preview {
+            font-size: 11px;
+            color: var(--silver-moon);
+            opacity: 0.8;
+            margin-top: 3px;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--midnight-black);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--shadow-purple);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--mystic-gold);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .sanctum-container {
+                grid-template-columns: 250px 1fr 220px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sanctum-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px 1fr 60px;
+                grid-template-areas: 
+                    "header"
+                    "main"
+                    "input";
+            }
+            
+            .mystical-sidebar,
+            .divination-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Arcane Symbols -->
+    <div class="arcane-symbols">
+        <div class="symbol">⚡</div>
+        <div class="symbol">🔮</div>
+        <div class="symbol">⭐</div>
+        <div class="symbol">🌙</div>
+        <div class="symbol">⚗️</div>
+        <div class="symbol">🗝️</div>
+    </div>
+
+    <div class="sanctum-container">
+        <!-- Gothic Header -->
+        <header class="gothic-header">
+            <h1 class="sanctum-title">⚡ The Magician's Sanctum ⚡</h1>
+        </header>
+
+        <!-- Mystical Sidebar -->
+        <aside class="mystical-sidebar">
+            <div class="sidebar-section">
+                <div class="section-title">🔐 Encrypted Channels</div>
+                <div class="channel-item active">
+                    <span class="channel-icon">🏰</span>
+                    <span class="channel-name">Inner Circle</span>
+                    <span class="encryption-level">⚡⚡⚡</span>
+                </div>
+                <div class="channel-item">
+                    <span class="channel-icon">🌟</span>
+                    <span class="channel-name">Apprentices</span>
+                    <span class="encryption-level">⚡⚡</span>
+                </div>
+                <div class="channel-item">
+                    <span class="channel-icon">🔮</span>
+                    <span class="channel-name">Mystic Network</span>
+                    <span class="encryption-level">⚡⚡⚡</span>
+                </div>
+                <div class="channel-item">
+                    <span class="channel-icon">⚗️</span>
+                    <span class="channel-name">Alchemists Guild</span>
+                    <span class="encryption-level">⚡⚡</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">🌙 Mystical Contacts</div>
+                <div class="contact-item">
+                    <span class="contact-icon">🧙‍♀️</span>
+                    <span class="contact-name">Archmage Lyra</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">🔬</span>
+                    <span class="contact-name">Master Alchemist</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">🌟</span>
+                    <span class="contact-name">Oracle of Visions</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">⚔️</span>
+                    <span class="contact-name">Guardian Sentinel</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <div class="message-group">
+                <div class="message">
+                    <div class="message-avatar">🧙‍♀️</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">Archmage Lyra</span>
+                            <span class="encrypted-badge">ENCRYPTED</span>
+                            <span class="message-time">2:47 PM</span>
+                        </div>
+                        <div class="message-text">The ancient ritual preparations are complete. The convergence of celestial energies tonight will amplify our scrying abilities tenfold. Have you prepared the obsidian mirror?</div>
+                    </div>
+                </div>
+
+                <div class="message own">
+                    <div class="message-avatar">⚡</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">You</span>
+                            <span class="encrypted-badge">ENCRYPTED</span>
+                            <span class="message-time">2:50 PM</span>
+                        </div>
+                        <div class="message-text">Yes, the mirror has been consecrated with moonwater and surrounded by protective wards. I've also prepared the silver chalice with spring water from the sacred grove. The astral alignment seems particularly potent tonight.</div>
+                    </div>
+                </div>
+
+                <div class="message">
+                    <div class="message-avatar">🔬</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">Master Alchemist</span>
+                            <span class="encrypted-badge">ENCRYPTED</span>
+                            <span class="message-time">3:15 PM</span>
+                        </div>
+                        <div class="message-text">The philosopher's stone synthesis is progressing beyond expectations. The transmutation matrices are stabilizing at unprecedented levels. I need the dragon's blood ink for the final inscriptions.</div>
+                    </div>
+                </div>
+
+                <div class="message own">
+                    <div class="message-avatar">⚡</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">You</span>
+                            <span class="encrypted-badge">ENCRYPTED</span>
+                            <span class="message-time">3:18 PM</span>
+                        </div>
+                        <div class="message-text">The dragon's blood ink is secured in the vault, sealed with temporal locks. I'll retrieve it after the lunar peak. The ink's potency increases with the moon's influence.</div>
+                    </div>
+                </div>
+
+                <div class="message">
+                    <div class="message-avatar">🌟</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">Oracle of Visions</span>
+                            <span class="encrypted-badge">ENCRYPTED</span>
+                            <span class="message-time">4:22 PM</span>
+                        </div>
+                        <div class="message-text">I've consulted the ethereal planes... A warning emerges from the mists. Dark forces gather in the shadow realm. The protective barriers around our sanctum must be reinforced before midnight.</div>
+                    </div>
+                </div>
+
+                <div class="message own">
+                    <div class="message-avatar">⚡</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">You</span>
+                            <span class="encrypted-badge">ENCRYPTED</span>
+                            <span class="message-time">4:25 PM</span>
+                        </div>
+                        <div class="message-text">Your vision is acknowledged. I'm weaving additional protection spells into the ward matrix. The guardian sentinels have been alerted and are taking positions at the cardinal points.</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <input type="text" class="spell-input" placeholder="Whisper your arcane message..." />
+            <div class="action-buttons">
+                <button class="mystical-button" title="Cast Encryption Spell">🔐</button>
+                <button class="mystical-button" title="Attach Mystical Artifact">📿</button>
+                <button class="mystical-button" title="Invoke Divination">🔮</button>
+                <button class="mystical-button" title="Send Message">⚡</button>
+            </div>
+        </div>
+
+        <!-- Divination Panel -->
+        <aside class="divination-panel">
+            <div class="divination-section">
+                <div class="divination-title">🔮 Mystical Guidance</div>
+                <div class="tarot-card">
+                    <div class="card-symbol">🌙</div>
+                    <div class="card-name">The Moon</div>
+                </div>
+                <div class="prediction-text">
+                    Illusions cloud your path, but intuition guides you. Trust your inner wisdom to navigate the shadows ahead.
+                </div>
+            </div>
+
+            <div class="divination-section">
+                <div class="divination-title">📚 Knowledge Vault</div>
+                <div class="knowledge-vault">
+                    <div class="knowledge-item">
+                        <div class="knowledge-title">Ancient Runes Translation</div>
+                        <div class="knowledge-preview">Nordic symbols and their mystical meanings...</div>
+                    </div>
+                    <div class="knowledge-item">
+                        <div class="knowledge-title">Celestial Alignments</div>
+                        <div class="knowledge-preview">Tonight's stellar configuration analysis...</div>
+                    </div>
+                    <div class="knowledge-item">
+                        <div class="knowledge-title">Protection Spells</div>
+                        <div class="knowledge-preview">Ward formulas and incantations...</div>
+                    </div>
+                    <div class="knowledge-item">
+                        <div class="knowledge-title">Alchemical Formulas</div>
+                        <div class="knowledge-preview">Transmutation recipes and ingredients...</div>
+                    </div>
+                    <div class="knowledge-item">
+                        <div class="knowledge-title">Scrying Techniques</div>
+                        <div class="knowledge-preview">Methods for divination and foresight...</div>
+                    </div>
+                    <div class="knowledge-item">
+                        <div class="knowledge-title">Shadow Realm Entities</div>
+                        <div class="knowledge-preview">Catalog of otherworldly beings...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divination-section">
+                <div class="divination-title">⚗️ Arcane Status</div>
+                <div style="font-size: 12px; color: var(--silver-moon); line-height: 1.5;">
+                    <div>🔋 Mystical Energy: 94%</div>
+                    <div>🛡️ Ward Strength: Strong</div>
+                    <div>🌙 Lunar Phase: Waxing</div>
+                    <div>⚡ Active Spells: 7</div>
+                    <div>🔮 Scrying Clarity: High</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Mystical interactions and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Channel switching
+            const channels = document.querySelectorAll('.channel-item');
+            channels.forEach(channel => {
+                channel.addEventListener('click', function() {
+                    channels.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Tarot card reveal
+            const tarotCard = document.querySelector('.tarot-card');
+            tarotCard.addEventListener('click', function() {
+                this.style.transform = 'rotateY(180deg)';
+                setTimeout(() => {
+                    this.style.transform = 'rotateY(0deg)';
+                }, 1000);
+            });
+
+            // Mystical input effects
+            const spellInput = document.querySelector('.spell-input');
+            spellInput.addEventListener('focus', function() {
+                this.parentElement.style.boxShadow = '0 0 30px rgba(255, 215, 0, 0.3)';
+            });
+
+            spellInput.addEventListener('blur', function() {
+                this.parentElement.style.boxShadow = 'none';
+            });
+
+            // Button hover effects with sound simulation
+            const buttons = document.querySelectorAll('.mystical-button');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.boxShadow = '0 0 25px rgba(255, 215, 0, 0.6)';
+                });
+
+                button.addEventListener('mouseleave', function() {
+                    this.style.boxShadow = 'none';
+                });
+
+                button.addEventListener('click', function() {
+                    // Create mystical ripple effect
+                    const ripple = document.createElement('div');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255, 215, 0, 0.6)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.left = '50%';
+                    ripple.style.top = '50%';
+                    ripple.style.width = '100px';
+                    ripple.style.height = '100px';
+                    ripple.style.marginLeft = '-50px';
+                    ripple.style.marginTop = '-50px';
+                    
+                    this.style.position = 'relative';
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+
+            // Knowledge vault item interactions
+            const knowledgeItems = document.querySelectorAll('.knowledge-item');
+            knowledgeItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Simulate opening knowledge entry
+                    const title = this.querySelector('.knowledge-title').textContent;
+                    alert(`Opening mystical knowledge: "${title}"\n\nThis would reveal ancient wisdom and arcane secrets...`);
+                });
+            });
+
+            // Auto-scroll to latest message
+            const chatMain = document.querySelector('.chat-main');
+            chatMain.scrollTop = chatMain.scrollHeight;
+
+            // Send message functionality
+            const sendButton = document.querySelector('.mystical-button[title="Send Message"]');
+            sendButton.addEventListener('click', function() {
+                const input = document.querySelector('.spell-input');
+                if (input.value.trim()) {
+                    // Create new message element
+                    const messageGroup = document.querySelector('.message-group');
+                    const newMessage = document.createElement('div');
+                    newMessage.className = 'message own';
+                    newMessage.innerHTML = `
+                        <div class="message-avatar">⚡</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-sender">You</span>
+                                <span class="encrypted-badge">ENCRYPTED</span>
+                                <span class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <div class="message-text">${input.value}</div>
+                        </div>
+                    `;
+                    messageGroup.appendChild(newMessage);
+                    input.value = '';
+                    chatMain.scrollTop = chatMain.scrollHeight;
+                }
+            });
+
+            // Send on Enter key
+            spellInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendButton.click();
+                }
+            });
+        });
+
+        // Add ripple animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

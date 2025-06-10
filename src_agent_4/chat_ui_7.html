@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TACTICAL COMMAND INTERFACE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Rajdhani:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --steel-gray: #2a2d31;
+            --iron-black: #1a1c1f;
+            --warning-orange: #ff6b35;
+            --military-green: #2d4a2b;
+            --metal-silver: #8a9ba8;
+            --hazard-yellow: #ffd23f;
+            --dark-steel: #1e2124;
+            --rust-orange: #cc4125;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, var(--iron-black) 0%, var(--steel-gray) 100%);
+            color: var(--metal-silver);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+                linear-gradient(45deg, 
+                    rgba(138, 155, 168, 0.02) 25%, 
+                    transparent 25%, 
+                    transparent 75%, 
+                    rgba(138, 155, 168, 0.02) 75%
+                );
+            background-size: 40px 40px;
+            animation: metalShimmer 20s ease-in-out infinite;
+        }
+        
+        @keyframes metalShimmer {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+        
+        .command-interface {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            grid-template-rows: 80px 1fr 100px;
+            height: 100vh;
+            gap: 2px;
+            background: var(--dark-steel);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header-panel {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, var(--iron-black) 0%, var(--steel-gray) 100%);
+            border-bottom: 3px solid var(--warning-orange);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.2), transparent);
+            animation: scanLine 3s linear infinite;
+        }
+        
+        @keyframes scanLine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .command-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--warning-orange);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+        
+        .status-indicators {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(138, 155, 168, 0.1);
+            border: 1px solid var(--metal-silver);
+            border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .status-dot.active { background: var(--military-green); }
+        .status-dot.warning { background: var(--warning-orange); }
+        .status-dot.critical { background: var(--rust-orange); }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .left-panel {
+            background: linear-gradient(180deg, var(--steel-gray) 0%, var(--iron-black) 100%);
+            border-right: 2px solid var(--metal-silver);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            padding: 15px;
+            background: var(--iron-black);
+            border-bottom: 1px solid var(--metal-silver);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--warning-orange);
+            font-size: 14px;
+        }
+        
+        .tactical-channels {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .channel-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(138, 155, 168, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .channel-item:hover {
+            background: rgba(255, 107, 53, 0.1);
+            border-left: 4px solid var(--warning-orange);
+        }
+        
+        .channel-item.active {
+            background: rgba(45, 74, 43, 0.3);
+            border-left: 4px solid var(--military-green);
+        }
+        
+        .channel-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            background: var(--metal-silver);
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+        
+        .channel-name {
+            flex: 1;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+        
+        .channel-badge {
+            background: var(--warning-orange);
+            color: var(--iron-black);
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .main-panel {
+            background: var(--iron-black);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .chat-header {
+            padding: 15px 20px;
+            background: linear-gradient(90deg, var(--steel-gray) 0%, var(--iron-black) 100%);
+            border-bottom: 2px solid var(--warning-orange);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .active-channel-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .channel-status {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--warning-orange);
+            text-transform: uppercase;
+        }
+        
+        .encryption-badge {
+            background: var(--military-green);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(180deg, var(--iron-black) 0%, var(--dark-steel) 100%);
+        }
+        
+        .message-group {
+            margin-bottom: 25px;
+        }
+        
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .message.outgoing {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, var(--steel-gray), var(--metal-silver));
+            border: 2px solid var(--warning-orange);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--iron-black);
+            text-transform: uppercase;
+        }
+        
+        .message-content {
+            max-width: 70%;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: var(--metal-silver);
+        }
+        
+        .message.outgoing .message-header {
+            justify-content: flex-end;
+        }
+        
+        .sender-name {
+            font-weight: 600;
+            color: var(--warning-orange);
+            text-transform: uppercase;
+        }
+        
+        .message-time {
+            font-family: 'JetBrains Mono', monospace;
+            opacity: 0.7;
+        }
+        
+        .message-bubble {
+            background: linear-gradient(135deg, var(--steel-gray) 0%, var(--iron-black) 100%);
+            border: 1px solid var(--metal-silver);
+            border-radius: 8px;
+            padding: 12px 16px;
+            position: relative;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .message.outgoing .message-bubble {
+            background: linear-gradient(135deg, var(--military-green) 0%, var(--steel-gray) 100%);
+            border-color: var(--warning-orange);
+        }
+        
+        .tactical-data {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid var(--warning-orange);
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        
+        .data-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .data-label {
+            color: var(--metal-silver);
+            text-transform: uppercase;
+        }
+        
+        .data-value {
+            color: var(--warning-orange);
+            font-weight: 600;
+        }
+        
+        .right-panel {
+            background: linear-gradient(180deg, var(--steel-gray) 0%, var(--iron-black) 100%);
+            border-left: 2px solid var(--metal-silver);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .intelligence-feed {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .intel-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(138, 155, 168, 0.2);
+            position: relative;
+        }
+        
+        .intel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .intel-type {
+            background: var(--warning-orange);
+            color: var(--iron-black);
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .intel-priority {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--rust-orange);
+        }
+        
+        .intel-content {
+            font-size: 13px;
+            line-height: 1.4;
+            color: var(--metal-silver);
+        }
+        
+        .input-panel {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, var(--steel-gray) 0%, var(--iron-black) 100%);
+            border-top: 2px solid var(--warning-orange);
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            gap: 15px;
+        }
+        
+        .message-input {
+            flex: 1;
+            background: var(--iron-black);
+            border: 2px solid var(--metal-silver);
+            border-radius: 5px;
+            padding: 12px 16px;
+            color: var(--metal-silver);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .message-input:focus {
+            border-color: var(--warning-orange);
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.3);
+        }
+        
+        .message-input::placeholder {
+            color: rgba(138, 155, 168, 0.6);
+            text-transform: uppercase;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(45deg, var(--warning-orange), var(--rust-orange));
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            color: var(--iron-black);
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+        }
+        
+        .action-btn.secondary {
+            background: linear-gradient(45deg, var(--steel-gray), var(--metal-silver));
+            color: var(--iron-black);
+        }
+        
+        /* Mechanical Animations */
+        .gear-animation {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--metal-silver);
+            border-radius: 50%;
+            animation: rotate 4s linear infinite;
+        }
+        
+        .gear-animation::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 8px;
+            width: 2px;
+            height: 8px;
+            background: var(--metal-silver);
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--iron-black);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--steel-gray);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--metal-silver);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .command-interface {
+                grid-template-columns: 250px 1fr 300px;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .command-interface {
+                grid-template-columns: 200px 1fr 250px;
+            }
+            
+            .command-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="command-interface">
+        <!-- Header Panel -->
+        <div class="header-panel">
+            <div class="command-title">TACTICAL COMMAND INTERFACE</div>
+            <div class="status-indicators">
+                <div class="status-indicator">
+                    <div class="status-dot active"></div>
+                    <span>SECURE</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot warning"></div>
+                    <span>THREAT LVL 3</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot active"></div>
+                    <span>OPS ACTIVE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Left Panel - Tactical Channels -->
+        <div class="left-panel">
+            <div class="panel-header">
+                TACTICAL CHANNELS
+                <div class="gear-animation"></div>
+            </div>
+            <div class="tactical-channels">
+                <div class="channel-item active">
+                    <div class="channel-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 24 24&quot;><path d=&quot;M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z&quot;/></svg>');"></div>
+                    <div class="channel-name">ALPHA SQUAD</div>
+                    <div class="channel-badge">3</div>
+                </div>
+                <div class="channel-item">
+                    <div class="channel-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 24 24&quot;><path d=&quot;M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z&quot;/></svg>');"></div>
+                    <div class="channel-name">BRAVO SQUAD</div>
+                    <div class="channel-badge">7</div>
+                </div>
+                <div class="channel-item">
+                    <div class="channel-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 24 24&quot;><path d=&quot;M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z&quot;/></svg>');"></div>
+                    <div class="channel-name">COMMAND</div>
+                    <div class="channel-badge">1</div>
+                </div>
+                <div class="channel-item">
+                    <div class="channel-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 24 24&quot;><path d=&quot;M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z&quot;/></svg>');"></div>
+                    <div class="channel-name">MISSION LOG</div>
+                    <div class="channel-badge">NEW</div>
+                </div>
+                <div class="channel-item">
+                    <div class="channel-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 24 24&quot;><path d=&quot;M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z&quot;/></svg>');"></div>
+                    <div class="channel-name">INTEL FEED</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Panel - Chat Interface -->
+        <div class="main-panel">
+            <div class="chat-header">
+                <div class="active-channel-info">
+                    <div class="channel-status">ALPHA SQUAD - SECURE</div>
+                    <div class="encryption-badge">AES-256</div>
+                </div>
+                <div class="gear-animation"></div>
+            </div>
+            
+            <div class="chat-messages">
+                <div class="message-group">
+                    <div class="message">
+                        <div class="message-avatar">CMD</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <div class="sender-name">COMMANDER STEEL</div>
+                                <div class="message-time">14:23:45</div>
+                            </div>
+                            <div class="message-bubble">
+                                Alpha Squad, we have confirmed hostile movement in sector 7-G. Prepare for tactical deployment. Mission parameters being uploaded to your HUD systems now.
+                                <div class="tactical-data">
+                                    <div class="data-row">
+                                        <span class="data-label">TARGET:</span>
+                                        <span class="data-value">SECTOR 7-G</span>
+                                    </div>
+                                    <div class="data-row">
+                                        <span class="data-label">HOSTILES:</span>
+                                        <span class="data-value">12-15 CONFIRMED</span>
+                                    </div>
+                                    <div class="data-row">
+                                        <span class="data-label">PRIORITY:</span>
+                                        <span class="data-value">HIGH</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="message outgoing">
+                        <div class="message-avatar">A1</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <div class="sender-name">ALPHA-1 (YOU)</div>
+                                <div class="message-time">14:24:12</div>
+                            </div>
+                            <div class="message-bubble">
+                                Copy that, Command. Alpha Squad is combat ready. Equipment check complete, all systems green. Requesting permission to advance.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="message">
+                        <div class="message-avatar">A2</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <div class="sender-name">ALPHA-2 PHANTOM</div>
+                                <div class="message-time">14:24:28</div>
+                            </div>
+                            <div class="message-bubble">
+                                Overwatch position secured. I have eyes on the target zone. Confirming 14 hostiles, armed and mobile. Recommend flanking approach from east corridor.
+                                <div class="tactical-data">
+                                    <div class="data-row">
+                                        <span class="data-label">VISUAL:</span>
+                                        <span class="data-value">CONFIRMED</span>
+                                    </div>
+                                    <div class="data-row">
+                                        <span class="data-label">RANGE:</span>
+                                        <span class="data-value">250M</span>
+                                    </div>
+                                    <div class="data-row">
+                                        <span class="data-label">WIND:</span>
+                                        <span class="data-value">3.2 KPH NE</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="message">
+                        <div class="message-avatar">A3</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <div class="sender-name">ALPHA-3 FORGE</div>
+                                <div class="message-time">14:25:01</div>
+                            </div>
+                            <div class="message-bubble">
+                                Breach charges are set and ready. Give me 30 seconds on your mark and I'll open up a new door for you. Heavy armor detected on three targets.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="message outgoing">
+                        <div class="message-avatar">A1</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <div class="sender-name">ALPHA-1 (YOU)</div>
+                                <div class="message-time">14:25:34</div>
+                            </div>
+                            <div class="message-bubble">
+                                Understood. Phantom, maintain overwatch. Forge, prepare for synchronized breach. Moving to position now. ETA 2 minutes to deployment.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Intelligence Feed -->
+        <div class="right-panel">
+            <div class="panel-header">
+                INTELLIGENCE FEED
+                <div class="gear-animation"></div>
+            </div>
+            <div class="intelligence-feed">
+                <div class="intel-item">
+                    <div class="intel-header">
+                        <div class="intel-type">THREAT ANALYSIS</div>
+                        <div class="intel-priority">HIGH</div>
+                    </div>
+                    <div class="intel-content">
+                        Enemy patrol patterns detected. 3 squads rotating every 12 minutes through sectors 6-G through 8-G. Vulnerability window identified.
+                    </div>
+                </div>
+                
+                <div class="intel-item">
+                    <div class="intel-header">
+                        <div class="intel-type">COMBAT DATA</div>
+                        <div class="intel-priority">MED</div>
+                    </div>
+                    <div class="intel-content">
+                        Alpha Squad performance metrics: 97% accuracy rate, 0.3s average response time. All members combat-ready with full ammunition load.
+                    </div>
+                </div>
+                
+                <div class="intel-item">
+                    <div class="intel-header">
+                        <div class="intel-type">ENVIRONMENTAL</div>
+                        <div class="intel-priority">LOW</div>
+                    </div>
+                    <div class="intel-content">
+                        Weather conditions favorable. No precipitation expected. Visibility excellent. Temperature 22°C. Optimal conditions for operation.
+                    </div>
+                </div>
+                
+                <div class="intel-item">
+                    <div class="intel-header">
+                        <div class="intel-type">MISSION UPDATE</div>
+                        <div class="intel-priority">HIGH</div>
+                    </div>
+                    <div class="intel-content">
+                        Secondary objective acquired: Retrieve intel package from central command post. Priority Alpha. Handle with extreme caution.
+                    </div>
+                </div>
+                
+                <div class="intel-item">
+                    <div class="intel-header">
+                        <div class="intel-type">EQUIPMENT</div>
+                        <div class="intel-priority">MED</div>
+                    </div>
+                    <div class="intel-content">
+                        All tactical gear operational. Night vision systems online. Communication array at 100% efficiency. Weapons systems green across all units.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Panel -->
+        <div class="input-panel">
+            <input type="text" class="message-input" placeholder="ENTER TACTICAL COMMAND..." />
+            <div class="action-buttons">
+                <button class="action-btn">TRANSMIT</button>
+                <button class="action-btn secondary">ENCRYPT</button>
+                <button class="action-btn secondary">ANALYZE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate real-time updates
+        function addSystemMessage() {
+            const messages = document.querySelector('.chat-messages');
+            const messageGroup = document.createElement('div');
+            messageGroup.className = 'message-group';
+            
+            const message = document.createElement('div');
+            message.className = 'message';
+            
+            const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false });
+            
+            message.innerHTML = `
+                <div class="message-avatar">SYS</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <div class="sender-name">TACTICAL SYSTEM</div>
+                        <div class="message-time">${currentTime}</div>
+                    </div>
+                    <div class="message-bubble">
+                        Mission parameters updated. New intelligence available. All units maintain radio discipline.
+                        <div class="tactical-data">
+                            <div class="data-row">
+                                <span class="data-label">STATUS:</span>
+                                <span class="data-value">OPERATIONAL</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">SYNC:</span>
+                                <span class="data-value">${Math.floor(Math.random() * 100)}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            messageGroup.appendChild(message);
+            messages.appendChild(messageGroup);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        // Add periodic system updates
+        setInterval(addSystemMessage, 30000);
+        
+        // Handle message input
+        const messageInput = document.querySelector('.message-input');
+        const transmitBtn = document.querySelector('.action-btn');
+        
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (!messageText) return;
+            
+            const messages = document.querySelector('.chat-messages');
+            const messageGroup = document.createElement('div');
+            messageGroup.className = 'message-group';
+            
+            const message = document.createElement('div');
+            message.className = 'message outgoing';
+            
+            const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false });
+            
+            message.innerHTML = `
+                <div class="message-avatar">A1</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <div class="sender-name">ALPHA-1 (YOU)</div>
+                        <div class="message-time">${currentTime}</div>
+                    </div>
+                    <div class="message-bubble">${messageText}</div>
+                </div>
+            `;
+            
+            messageGroup.appendChild(message);
+            messages.appendChild(messageGroup);
+            messages.scrollTop = messages.scrollHeight;
+            
+            messageInput.value = '';
+        }
+        
+        transmitBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Channel switching
+        document.querySelectorAll('.channel-item').forEach(channel => {
+            channel.addEventListener('click', () => {
+                document.querySelectorAll('.channel-item').forEach(c => c.classList.remove('active'));
+                channel.classList.add('active');
+                
+                const channelName = channel.querySelector('.channel-name').textContent;
+                document.querySelector('.channel-status').textContent = `${channelName} - SECURE`;
+            });
+        });
+        
+        // Simulate network activity
+        function updateNetworkStatus() {
+            const indicators = document.querySelectorAll('.status-dot');
+            indicators.forEach((dot, index) => {
+                if (Math.random() > 0.9) {
+                    dot.style.animationDuration = '0.5s';
+                    setTimeout(() => {
+                        dot.style.animationDuration = '2s';
+                    }, 2000);
+                }
+            });
+        }
+        
+        setInterval(updateNetworkStatus, 5000);
+        
+        // Add tactical realism
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                messageInput.value += ' [PRIORITY ALPHA]';
+            }
+        });
+    </script>
+</body>
+</html>

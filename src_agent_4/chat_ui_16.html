@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lover's Touch - Intimate Communication Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --rose-primary: #e8b5a0;
+            --rose-secondary: #f4d1c5;
+            --gold-accent: #f0c674;
+            --lavender-soft: #e6d7ff;
+            --cream-white: #faf8f5;
+            --tender-gray: #d4cfc7;
+            --warm-shadow: rgba(203, 168, 147, 0.4);
+            --light-shadow: rgba(255, 255, 255, 0.8);
+            --deep-rose: #d49383;
+            --gradient-warm: linear-gradient(135deg, #faf8f5 0%, #f4d1c5 100%);
+            --gradient-romantic: linear-gradient(135deg, #e8b5a0 0%, #f0c674 100%);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--gradient-warm);
+            min-height: 100vh;
+            color: #6b5b73;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            height: 100vh;
+            background: var(--cream-white);
+            box-shadow: 
+                20px 20px 40px var(--warm-shadow),
+                -20px -20px 40px var(--light-shadow);
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: var(--gradient-romantic);
+            padding: 50px 25px 25px;
+            text-align: center;
+            position: relative;
+            box-shadow: 
+                inset 5px 5px 15px rgba(212, 147, 131, 0.3),
+                inset -5px -5px 15px rgba(255, 255, 255, 0.7);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            color: #6b5b73;
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+        }
+
+        .header .subtitle {
+            color: #8a7a85;
+            font-size: 14px;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        .wellness-dashboard {
+            padding: 20px;
+            background: var(--cream-white);
+        }
+
+        .wellness-card {
+            background: var(--cream-white);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 
+                8px 8px 16px var(--warm-shadow),
+                -8px -8px 16px var(--light-shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wellness-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--gradient-romantic);
+            border-radius: 22px;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .wellness-card:active {
+            transform: scale(0.98);
+            box-shadow: 
+                4px 4px 8px var(--warm-shadow),
+                -4px -4px 8px var(--light-shadow);
+        }
+
+        .wellness-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #6b5b73;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wellness-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--gradient-romantic);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            box-shadow: 
+                3px 3px 6px var(--warm-shadow),
+                -3px -3px 6px var(--light-shadow);
+        }
+
+        .heart-meter {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .heart {
+            width: 20px;
+            height: 18px;
+            background: var(--tender-gray);
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            box-shadow: 
+                2px 2px 4px var(--warm-shadow),
+                -2px -2px 4px var(--light-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .heart.filled {
+            background: var(--gradient-romantic);
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: '';
+            width: 10px;
+            height: 16px;
+            position: absolute;
+            left: 5px;
+            top: 0;
+            background: inherit;
+            border-radius: 10px 10px 0 0;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+
+        .heart::after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .message-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .message {
+            background: var(--cream-white);
+            border-radius: 20px;
+            padding: 15px 18px;
+            margin-bottom: 12px;
+            box-shadow: 
+                6px 6px 12px var(--warm-shadow),
+                -6px -6px 12px var(--light-shadow);
+            animation: messageFloat 0.5s ease-out;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .message:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                8px 8px 16px var(--warm-shadow),
+                -8px -8px 16px var(--light-shadow);
+        }
+
+        .message.sent {
+            background: var(--gradient-romantic);
+            margin-left: 40px;
+            color: #6b5b73;
+        }
+
+        .message.received {
+            margin-right: 40px;
+            background: var(--lavender-soft);
+        }
+
+        @keyframes messageFloat {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 5px;
+        }
+
+        .intimate-planning {
+            padding: 20px;
+        }
+
+        .date-card {
+            background: var(--cream-white);
+            border-radius: 25px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 
+                10px 10px 20px var(--warm-shadow),
+                -10px -10px 20px var(--light-shadow);
+            border: 1px solid rgba(232, 181, 160, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .date-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                12px 12px 24px var(--warm-shadow),
+                -12px -12px 24px var(--light-shadow);
+        }
+
+        .date-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #6b5b73;
+            margin-bottom: 8px;
+        }
+
+        .date-details {
+            color: #8a7a85;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .floating-action {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-romantic);
+            border-radius: 50%;
+            border: none;
+            box-shadow: 
+                8px 8px 16px var(--warm-shadow),
+                -8px -8px 16px var(--light-shadow);
+            font-size: 24px;
+            color: #6b5b73;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .floating-action:hover {
+            transform: scale(1.1);
+        }
+
+        .floating-action:active {
+            transform: scale(0.95);
+            box-shadow: 
+                4px 4px 8px var(--warm-shadow),
+                -4px -4px 8px var(--light-shadow);
+        }
+
+        .input-area {
+            padding: 20px;
+            background: var(--cream-white);
+            border-top: 1px solid rgba(232, 181, 160, 0.2);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            background: var(--cream-white);
+            border: none;
+            padding: 15px 20px;
+            border-radius: 25px;
+            box-shadow: 
+                inset 6px 6px 12px var(--warm-shadow),
+                inset -6px -6px 12px var(--light-shadow);
+            font-size: 16px;
+            color: #6b5b73;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .message-input:focus {
+            box-shadow: 
+                inset 8px 8px 16px var(--warm-shadow),
+                inset -8px -8px 16px var(--light-shadow);
+        }
+
+        .send-button {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-romantic);
+            border: none;
+            border-radius: 50%;
+            box-shadow: 
+                6px 6px 12px var(--warm-shadow),
+                -6px -6px 12px var(--light-shadow);
+            font-size: 18px;
+            color: #6b5b73;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-button:active {
+            transform: scale(0.95);
+            box-shadow: 
+                3px 3px 6px var(--warm-shadow),
+                -3px -3px 6px var(--light-shadow);
+        }
+
+        .navigation {
+            display: flex;
+            background: var(--cream-white);
+            padding: 15px;
+            border-top: 1px solid rgba(232, 181, 160, 0.2);
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            background: var(--cream-white);
+            border: none;
+            border-radius: 15px;
+            margin: 0 5px;
+            box-shadow: 
+                4px 4px 8px var(--warm-shadow),
+                -4px -4px 8px var(--light-shadow);
+            font-size: 12px;
+            color: #8a7a85;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            background: var(--gradient-romantic);
+            color: #6b5b73;
+            box-shadow: 
+                inset 2px 2px 4px var(--warm-shadow),
+                inset -2px -2px 4px var(--light-shadow);
+        }
+
+        .ai-suggestion {
+            background: rgba(230, 215, 255, 0.3);
+            border-radius: 20px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid var(--lavender-soft);
+            box-shadow: 
+                6px 6px 12px var(--warm-shadow),
+                -6px -6px 12px var(--light-shadow);
+            animation: sugestionGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes sugestionGlow {
+            from { box-shadow: 6px 6px 12px var(--warm-shadow), -6px -6px 12px var(--light-shadow); }
+            to { box-shadow: 8px 8px 16px var(--warm-shadow), -8px -8px 16px var(--light-shadow); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .milestone {
+            background: var(--cream-white);
+            border-radius: 20px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 
+                6px 6px 12px var(--warm-shadow),
+                -6px -6px 12px var(--light-shadow);
+            border-left: 4px solid var(--gold-accent);
+        }
+
+        .relationship-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: var(--cream-white);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 
+                5px 5px 10px var(--warm-shadow),
+                -5px -5px 10px var(--light-shadow);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #6b5b73;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #8a7a85;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💕 Lover's Touch</h1>
+            <div class="subtitle">Intimate Communication Hub</div>
+        </div>
+
+        <!-- Messages Section -->
+        <div class="section active" id="messages">
+            <div class="message-area">
+                <div class="message received">
+                    <div>Good morning, beautiful! I've been thinking about you since I woke up 💕</div>
+                    <div class="message-time">9:23 AM</div>
+                </div>
+                
+                <div class="message sent">
+                    <div>You always know how to make my heart skip a beat 💖 Can't wait to see you tonight</div>
+                    <div class="message-time">9:25 AM</div>
+                </div>
+
+                <div class="ai-suggestion">
+                    <strong>💡 AI Suggestion:</strong> Based on your conversation pattern, consider sharing a voice message - your partner loves hearing your voice in the morning.
+                </div>
+
+                <div class="message received">
+                    <div>I have a surprise planned for us this weekend... something special under the stars ✨</div>
+                    <div class="message-time">9:30 AM</div>
+                </div>
+
+                <div class="message sent">
+                    <div>You're making me so curious! I love how you always keep the romance alive 🌹</div>
+                    <div class="message-time">9:32 AM</div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-container">
+                    <input type="text" class="message-input" placeholder="Share your heart..." />
+                    <button class="send-button">💕</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wellness Dashboard Section -->
+        <div class="section" id="wellness">
+            <div class="wellness-dashboard">
+                <div class="wellness-card">
+                    <div class="wellness-title">
+                        <div class="wellness-icon">💖</div>
+                        Relationship Health
+                    </div>
+                    <div class="heart-meter">
+                        <div class="heart filled"></div>
+                        <div class="heart filled"></div>
+                        <div class="heart filled"></div>
+                        <div class="heart filled"></div>
+                        <div class="heart"></div>
+                    </div>
+                    <div style="font-size: 14px; color: #8a7a85;">Strong connection - Regular check-ins recommended</div>
+                </div>
+
+                <div class="wellness-card">
+                    <div class="wellness-title">
+                        <div class="wellness-icon">🌸</div>
+                        Emotional Well-being
+                    </div>
+                    <div class="relationship-stats">
+                        <div class="stat-card">
+                            <div class="stat-number">8.5</div>
+                            <div class="stat-label">Happiness</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">9.2</div>
+                            <div class="stat-label">Connection</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wellness-card">
+                    <div class="wellness-title">
+                        <div class="wellness-icon">💝</div>
+                        Love Languages
+                    </div>
+                    <div style="font-size: 14px; color: #8a7a85; line-height: 1.5;">
+                        <strong>Your top:</strong> Quality Time<br>
+                        <strong>Partner's top:</strong> Words of Affirmation<br>
+                        <em>Suggestion: Share more verbal appreciation</em>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relationship Building Section -->
+        <div class="section" id="building">
+            <div class="intimate-planning">
+                <div class="milestone">
+                    <div style="font-weight: 600; color: #6b5b73; margin-bottom: 8px;">🎯 Current Goal</div>
+                    <div style="font-size: 14px; color: #8a7a85;">Plan a surprise romantic weekend getaway by month-end</div>
+                </div>
+
+                <div class="milestone">
+                    <div style="font-weight: 600; color: #6b5b73; margin-bottom: 8px;">🏆 Recent Achievement</div>
+                    <div style="font-size: 14px; color: #8a7a85;">Completed daily appreciation messages for 2 weeks straight!</div>
+                </div>
+
+                <div class="ai-suggestion">
+                    <strong>💡 Growth Tip:</strong> Your partner mentioned feeling stressed at work. Consider sending supportive messages during their lunch break.
+                </div>
+
+                <div class="wellness-card">
+                    <div class="wellness-title">
+                        <div class="wellness-icon">📈</div>
+                        Relationship Insights
+                    </div>
+                    <div style="font-size: 14px; color: #8a7a85; line-height: 1.6;">
+                        • Communication frequency: Up 23% this month<br>
+                        • Positive sentiment: 94% of messages<br>
+                        • Quality time logged: 18.5 hours this week<br>
+                        • Shared activities: 5 new experiences
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Intimate Planning Section -->
+        <div class="section" id="planning">
+            <div class="intimate-planning">
+                <div class="date-card">
+                    <div class="date-title">🌅 Sunrise Picnic</div>
+                    <div class="date-details">
+                        <strong>Tomorrow, 6:00 AM</strong><br>
+                        Location: Hilltop Park<br>
+                        Bringing: Homemade pastries, fresh fruit, and your favorite coffee<br>
+                        <em>Perfect for watching the sunrise together</em>
+                    </div>
+                </div>
+
+                <div class="date-card">
+                    <div class="date-title">💃 Dance Under Stars</div>
+                    <div class="date-details">
+                        <strong>Friday, 8:00 PM</strong><br>
+                        Location: Rooftop Garden<br>
+                        Music: Your "Our Songs" playlist<br>
+                        <em>Recreating our first dance moment</em>
+                    </div>
+                </div>
+
+                <div class="ai-suggestion">
+                    <strong>💕 Romantic Idea:</strong> The weather will be perfect this weekend. Consider a spontaneous beach walk at sunset - it matches your shared love for peaceful moments.
+                </div>
+
+                <div class="date-card">
+                    <div class="date-title">🍷 Wine & Paint Night</div>
+                    <div class="date-details">
+                        <strong>Next Saturday, 7:00 PM</strong><br>
+                        Location: Home studio setup<br>
+                        Activity: Paint each other's portraits<br>
+                        <em>Creating art and memories together</em>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-item active" onclick="showSection('messages')">💕<br>Messages</button>
+            <button class="nav-item" onclick="showSection('wellness')">💖<br>Wellness</button>
+            <button class="nav-item" onclick="showSection('building')">🌱<br>Building</button>
+            <button class="nav-item" onclick="showSection('planning')">📅<br>Planning</button>
+        </div>
+
+        <button class="floating-action" onclick="triggerRomanticAction()">✨</button>
+    </div>
+
+    <script>
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function triggerRomanticAction() {
+            const actions = [
+                "💕 Sending virtual hug...",
+                "🌹 Sharing love note...",
+                "✨ Creating romantic moment...",
+                "💖 Spreading positive energy...",
+                "🎵 Playing your song..."
+            ];
+            
+            const randomAction = actions[Math.floor(Math.random() * actions.length)];
+            
+            // Create floating notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--gradient-romantic);
+                color: #6b5b73;
+                padding: 20px 30px;
+                border-radius: 25px;
+                box-shadow: 10px 10px 20px var(--warm-shadow), -10px -10px 20px var(--light-shadow);
+                font-weight: 600;
+                z-index: 2000;
+                animation: fadeInOut 2s ease-in-out;
+            `;
+            notification.textContent = randomAction;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 2000);
+        }
+
+        // Add floating heart animation
+        function createFloatingHeart() {
+            const heart = document.createElement('div');
+            heart.innerHTML = '💕';
+            heart.style.cssText = `
+                position: fixed;
+                font-size: 20px;
+                pointer-events: none;
+                z-index: 1000;
+                animation: floatUp 3s ease-out forwards;
+                left: ${Math.random() * window.innerWidth}px;
+                top: ${window.innerHeight}px;
+            `;
+            document.body.appendChild(heart);
+            
+            setTimeout(() => {
+                document.body.removeChild(heart);
+            }, 3000);
+        }
+
+        // Add CSS for floating animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes floatUp {
+                from {
+                    transform: translateY(0) rotate(0deg);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateY(-100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes fadeInOut {
+                0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Trigger floating hearts periodically
+        setInterval(createFloatingHeart, 5000);
+
+        // Add tactile feedback to all interactive elements
+        document.querySelectorAll('.wellness-card, .message, .date-card, .nav-item, .send-button, .floating-action').forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            element.addEventListener('touchend', function() {
+                this.style.transform = '';
+            });
+        });
+
+        // Simulate typing indicator
+        function showTypingIndicator() {
+            const messageArea = document.querySelector('.message-area');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message received typing';
+            typingDiv.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <span style="animation: pulse 1s infinite;">💭</span>
+                    <span style="font-style: italic; opacity: 0.7;">typing...</span>
+                </div>
+            `;
+            messageArea.appendChild(typingDiv);
+            messageArea.scrollTop = messageArea.scrollHeight;
+            
+            setTimeout(() => {
+                messageArea.removeChild(typingDiv);
+            }, 3000);
+        }
+
+        // Add pulse animation
+        const pulseStyle = document.createElement('style');
+        pulseStyle.textContent = `
+            @keyframes pulse {
+                0%, 100% { opacity: 0.4; }
+                50% { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(pulseStyle);
+
+        // Trigger typing indicator occasionally
+        setInterval(() => {
+            if (Math.random() < 0.3) {
+                showTypingIndicator();
+            }
+        }, 15000);
+
+        // Handle message sending
+        document.querySelector('.send-button').addEventListener('click', function() {
+            const input = document.querySelector('.message-input');
+            if (input.value.trim()) {
+                const messageArea = document.querySelector('.message-area');
+                const newMessage = document.createElement('div');
+                newMessage.className = 'message sent';
+                newMessage.innerHTML = `
+                    <div>${input.value}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                `;
+                messageArea.appendChild(newMessage);
+                messageArea.scrollTop = messageArea.scrollHeight;
+                input.value = '';
+                
+                // Show typing indicator after sending
+                setTimeout(showTypingIndicator, 1000);
+            }
+        });
+
+        // Handle enter key in input
+        document.querySelector('.message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.querySelector('.send-button').click();
+            }
+        });
+    </script>
+</body>
+</html>

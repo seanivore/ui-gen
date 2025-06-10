@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WARNET - Tactical Combat Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-red: #ff0040;
+            --electric-blue: #00ffff;
+            --warning-orange: #ff6600;
+            --combat-green: #00ff41;
+            --stark-white: #ffffff;
+            --neon-pink: #ff1493;
+            --electric-purple: #9d00ff;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --grid-color: rgba(0, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Rajdhani', monospace;
+            background: var(--darker-bg);
+            color: var(--stark-white);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Electric Grid Background */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Neon Glow Effects */
+        .neon-glow-red {
+            text-shadow: 0 0 5px var(--neon-red), 0 0 10px var(--neon-red), 0 0 15px var(--neon-red);
+            color: var(--neon-red);
+        }
+
+        .neon-glow-blue {
+            text-shadow: 0 0 5px var(--electric-blue), 0 0 10px var(--electric-blue), 0 0 15px var(--electric-blue);
+            color: var(--electric-blue);
+        }
+
+        .neon-glow-green {
+            text-shadow: 0 0 5px var(--combat-green), 0 0 10px var(--combat-green), 0 0 15px var(--combat-green);
+            color: var(--combat-green);
+        }
+
+        .neon-glow-orange {
+            text-shadow: 0 0 5px var(--warning-orange), 0 0 10px var(--warning-orange), 0 0 15px var(--warning-orange);
+            color: var(--warning-orange);
+        }
+
+        /* Main Container */
+        .warnet-container {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            grid-template-rows: 80px 1fr 100px;
+            height: 100vh;
+            gap: 2px;
+            background: var(--dark-bg);
+        }
+
+        /* Header */
+        .tactical-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--darker-bg) 0%, rgba(255, 0, 64, 0.1) 100%);
+            border-bottom: 2px solid var(--neon-red);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tactical-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            animation: scanLine 4s linear infinite;
+        }
+
+        @keyframes scanLine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .warnet-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 3px;
+        }
+
+        .combat-status {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+        }
+
+        /* Combat Sidebar */
+        .combat-sidebar {
+            background: linear-gradient(180deg, var(--darker-bg) 0%, rgba(255, 0, 64, 0.05) 100%);
+            border-right: 2px solid var(--neon-red);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .squad-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--neon-red);
+            padding-bottom: 5px;
+        }
+
+        .squad-member {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .squad-member:hover {
+            border-color: var(--electric-blue);
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--neon-red), var(--electric-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 12px;
+            border: 2px solid var(--stark-white);
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .member-status {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Main Combat Chat */
+        .main-combat-area {
+            display: flex;
+            flex-direction: column;
+            background: var(--dark-bg);
+        }
+
+        .combat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: linear-gradient(180deg, var(--dark-bg) 0%, rgba(0, 0, 0, 0.9) 100%);
+        }
+
+        .message-group {
+            margin-bottom: 25px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            animation: messageSlide 0.5s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .message.own {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--neon-red), var(--warning-orange));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            border: 2px solid var(--stark-white);
+            margin: 0 15px;
+            box-shadow: 0 0 20px rgba(255, 0, 64, 0.5);
+        }
+
+        .message-content {
+            max-width: 60%;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: 1px solid var(--electric-blue);
+            position: relative;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .message.own .message-content {
+            background: rgba(255, 0, 64, 0.2);
+            border-color: var(--neon-red);
+            box-shadow: 0 0 15px rgba(255, 0, 64, 0.2);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .message-sender {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .message-text {
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .tactical-alert {
+            background: linear-gradient(135deg, rgba(255, 102, 0, 0.2), rgba(255, 0, 64, 0.2));
+            border: 2px solid var(--warning-orange);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tactical-alert::before {
+            content: '⚠';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            animation: alertPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes alertPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .alert-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        /* Analytics Panel */
+        .analytics-panel {
+            background: linear-gradient(180deg, var(--darker-bg) 0%, rgba(0, 255, 65, 0.05) 100%);
+            border-left: 2px solid var(--combat-green);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .analytics-section {
+            margin-bottom: 25px;
+        }
+
+        .metric-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--combat-green);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--combat-green), transparent);
+            animation: metricScan 2s linear infinite;
+        }
+
+        @keyframes metricScan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .metric-title {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .battle-chart {
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 255, 65, 0.1);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 8px;
+            background: linear-gradient(to top, var(--combat-green), var(--electric-blue));
+            border-radius: 2px 2px 0 0;
+            animation: chartPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes chartPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* Input Area */
+        .combat-input-area {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--darker-bg) 0%, rgba(0, 255, 255, 0.05) 100%);
+            border-top: 2px solid var(--electric-blue);
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            gap: 15px;
+        }
+
+        .combat-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--electric-blue);
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: var(--stark-white);
+            font-size: 16px;
+            font-family: 'Rajdhani', monospace;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .combat-input:focus {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 20px rgba(255, 0, 64, 0.3);
+            background: rgba(255, 0, 64, 0.1);
+        }
+
+        .combat-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--neon-red);
+            background: rgba(255, 0, 64, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 20px;
+        }
+
+        .action-btn:hover {
+            background: var(--neon-red);
+            box-shadow: 0 0 25px rgba(255, 0, 64, 0.6);
+            transform: scale(1.1);
+        }
+
+        /* Particle Effects */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--electric-blue);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 3s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--darker-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--neon-red), var(--electric-blue));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, var(--electric-blue), var(--neon-red));
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .warnet-container {
+                grid-template-columns: 250px 1fr 280px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .warnet-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 80px 1fr 100px;
+            }
+            
+            .combat-sidebar,
+            .analytics-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay"></div>
+    
+    <div class="warnet-container">
+        <!-- Tactical Header -->
+        <header class="tactical-header">
+            <h1 class="warnet-title neon-glow-red">WARNET</h1>
+            <div class="combat-status">
+                <div class="status-indicator">
+                    <div class="status-dot neon-glow-green" style="background: var(--combat-green);"></div>
+                    <span class="neon-glow-green">COMBAT READY</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot neon-glow-orange" style="background: var(--warning-orange);"></div>
+                    <span class="neon-glow-orange">7 ALERTS</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot neon-glow-blue" style="background: var(--electric-blue);"></div>
+                    <span class="neon-glow-blue">ONLINE</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Combat Sidebar -->
+        <aside class="combat-sidebar">
+            <div class="squad-section">
+                <h3 class="section-title neon-glow-red">ACTIVE SQUAD</h3>
+                <div class="squad-member">
+                    <div class="member-avatar">AX</div>
+                    <div class="member-info">
+                        <div class="member-name neon-glow-blue">APEX</div>
+                        <div class="member-status neon-glow-green">In Combat</div>
+                    </div>
+                </div>
+                <div class="squad-member">
+                    <div class="member-avatar">VX</div>
+                    <div class="member-info">
+                        <div class="member-name neon-glow-blue">VORTEX</div>
+                        <div class="member-status neon-glow-orange">Wounded</div>
+                    </div>
+                </div>
+                <div class="squad-member">
+                    <div class="member-avatar">RZ</div>
+                    <div class="member-info">
+                        <div class="member-name neon-glow-blue">RAZOR</div>
+                        <div class="member-status neon-glow-green">Ready</div>
+                    </div>
+                </div>
+                <div class="squad-member">
+                    <div class="member-avatar">ST</div>
+                    <div class="member-info">
+                        <div class="member-name neon-glow-blue">STORM</div>
+                        <div class="member-status neon-glow-blue">Recon</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="squad-section">
+                <h3 class="section-title neon-glow-red">OBJECTIVES</h3>
+                <div class="tactical-alert">
+                    <div class="alert-title neon-glow-orange">PRIORITY TARGET</div>
+                    <div>Eliminate HVT at Grid 247</div>
+                </div>
+                <div class="tactical-alert">
+                    <div class="alert-title neon-glow-orange">EXTRACTION</div>
+                    <div>LZ Hot - Alternative route</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Combat Area -->
+        <main class="main-combat-area">
+            <div class="combat-messages">
+                <div class="message-group">
+                    <div class="message">
+                        <div class="message-avatar neon-glow-blue">AX</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-sender neon-glow-blue">APEX</span>
+                                <span class="message-time">14:23:45</span>
+                            </div>
+                            <div class="message-text">Contact! Three tangos, building 12. Moving to flank.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tactical-alert">
+                    <div class="alert-title neon-glow-orange">TACTICAL UPDATE</div>
+                    <div>Enemy reinforcements detected - ETA 3 minutes</div>
+                </div>
+
+                <div class="message-group">
+                    <div class="message own">
+                        <div class="message-avatar neon-glow-red">W</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-sender neon-glow-red">WARRIOR</span>
+                                <span class="message-time">14:24:01</span>
+                            </div>
+                            <div class="message-text">Copy that. VORTEX, cover the rear. RAZOR, with me.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message-group">
+                    <div class="message">
+                        <div class="message-avatar neon-glow-green">VX</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-sender neon-glow-green">VORTEX</span>
+                                <span class="message-time">14:24:15</span>
+                            </div>
+                            <div class="message-text">Taking heavy fire! Need immediate support!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message-group">
+                    <div class="message">
+                        <div class="message-avatar neon-glow-orange">RZ</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-sender neon-glow-orange">RAZOR</span>
+                                <span class="message-time">14:24:32</span>
+                            </div>
+                            <div class="message-text">Grenades out! Clear the building, NOW!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tactical-alert">
+                    <div class="alert-title neon-glow-red">CRITICAL ALERT</div>
+                    <div>Hostiles breached perimeter - All units engage!</div>
+                </div>
+
+                <div class="message-group">
+                    <div class="message own">
+                        <div class="message-avatar neon-glow-red">W</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-sender neon-glow-red">WARRIOR</span>
+                                <span class="message-time">14:25:01</span>
+                            </div>
+                            <div class="message-text">No mercy. Light them up. Show them what warriors do.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message-group">
+                    <div class="message">
+                        <div class="message-avatar neon-glow-blue">ST</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-sender neon-glow-blue">STORM</span>
+                                <span class="message-time">14:25:18</span>
+                            </div>
+                            <div class="message-text">Drone surveillance active. Tracking 6 more inbound.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Analytics Panel -->
+        <aside class="analytics-panel">
+            <div class="analytics-section">
+                <h3 class="section-title neon-glow-green">BATTLE METRICS</h3>
+                <div class="metric-card">
+                    <div class="metric-title">KILLS</div>
+                    <div class="metric-value neon-glow-red">47</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">ACCURACY</div>
+                    <div class="metric-value neon-glow-blue">89%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">HEALTH</div>
+                    <div class="metric-value neon-glow-green">78%</div>
+                </div>
+            </div>
+
+            <div class="analytics-section">
+                <h3 class="section-title neon-glow-green">COMBAT ANALYSIS</h3>
+                <div class="battle-chart">
+                    <div class="chart-bar" style="left: 10px; height: 40%; animation-delay: 0s;"></div>
+                    <div class="chart-bar" style="left: 25px; height: 60%; animation-delay: 0.2s;"></div>
+                    <div class="chart-bar" style="left: 40px; height: 80%; animation-delay: 0.4s;"></div>
+                    <div class="chart-bar" style="left: 55px; height: 45%; animation-delay: 0.6s;"></div>
+                    <div class="chart-bar" style="left: 70px; height: 90%; animation-delay: 0.8s;"></div>
+                    <div class="chart-bar" style="left: 85px; height: 70%; animation-delay: 1s;"></div>
+                </div>
+            </div>
+
+            <div class="analytics-section">
+                <h3 class="section-title neon-glow-green">SQUAD STATUS</h3>
+                <div class="metric-card">
+                    <div class="metric-title">ACTIVE</div>
+                    <div class="metric-value neon-glow-green">4/4</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">AMMO</div>
+                    <div class="metric-value neon-glow-orange">67%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">MORALE</div>
+                    <div class="metric-value neon-glow-blue">HIGH</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Combat Input Area -->
+        <div class="combat-input-area">
+            <input type="text" class="combat-input" placeholder="Enter tactical command..." />
+            <div class="action-buttons">
+                <button class="action-btn neon-glow-red">⚡</button>
+                <button class="action-btn neon-glow-orange">🎯</button>
+                <button class="action-btn neon-glow-green">📡</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            
+            const colors = ['var(--electric-blue)', 'var(--neon-red)', 'var(--combat-green)', 'var(--warning-orange)'];
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 5000);
+        }
+
+        // Generate particles periodically
+        setInterval(createParticle, 500);
+
+        // Combat input functionality
+        const combatInput = document.querySelector('.combat-input');
+        const actionButtons = document.querySelectorAll('.action-btn');
+
+        combatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const message = this.value.trim();
+                if (message) {
+                    addMessage('WARRIOR', message, true);
+                    this.value = '';
+                    
+                    // Simulate AI response
+                    setTimeout(() => {
+                        const responses = [
+                            'Roger that. Executing orders.',
+                            'Target acquired. Moving to position.',
+                            'Copy. Weapons hot.',
+                            'Understood. No survivors.',
+                            'Affirmative. Engaging now.'
+                        ];
+                        const response = responses[Math.floor(Math.random() * responses.length)];
+                        addMessage('AI-TACTICAL', response, false);
+                    }, 1000);
+                }
+            }
+        });
+
+        function addMessage(sender, text, isOwn) {
+            const messagesContainer = document.querySelector('.combat-messages');
+            const messageGroup = document.createElement('div');
+            messageGroup.className = 'message-group';
+            
+            const now = new Date();
+            const timeString = now.toTimeString().slice(0, 8);
+            
+            messageGroup.innerHTML = `
+                <div class="message ${isOwn ? 'own' : ''}">
+                    <div class="message-avatar ${isOwn ? 'neon-glow-red' : 'neon-glow-blue'}">${sender[0]}</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender ${isOwn ? 'neon-glow-red' : 'neon-glow-blue'}">${sender}</span>
+                            <span class="message-time">${timeString}</span>
+                        </div>
+                        <div class="message-text">${text}</div>
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageGroup);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Action button functionality
+        actionButtons.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                const actions = [
+                    'Lightning strike initiated',
+                    'Target locked and acquired',
+                    'Surveillance drone deployed'
+                ];
+                
+                addMessage('SYSTEM', actions[index], false);
+            });
+        });
+
+        // Dynamic metric updates
+        function updateMetrics() {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                if (metric.textContent.includes('%')) {
+                    const currentValue = parseInt(metric.textContent);
+                    const change = Math.floor(Math.random() * 10) - 5;
+                    const newValue = Math.max(0, Math.min(100, currentValue + change));
+                    metric.textContent = newValue + '%';
+                } else if (!isNaN(parseInt(metric.textContent))) {
+                    const currentValue = parseInt(metric.textContent);
+                    const change = Math.floor(Math.random() * 6) - 3;
+                    const newValue = Math.max(0, currentValue + change);
+                    metric.textContent = newValue;
+                }
+            });
+        }
+
+        // Update metrics every 5 seconds
+        setInterval(updateMetrics, 5000);
+
+        // Squad member click functionality
+        document.querySelectorAll('.squad-member').forEach(member => {
+            member.addEventListener('click', () => {
+                const name = member.querySelector('.member-name').textContent;
+                addMessage('SYSTEM', `Direct channel opened with ${name}`, false);
+            });
+        });
+
+        // Random tactical alerts
+        function generateTacticalAlert() {
+            const alerts = [
+                'Enemy sniper detected at 2 o\'clock',
+                'Ammunition resupply inbound',
+                'Hostile vehicle approaching',
+                'Civilian evacuation complete',
+                'Air support requested',
+                'Medical assistance needed'
+            ];
+            
+            const alertText = alerts[Math.floor(Math.random() * alerts.length)];
+            const messagesContainer = document.querySelector('.combat-messages');
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'tactical-alert';
+            alertDiv.innerHTML = `
+                <div class="alert-title neon-glow-orange">TACTICAL ALERT</div>
+                <div>${alertText}</div>
+            `;
+            
+            messagesContainer.appendChild(alertDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Generate random alerts every 15-30 seconds
+        setInterval(generateTacticalAlert, Math.random() * 15000 + 15000);
+
+        // Initialize with welcome message
+        setTimeout(() => {
+            addMessage('SYSTEM', 'WARNET tactical interface initialized. All systems operational.', false);
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Magician - Neon Mystical Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Audiowide&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: radial-gradient(circle at center, #0a0015 0%, #000005 50%, #000000 100%);
+            color: #00ffff;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Magical Background Effects */
+        .cosmic-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(2px 2px at 20% 30%, #ff00ff, transparent),
+                radial-gradient(2px 2px at 40% 70%, #00ffff, transparent),
+                radial-gradient(1px 1px at 90% 40%, #ffff00, transparent),
+                radial-gradient(1px 1px at 50% 50%, #ff0080, transparent);
+            animation: sparkle 4s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.2; }
+        }
+
+        /* Main Container */
+        .magician-interface {
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-rows: 80px 1fr 120px;
+            gap: 20px;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header */
+        .mystical-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(45deg, rgba(255, 0, 255, 0.1), rgba(0, 255, 255, 0.1));
+            border: 2px solid;
+            border-image: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00) 1;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mystical-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(255, 0, 255, 0.1), transparent);
+            animation: rotate 6s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .logo {
+            font-family: 'Audiowide', cursive;
+            font-size: 28px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 
+                0 0 10px #ff00ff,
+                0 0 20px #ff00ff,
+                0 0 30px #ff00ff;
+            animation: glow-pulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow-pulse {
+            0% { text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff; }
+            100% { text-shadow: 0 0 20px #ff00ff, 0 0 30px #ff00ff, 0 0 50px #ff00ff; }
+        }
+
+        .power-level {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .energy-bar {
+            width: 150px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00ffff;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .energy-fill {
+            width: 85%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00);
+            animation: energy-flow 2s linear infinite;
+        }
+
+        @keyframes energy-flow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Left Panel - Spell Casting */
+        .spell-panel {
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.15), rgba(138, 43, 226, 0.1));
+            border: 2px solid #ff00ff;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 0 30px rgba(255, 0, 255, 0.3),
+                inset 0 0 20px rgba(255, 0, 255, 0.1);
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-family: 'Audiowide', cursive;
+            font-size: 18px;
+            color: #ff00ff;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #ff00ff;
+            border-bottom: 2px solid #ff00ff;
+            padding-bottom: 10px;
+        }
+
+        .spell-circle {
+            width: 180px;
+            height: 180px;
+            margin: 20px auto;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .spell-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .spell-circle svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 20px #ff00ff);
+        }
+
+        .spell-list {
+            margin-top: 25px;
+        }
+
+        .spell-item {
+            background: rgba(255, 0, 255, 0.1);
+            border: 1px solid #ff00ff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spell-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .spell-item:hover::before {
+            left: 100%;
+        }
+
+        .spell-item:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .spell-name {
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .spell-power {
+            font-size: 12px;
+            color: #00ffff;
+        }
+
+        /* Center Panel - Knowledge Vault */
+        .knowledge-vault {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(0, 191, 255, 0.1));
+            border: 2px solid #00ffff;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 255, 0.3),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .knowledge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .knowledge-title {
+            font-family: 'Audiowide', cursive;
+            font-size: 20px;
+            color: #00ffff;
+            text-shadow: 0 0 15px #00ffff;
+        }
+
+        .search-mystic {
+            width: 200px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00ffff;
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: #00ffff;
+            font-family: 'Orbitron', monospace;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-mystic::placeholder {
+            color: rgba(0, 255, 255, 0.5);
+        }
+
+        .search-mystic:focus {
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .knowledge-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .knowledge-entry {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .knowledge-entry:hover {
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+            transform: translateX(5px);
+        }
+
+        .entry-title {
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .entry-content {
+            color: #00ffff;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .entry-tags {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            color: #000;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Right Panel - Illusion Control */
+        .illusion-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 0, 0.15), rgba(255, 165, 0, 0.1));
+            border: 2px solid #ffff00;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 0 30px rgba(255, 255, 0, 0.3),
+                inset 0 0 20px rgba(255, 255, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .illusion-title {
+            font-family: 'Audiowide', cursive;
+            font-size: 18px;
+            color: #ffff00;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #ffff00;
+            border-bottom: 2px solid #ffff00;
+            padding-bottom: 10px;
+        }
+
+        .reality-controls {
+            margin-bottom: 25px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            font-size: 14px;
+            color: #fff;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .neon-slider {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+            position: relative;
+        }
+
+        .neon-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #ffff00, #ff00ff);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.7);
+        }
+
+        .illusion-presets {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .preset-btn {
+            background: linear-gradient(45deg, rgba(255, 255, 0, 0.2), rgba(255, 0, 255, 0.2));
+            border: 2px solid #ffff00;
+            border-radius: 12px;
+            padding: 12px;
+            color: #fff;
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .preset-btn:hover {
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
+            transform: scale(1.05);
+        }
+
+        /* Bottom Panel - Magical Networks */
+        .network-panel {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, rgba(255, 0, 255, 0.1), rgba(0, 255, 255, 0.1), rgba(255, 255, 0, 0.1));
+            border: 2px solid;
+            border-image: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00) 1;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .active-connections {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .connection {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 1px solid #00ffff;
+            transition: all 0.3s ease;
+        }
+
+        .connection:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+
+        .connection-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .connection-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .connection-name {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .connection-status {
+            color: #00ffff;
+            font-size: 12px;
+        }
+
+        .network-stats {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #00ffff;
+            margin-top: 5px;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #00ffff, #ffff00);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .magician-interface {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto auto;
+            }
+            
+            .mystical-header {
+                grid-column: 1;
+            }
+            
+            .network-panel {
+                grid-column: 1;
+            }
+        }
+
+        /* Animation for magical particles */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ff00ff;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 6s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Active spell casting effect */
+        .casting {
+            animation: spell-cast 2s ease-in-out;
+        }
+
+        @keyframes spell-cast {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+        }
+    </style>
+</head>
+<body class="cosmic-bg">
+    <div class="magician-interface">
+        <!-- Header -->
+        <header class="mystical-header">
+            <div class="logo">⚡ ARCANE NEXUS ⚡</div>
+            <div class="power-level">
+                <span style="color: #00ffff; font-size: 14px;">Magical Energy:</span>
+                <div class="energy-bar">
+                    <div class="energy-fill"></div>
+                </div>
+                <span style="color: #ffff00; font-size: 14px;">85%</span>
+            </div>
+        </header>
+
+        <!-- Left Panel - Spell Casting -->
+        <section class="spell-panel">
+            <h2 class="panel-title">✨ SPELL FORGE ✨</h2>
+            
+            <div class="spell-circle" onclick="castSpell()">
+                <svg viewBox="0 0 200 200">
+                    <defs>
+                        <linearGradient id="spellGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ff00ff;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#00ffff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#ffff00;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="url(#spellGrad)" stroke-width="3"/>
+                    <circle cx="100" cy="100" r="70" fill="none" stroke="url(#spellGrad)" stroke-width="2" opacity="0.7"/>
+                    <circle cx="100" cy="100" r="50" fill="none" stroke="url(#spellGrad)" stroke-width="2" opacity="0.5"/>
+                    <polygon points="100,30 120,80 170,80 130,110 150,160 100,130 50,160 70,110 30,80 80,80" 
+                             fill="url(#spellGrad)" opacity="0.8"/>
+                    <circle cx="100" cy="100" r="15" fill="#fff" opacity="0.9"/>
+                    <text x="100" y="190" text-anchor="middle" fill="#ff00ff" font-family="Audiowide" font-size="12">CAST SPELL</text>
+                </svg>
+            </div>
+
+            <div class="spell-list">
+                <div class="spell-item" onclick="selectSpell('lightning')">
+                    <div class="spell-name">⚡ Lightning Bolt</div>
+                    <div class="spell-power">Power: 850 | Mana: 120</div>
+                </div>
+                <div class="spell-item" onclick="selectSpell('shield')">
+                    <div class="spell-name">🛡️ Mystic Shield</div>
+                    <div class="spell-power">Power: 650 | Mana: 80</div>
+                </div>
+                <div class="spell-item" onclick="selectSpell('teleport')">
+                    <div class="spell-name">🌀 Dimensional Rift</div>
+                    <div class="spell-power">Power: 950 | Mana: 200</div>
+                </div>
+                <div class="spell-item" onclick="selectSpell('heal')">
+                    <div class="spell-name">✨ Radiant Healing</div>
+                    <div class="spell-power">Power: 750 | Mana: 100</div>
+                </div>
+                <div class="spell-item" onclick="selectSpell('time')">
+                    <div class="spell-name">⏰ Temporal Manipulation</div>
+                    <div class="spell-power">Power: 1200 | Mana: 300</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Center Panel - Knowledge Vault -->
+        <section class="knowledge-vault">
+            <div class="knowledge-header">
+                <h2 class="knowledge-title">📚 WISDOM CODEX 📚</h2>
+                <input type="text" class="search-mystic" placeholder="Search ancient knowledge..." />
+            </div>
+            
+            <div class="knowledge-content">
+                <div class="knowledge-entry">
+                    <div class="entry-title">🔮 Quantum Entanglement Principles</div>
+                    <div class="entry-content">
+                        Recent analysis reveals that magical energies operate on quantum frequencies, allowing for instantaneous communication across dimensional barriers. The resonance patterns indicate...
+                    </div>
+                    <div class="entry-tags">
+                        <span class="tag">Quantum</span>
+                        <span class="tag">Dimensions</span>
+                        <span class="tag">Energy</span>
+                    </div>
+                </div>
+                
+                <div class="knowledge-entry">
+                    <div class="entry-title">⚗️ Alchemical Transmutation Matrix</div>
+                    <div class="entry-content">
+                        The fundamental laws of matter manipulation through magical means. Base elements can be transformed using specific frequency combinations and energy channeling techniques...
+                    </div>
+                    <div class="entry-tags">
+                        <span class="tag">Alchemy</span>
+                        <span class="tag">Transmutation</span>
+                        <span class="tag">Elements</span>
+                    </div>
+                </div>
+                
+                <div class="knowledge-entry">
+                    <div class="entry-title">🌟 Astral Projection Protocols</div>
+                    <div class="entry-content">
+                        Advanced techniques for consciousness separation and astral plane navigation. Safety measures include energy tethering and protective ward establishment before projection...
+                    </div>
+                    <div class="entry-tags">
+                        <span class="tag">Astral</span>
+                        <span class="tag">Consciousness</span>
+                        <span class="tag">Protection</span>
+                    </div>
+                </div>
+                
+                <div class="knowledge-entry">
+                    <div class="entry-title">🧬 Genetic Arcane Integration</div>
+                    <div class="entry-content">
+                        The intersection of biological enhancement and magical augmentation. DNA modification using ethereal energies can unlock latent psychic abilities and extend lifespan...
+                    </div>
+                    <div class="entry-tags">
+                        <span class="tag">Genetics</span>
+                        <span class="tag">Enhancement</span>
+                        <span class="tag">Psychic</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Panel - Illusion Control -->
+        <section class="illusion-panel">
+            <h2 class="illusion-title">🎭 REALITY FORGE 🎭</h2>
+            
+            <div class="reality-controls">
+                <div class="control-group">
+                    <label class="control-label">Perception Distortion</label>
+                    <input type="range" class="neon-slider" min="0" max="100" value="65" />
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Temporal Displacement</label>
+                    <input type="range" class="neon-slider" min="0" max="100" value="40" />
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Dimensional Phase</label>
+                    <input type="range" class="neon-slider" min="0" max="100" value="80" />
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Mind Influence</label>
+                    <input type="range" class="neon-slider" min="0" max="100" value="55" />
+                </div>
+            </div>
+
+            <div class="illusion-presets">
+                <button class="preset-btn" onclick="activateIllusion('mirror')">
+                    🪞 Mirror Realm
+                </button>
+                <button class="preset-btn" onclick="activateIllusion('shadow')">
+                    👤 Shadow Play
+                </button>
+                <button class="preset-btn" onclick="activateIllusion('maze')">
+                    🌀 Mind Maze
+                </button>
+                <button class="preset-btn" onclick="activateIllusion('phantom')">
+                    👻 Phantom Zone
+                </button>
+                <button class="preset-btn" onclick="activateIllusion('dream')">
+                    💭 Dream State
+                </button>
+                <button class="preset-btn" onclick="activateIllusion('void')">
+                    ⚫ Void Walker
+                </button>
+            </div>
+        </section>
+
+        <!-- Bottom Panel - Magical Networks -->
+        <section class="network-panel">
+            <div class="active-connections">
+                <div class="connection">
+                    <div class="connection-avatar">🧙</div>
+                    <div class="connection-info">
+                        <div class="connection-name">Sage Ethereal</div>
+                        <div class="connection-status">Channeling Energy</div>
+                    </div>
+                </div>
+                <div class="connection">
+                    <div class="connection-avatar">🔮</div>
+                    <div class="connection-info">
+                        <div class="connection-name">Oracle Nova</div>
+                        <div class="connection-status">Divining Future</div>
+                    </div>
+                </div>
+                <div class="connection">
+                    <div class="connection-avatar">⚡</div>
+                    <div class="connection-info">
+                        <div class="connection-name">Volt Mystic</div>
+                        <div class="connection-status">Power Sharing</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="network-stats">
+                <div class="stat">
+                    <div class="stat-value">47</div>
+                    <div class="stat-label">Active Nodes</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">2.3K</div>
+                    <div class="stat-label">Energy Flow</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">99.7%</div>
+                    <div class="stat-label">Stability</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Create magical particles
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.backgroundColor = ['#ff00ff', '#00ffff', '#ffff00'][Math.floor(Math.random() * 3)];
+            particle.style.boxShadow = `0 0 10px ${particle.style.backgroundColor}`;
+            document.body.appendChild(particle);
+
+            setTimeout(() => {
+                particle.remove();
+            }, 6000);
+        }
+
+        // Generate particles continuously
+        setInterval(createParticle, 300);
+
+        // Spell casting functionality
+        let selectedSpell = null;
+
+        function selectSpell(spellType) {
+            selectedSpell = spellType;
+            document.querySelectorAll('.spell-item').forEach(item => {
+                item.style.background = 'rgba(255, 0, 255, 0.1)';
+            });
+            event.target.closest('.spell-item').style.background = 'rgba(255, 0, 255, 0.3)';
+        }
+
+        function castSpell() {
+            const spellCircle = document.querySelector('.spell-circle');
+            spellCircle.classList.add('casting');
+            
+            // Create spell effect
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    createMagicalBurst();
+                }, i * 100);
+            }
+
+            setTimeout(() => {
+                spellCircle.classList.remove('casting');
+            }, 2000);
+
+            // Show spell notification
+            if (selectedSpell) {
+                showNotification(`Casting ${selectedSpell} spell...`);
+            } else {
+                showNotification('Select a spell first!');
+            }
+        }
+
+        function createMagicalBurst() {
+            const burst = document.createElement('div');
+            burst.style.position = 'absolute';
+            burst.style.left = '50%';
+            burst.style.top = '50%';
+            burst.style.width = '10px';
+            burst.style.height = '10px';
+            burst.style.backgroundColor = ['#ff00ff', '#00ffff', '#ffff00'][Math.floor(Math.random() * 3)];
+            burst.style.borderRadius = '50%';
+            burst.style.boxShadow = `0 0 20px ${burst.style.backgroundColor}`;
+            burst.style.transform = 'translate(-50%, -50%)';
+            burst.style.animation = 'burst 1s ease-out forwards';
+            burst.style.zIndex = '1000';
+            document.querySelector('.spell-panel').appendChild(burst);
+
+            setTimeout(() => {
+                burst.remove();
+            }, 1000);
+        }
+
+        // Add burst animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes burst {
+                0% {
+                    transform: translate(-50%, -50%) scale(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translate(-50%, -50%) scale(5);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Illusion activation
+        function activateIllusion(type) {
+            const effects = {
+                mirror: '🪞 Activating Mirror Realm...',
+                shadow: '👤 Summoning Shadow Play...',
+                maze: '🌀 Constructing Mind Maze...',
+                phantom: '👻 Opening Phantom Zone...',
+                dream: '💭 Inducing Dream State...',
+                void: '⚫ Accessing Void Walker...'
+            };
+            
+            showNotification(effects[type] || 'Illusion activated!');
+            
+            // Visual effect
+            document.body.style.filter = 'hue-rotate(180deg)';
+            setTimeout(() => {
+                document.body.style.filter = 'none';
+            }, 2000);
+        }
+
+        // Search functionality
+        document.querySelector('.search-mystic').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const entries = document.querySelectorAll('.knowledge-entry');
+            
+            entries.forEach(entry => {
+                const title = entry.querySelector('.entry-title').textContent.toLowerCase();
+                const content = entry.querySelector('.entry-content').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || content.includes(searchTerm)) {
+                    entry.style.display = 'block';
+                    entry.style.animation = 'fadeIn 0.5s ease';
+                } else {
+                    entry.style.display = searchTerm ? 'none' : 'block';
+                }
+            });
+        });
+
+        // Notification system
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '50%';
+            notification.style.left = '50%';
+            notification.style.transform = 'translate(-50%, -50%)';
+            notification.style.background = 'linear-gradient(45deg, rgba(255, 0, 255, 0.9), rgba(0, 255, 255, 0.9))';
+            notification.style.color = '#fff';
+            notification.style.padding = '20px 40px';
+            notification.style.borderRadius = '25px';
+            notification.style.border = '2px solid #fff';
+            notification.style.boxShadow = '0 0 30px rgba(255, 0, 255, 0.7)';
+            notification.style.fontFamily = 'Audiowide, cursive';
+            notification.style.fontSize = '18px';
+            notification.style.textAlign = 'center';
+            notification.style.zIndex = '10000';
+            notification.style.animation = 'notificationFade 3s ease forwards';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Add notification animation
+        const notificationStyle = document.createElement('style');
+        notificationStyle.textContent = `
+            @keyframes notificationFade {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+                20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+                25% { transform: translate(-50%, -50%) scale(1); }
+                75% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(notificationStyle);
+
+        // Dynamic energy bar animation
+        setInterval(() => {
+            const energyFill = document.querySelector('.energy-fill');
+            const currentWidth = parseInt(energyFill.style.width) || 85;
+            const newWidth = Math.max(75, Math.min(95, currentWidth + (Math.random() - 0.5) * 10));
+            energyFill.style.width = newWidth + '%';
+        }, 2000);
+
+        // Interactive slider effects
+        document.querySelectorAll('.neon-slider').forEach(slider => {
+            slider.addEventListener('input', function() {
+                const value = this.value;
+                this.style.background = `linear-gradient(90deg, 
+                    rgba(255, 255, 0, 0.5) 0%, 
+                    rgba(255, 255, 0, 0.5) ${value}%, 
+                    rgba(0, 0, 0, 0.5) ${value}%, 
+                    rgba(0, 0, 0, 0.5) 100%)`;
+            });
+        });
+
+        // Initialize sliders
+        document.querySelectorAll('.neon-slider').forEach(slider => {
+            slider.dispatchEvent(new Event('input'));
+        });
+
+        console.log('🔮 Arcane Nexus Interface Initialized - The Magician + Neon theme active');
+    </script>
+</body>
+</html>

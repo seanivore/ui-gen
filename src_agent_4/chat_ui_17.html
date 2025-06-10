@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoHero Command - Jungle Guardian Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --jungle-primary: #1a4d3a;
+            --jungle-secondary: #2d7a2d;
+            --tropical-orange: #ff7b42;
+            --exotic-purple: #8b4a9c;
+            --earth-brown: #8b4513;
+            --golden-sun: #ffd700;
+            --vibrant-green: #32cd32;
+            --deep-forest: #0f2e1b;
+            --mist-white: rgba(255, 255, 255, 0.9);
+            --hero-glow: #00ff88;
+        }
+        
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: linear-gradient(135deg, var(--deep-forest) 0%, var(--jungle-primary) 50%, var(--jungle-secondary) 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Animated jungle background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(50, 205, 50, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 123, 66, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 60% 20%, rgba(139, 74, 156, 0.2) 0%, transparent 50%);
+            animation: jungleBreeze 20s ease-in-out infinite;
+            z-index: 0;
+        }
+        
+        @keyframes jungleBreeze {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.7; }
+            50% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+        }
+        
+        .hero-interface {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 320px 1fr 280px;
+            grid-template-rows: 80px 1fr 100px;
+            height: 100vh;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        /* Header - Mission Control */
+        .mission-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, var(--jungle-primary), var(--tropical-orange));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            border: 2px solid var(--hero-glow);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .hero-emblem {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, var(--golden-sun), var(--tropical-orange));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            animation: heroicPulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes heroicPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+            50% { transform: scale(1.1); box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+        }
+        
+        .hero-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--mist-white);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .mission-status {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 25px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--hero-glow);
+            animation: statusBlink 2s ease-in-out infinite;
+        }
+        
+        @keyframes statusBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        /* Left Panel - Team Dashboard */
+        .team-panel {
+            background: linear-gradient(180deg, var(--jungle-primary), var(--deep-forest));
+            border-radius: 20px;
+            border: 1px solid var(--vibrant-green);
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            overflow-y: auto;
+        }
+        
+        .panel-header {
+            font-family: 'Orbitron', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--golden-sun);
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .team-member {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, rgba(45, 122, 45, 0.3), rgba(139, 74, 156, 0.2));
+            border-radius: 15px;
+            border-left: 4px solid var(--tropical-orange);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .team-member:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 30px rgba(255, 123, 66, 0.3);
+        }
+        
+        .member-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--vibrant-green), var(--tropical-orange));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .member-info {
+            flex: 1;
+        }
+        
+        .member-name {
+            font-weight: 600;
+            color: var(--mist-white);
+            font-size: 14px;
+        }
+        
+        .member-role {
+            font-size: 12px;
+            color: var(--golden-sun);
+            opacity: 0.8;
+        }
+        
+        .member-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--hero-glow);
+        }
+        
+        /* Main Chat Area */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, rgba(15, 46, 27, 0.9), rgba(26, 77, 58, 0.8));
+            border-radius: 20px;
+            border: 1px solid var(--hero-glow);
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            padding: 20px 25px;
+            background: linear-gradient(90deg, var(--jungle-secondary), var(--exotic-purple));
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            gap: 15px;
+        }
+        
+        .mission-badge {
+            background: linear-gradient(45deg, var(--golden-sun), var(--tropical-orange));
+            color: var(--deep-forest);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            animation: messageSlide 0.5s ease-out;
+        }
+        
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.hero {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .message.hero .message-avatar {
+            background: linear-gradient(45deg, var(--golden-sun), var(--tropical-orange));
+        }
+        
+        .message.team .message-avatar {
+            background: linear-gradient(45deg, var(--vibrant-green), var(--jungle-secondary));
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            position: relative;
+        }
+        
+        .message.hero .message-content {
+            background: linear-gradient(135deg, var(--tropical-orange), var(--golden-sun));
+            color: var(--deep-forest);
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message.team .message-content {
+            background: linear-gradient(135deg, var(--jungle-secondary), var(--vibrant-green));
+            color: var(--mist-white);
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-text {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+        
+        .mission-alert {
+            background: linear-gradient(135deg, var(--exotic-purple), var(--tropical-orange));
+            border: 2px solid var(--hero-glow);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            margin: 10px 0;
+            animation: alertPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes alertPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.6); }
+        }
+        
+        /* Right Panel - Environmental Dashboard */
+        .eco-panel {
+            background: linear-gradient(180deg, var(--jungle-secondary), var(--deep-forest));
+            border-radius: 20px;
+            border: 1px solid var(--vibrant-green);
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            overflow-y: auto;
+        }
+        
+        .eco-metric {
+            background: linear-gradient(135deg, rgba(50, 205, 50, 0.2), rgba(255, 123, 66, 0.1));
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--hero-glow);
+            transition: all 0.3s ease;
+        }
+        
+        .eco-metric:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: var(--golden-sun);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--mist-white);
+            margin: 5px 0;
+        }
+        
+        .metric-status {
+            font-size: 11px;
+            color: var(--hero-glow);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--hero-glow), var(--vibrant-green));
+            border-radius: 10px;
+            animation: progressGlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes progressGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
+        }
+        
+        /* Input Area */
+        .input-container {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, var(--deep-forest), var(--jungle-primary));
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 2px solid var(--hero-glow);
+            backdrop-filter: blur(15px);
+        }
+        
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .message-input {
+            width: 100%;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(0, 255, 136, 0.1));
+            color: var(--mist-white);
+            font-size: 16px;
+            font-family: 'Exo 2', sans-serif;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .message-input:focus {
+            outline: none;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+            transform: scale(1.02);
+        }
+        
+        .message-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--tropical-orange), var(--golden-sun));
+            color: var(--deep-forest);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(255, 123, 66, 0.4);
+        }
+        
+        .send-btn {
+            background: linear-gradient(45deg, var(--hero-glow), var(--vibrant-green)) !important;
+            color: white !important;
+        }
+        
+        /* Floating elements */
+        .jungle-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--hero-glow);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0px) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) translateX(100px) rotate(360deg); opacity: 0; }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .hero-interface {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto;
+            }
+            
+            .team-panel, .eco-panel {
+                display: none;
+            }
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--hero-glow), var(--vibrant-green));
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="jungle-particles">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 40%; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 50%; animation-delay: 8s;"></div>
+        <div class="particle" style="left: 60%; animation-delay: 10s;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 12s;"></div>
+        <div class="particle" style="left: 80%; animation-delay: 14s;"></div>
+        <div class="particle" style="left: 90%; animation-delay: 16s;"></div>
+    </div>
+
+    <div class="hero-interface">
+        <!-- Mission Control Header -->
+        <div class="mission-header">
+            <div class="hero-logo">
+                <div class="hero-emblem">🌿</div>
+                <div class="hero-title">ECOHERO COMMAND</div>
+            </div>
+            <div class="mission-status">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>ACTIVE MISSION</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot" style="background: var(--tropical-orange);"></div>
+                    <span>12 TEAMS DEPLOYED</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Management Panel -->
+        <div class="team-panel">
+            <div class="panel-header">🦸‍♀️ ECO-WARRIORS</div>
+            
+            <div class="team-member">
+                <div class="member-avatar">🌳</div>
+                <div class="member-info">
+                    <div class="member-name">Maya Rodriguez</div>
+                    <div class="member-role">Forest Guardian</div>
+                </div>
+                <div class="member-status"></div>
+            </div>
+            
+            <div class="team-member">
+                <div class="member-avatar">🐋</div>
+                <div class="member-info">
+                    <div class="member-name">Ocean Chen</div>
+                    <div class="member-role">Marine Protector</div>
+                </div>
+                <div class="member-status"></div>
+            </div>
+            
+            <div class="team-member">
+                <div class="member-avatar">🦅</div>
+                <div class="member-info">
+                    <div class="member-name">Sky Thompson</div>
+                    <div class="member-role">Wildlife Defender</div>
+                </div>
+                <div class="member-status"></div>
+            </div>
+            
+            <div class="team-member">
+                <div class="member-avatar">🌸</div>
+                <div class="member-info">
+                    <div class="member-name">River Patel</div>
+                    <div class="member-role">Pollination Specialist</div>
+                </div>
+                <div class="member-status"></div>
+            </div>
+            
+            <div class="team-member">
+                <div class="member-avatar">⚡</div>
+                <div class="member-info">
+                    <div class="member-name">Storm Jackson</div>
+                    <div class="member-role">Climate Tech Lead</div>
+                </div>
+                <div class="member-status"></div>
+            </div>
+        </div>
+
+        <!-- Main Communication Hub -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="mission-badge">🎯 RAINFOREST PROTECTION</div>
+                <div style="flex: 1; text-align: center; color: white; font-weight: 600;">Mission Control Channel</div>
+                <div class="mission-badge">PRIORITY: HIGH</div>
+            </div>
+            
+            <div class="chat-messages">
+                <div class="mission-alert">
+                    🚨 URGENT: Deforestation activity detected in Sector 7 - immediate response required
+                </div>
+                
+                <div class="message team">
+                    <div class="message-avatar">🌳</div>
+                    <div class="message-content">
+                        <div class="message-text">Commander, we've identified illegal logging operations 15km north of our base camp. Requesting permission to intercept.</div>
+                        <div class="message-time">14:23 - Maya Rodriguez</div>
+                    </div>
+                </div>
+                
+                <div class="message hero">
+                    <div class="message-avatar">🦸</div>
+                    <div class="message-content">
+                        <div class="message-text">Permission granted, Maya. Deploy drones for reconnaissance first. I'm sending backup teams to your coordinates.</div>
+                        <div class="message-time">14:24 - You</div>
+                    </div>
+                </div>
+                
+                <div class="message team">
+                    <div class="message-avatar">🐋</div>
+                    <div class="message-content">
+                        <div class="message-text">Ocean team reporting: We've successfully relocated 3 whale pods away from shipping lanes. Marine sanctuary secured! 🐋✨</div>
+                        <div class="message-time">14:26 - Ocean Chen</div>
+                    </div>
+                </div>
+                
+                <div class="message hero">
+                    <div class="message-avatar">🦸</div>
+                    <div class="message-content">
+                        <div class="message-text">Outstanding work, Ocean! Your marine protection efforts are making a real difference. Keep monitoring migration patterns.</div>
+                        <div class="message-time">14:27 - You</div>
+                    </div>
+                </div>
+                
+                <div class="message team">
+                    <div class="message-avatar">⚡</div>
+                    <div class="message-content">
+                        <div class="message-text">Climate data analysis complete: Our reforestation efforts have increased local oxygen levels by 12% this quarter. The ecosystem is responding beautifully! 🌱📊</div>
+                        <div class="message-time">14:29 - Storm Jackson</div>
+                    </div>
+                </div>
+                
+                <div class="message team">
+                    <div class="message-avatar">🦅</div>
+                    <div class="message-content">
+                        <div class="message-text">Sky patrol update: Spotted rare golden eagles nesting in the protected zone. Population is increasing! Should we establish additional no-fly zones?</div>
+                        <div class="message-time">14:31 - Sky Thompson</div>
+                    </div>
+                </div>
+                
+                <div class="message hero">
+                    <div class="message-avatar">🦸</div>
+                    <div class="message-content">
+                        <div class="message-text">Absolutely, Sky. Expand the protected airspace by 5km radius. Every species under our protection deserves to thrive. This is what we fight for! 🦅🛡️</div>
+                        <div class="message-time">14:32 - You</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Environmental Metrics Panel -->
+        <div class="eco-panel">
+            <div class="panel-header">🌱 ECO METRICS</div>
+            
+            <div class="eco-metric">
+                <div class="metric-label">Forest Coverage</div>
+                <div class="metric-value">94.7%</div>
+                <div class="metric-status">↗️ +2.3% this month</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 94.7%;"></div>
+                </div>
+            </div>
+            
+            <div class="eco-metric">
+                <div class="metric-label">Wildlife Population</div>
+                <div class="metric-value">15,847</div>
+                <div class="metric-status">↗️ +847 protected</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 82%;"></div>
+                </div>
+            </div>
+            
+            <div class="eco-metric">
+                <div class="metric-label">Water Quality</div>
+                <div class="metric-value">98.2%</div>
+                <div class="metric-status">🌊 Crystal clear</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 98.2%;"></div>
+                </div>
+            </div>
+            
+            <div class="eco-metric">
+                <div class="metric-label">Air Purity</div>
+                <div class="metric-value">96.5%</div>
+                <div class="metric-status">🍃 Excellent quality</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 96.5%;"></div>
+                </div>
+            </div>
+            
+            <div class="eco-metric">
+                <div class="metric-label">CO₂ Absorbed</div>
+                <div class="metric-value">2.4M</div>
+                <div class="metric-status">tons this year</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 78%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Command Input Interface -->
+        <div class="input-container">
+            <div class="input-wrapper">
+                <input type="text" class="message-input" placeholder="Issue mission commands, coordinate teams, or share environmental insights...">
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" title="Voice Command">🎤</button>
+                <button class="action-btn" title="Attach Mission Files">📋</button>
+                <button class="action-btn" title="Deploy Emergency Protocol">🚨</button>
+                <button class="action-btn send-btn" title="Send Command">🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Heroic jungle interaction effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Message input focus effects
+            const messageInput = document.querySelector('.message-input');
+            
+            messageInput.addEventListener('focus', function() {
+                document.body.style.setProperty('--hero-glow', '#00ff88');
+                this.style.background = 'linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(50, 205, 50, 0.1))';
+            });
+            
+            messageInput.addEventListener('blur', function() {
+                this.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(0, 255, 136, 0.1))';
+            });
+            
+            // Send message functionality
+            const sendBtn = document.querySelector('.send-btn');
+            const chatMessages = document.querySelector('.chat-messages');
+            
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message hero';
+                    messageDiv.innerHTML = `
+                        <div class="message-avatar">🦸</div>
+                        <div class="message-content">
+                            <div class="message-text">${message}</div>
+                            <div class="message-time">${new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })} - You</div>
+                        </div>
+                    `;
+                    
+                    chatMessages.appendChild(messageDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    messageInput.value = '';
+                    
+                    // Heroic send effect
+                    sendBtn.style.transform = 'scale(1.3)';
+                    setTimeout(() => {
+                        sendBtn.style.transform = 'scale(1)';
+                    }, 200);
+                }
+            }
+            
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Team member interaction
+            document.querySelectorAll('.team-member').forEach(member => {
+                member.addEventListener('click', function() {
+                    const memberName = this.querySelector('.member-name').textContent;
+                    const memberRole = this.querySelector('.member-role').textContent;
+                    
+                    // Add contact message
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message team';
+                    messageDiv.innerHTML = `
+                        <div class="message-avatar">${this.querySelector('.member-avatar').textContent}</div>
+                        <div class="message-content">
+                            <div class="message-text">Ready for orders, Commander! ${memberRole} team standing by for environmental protection duties. 🌿⚡</div>
+                            <div class="message-time">${new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })} - ${memberName}</div>
+                        </div>
+                    `;
+                    
+                    chatMessages.appendChild(messageDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                    // Highlight effect
+                    this.style.background = 'linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(255, 123, 66, 0.2))';
+                    setTimeout(() => {
+                        this.style.background = 'linear-gradient(135deg, rgba(45, 122, 45, 0.3), rgba(139, 74, 156, 0.2))';
+                    }, 1000);
+                });
+            });
+            
+            // Environmental metrics updates
+            function updateMetrics() {
+                const metrics = document.querySelectorAll('.metric-value');
+                metrics.forEach(metric => {
+                    const currentValue = parseFloat(metric.textContent);
+                    const variation = (Math.random() - 0.5) * 0.2;
+                    const newValue = Math.max(0, currentValue + variation);
+                    
+                    if (metric.textContent.includes('%')) {
+                        metric.textContent = Math.min(100, newValue).toFixed(1) + '%';
+                    } else if (metric.textContent.includes('M')) {
+                        metric.textContent = newValue.toFixed(1) + 'M';
+                    } else {
+                        metric.textContent = Math.floor(newValue).toLocaleString();
+                    }
+                });
+            }
+            
+            // Update metrics every 30 seconds
+            setInterval(updateMetrics, 30000);
+            
+            // Action button effects
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Create ripple effect
+                    const ripple = document.createElement('div');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255, 255, 255, 0.6)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.width = '100px';
+                    ripple.style.height = '100px';
+                    ripple.style.left = '-25px';
+                    ripple.style.top = '-25px';
+                    
+                    this.style.position = 'relative';
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+            
+            // Auto-scroll chat to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+        
+        // CSS animation for ripple effect
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

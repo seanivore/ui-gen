@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorer Chat - Jungle Core</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --jungle-green: #1a4d3a;
+            --tropical-lime: #7ed321;
+            --exotic-orange: #ff6b35;
+            --jungle-purple: #6a4c93;
+            --earth-brown: #8b4513;
+            --canopy-dark: #0d2818;
+            --leaf-light: #90ee90;
+            --bamboo-yellow: #f4d03f;
+            --mist-white: rgba(255, 255, 255, 0.15);
+            --shadow-deep: rgba(0, 0, 0, 0.8);
+        }
+        
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: linear-gradient(135deg, var(--jungle-green) 0%, var(--canopy-dark) 100%);
+            color: var(--leaf-light);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Animated jungle background */
+        .jungle-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: 
+                radial-gradient(circle at 20% 30%, var(--tropical-lime) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, var(--exotic-orange) 0%, transparent 40%),
+                radial-gradient(circle at 60% 20%, var(--jungle-purple) 0%, transparent 35%);
+            opacity: 0.1;
+            animation: jungleGlow 8s ease-in-out infinite alternate;
+        }
+        
+        @keyframes jungleGlow {
+            0% { opacity: 0.1; transform: scale(1); }
+            100% { opacity: 0.2; transform: scale(1.05); }
+        }
+        
+        /* Floating leaves animation */
+        .floating-leaves {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .leaf {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: var(--tropical-lime);
+            border-radius: 50% 0;
+            transform: rotate(45deg);
+            opacity: 0.3;
+            animation: float 15s linear infinite;
+        }
+        
+        .leaf:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .leaf:nth-child(2) { left: 30%; animation-delay: -5s; }
+        .leaf:nth-child(3) { left: 60%; animation-delay: -10s; }
+        .leaf:nth-child(4) { left: 80%; animation-delay: -2s; }
+        
+        @keyframes float {
+            0% { transform: translateY(-100px) rotate(45deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(100vh) rotate(405deg); opacity: 0; }
+        }
+        
+        .chat-container {
+            display: flex;
+            height: 100vh;
+            backdrop-filter: blur(10px);
+            background: var(--mist-white);
+            border: 1px solid rgba(126, 211, 33, 0.3);
+        }
+        
+        /* Sidebar with exploration tools */
+        .sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, var(--canopy-dark) 0%, var(--jungle-green) 100%);
+            border-right: 2px solid var(--tropical-lime);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,20 Q50,10 80,20 Q90,50 80,80 Q50,90 20,80 Q10,50 20,20" fill="none" stroke="rgba(126,211,33,0.1)" stroke-width="0.5"/></svg>');
+            background-size: 50px 50px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .user-profile {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--tropical-lime);
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--exotic-orange), var(--bamboo-yellow));
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 3px solid var(--tropical-lime);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px var(--tropical-lime); }
+            50% { box-shadow: 0 0 40px var(--exotic-orange); }
+        }
+        
+        .user-name {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--leaf-light);
+        }
+        
+        .status {
+            color: var(--bamboo-yellow);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .exploration-tools {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .tool-section {
+            margin-bottom: 25px;
+        }
+        
+        .tool-header {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            color: var(--tropical-lime);
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tool-item {
+            background: var(--mist-white);
+            border: 1px solid var(--tropical-lime);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tool-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--tropical-lime), transparent);
+            opacity: 0.1;
+            transition: left 0.5s ease;
+        }
+        
+        .tool-item:hover::before {
+            left: 100%;
+        }
+        
+        .tool-item:hover {
+            background: rgba(126, 211, 33, 0.2);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(126, 211, 33, 0.3);
+        }
+        
+        .compass {
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--exotic-orange);
+            border-radius: 50%;
+            position: relative;
+            margin: 10px auto;
+            background: radial-gradient(circle, var(--bamboo-yellow), var(--earth-brown));
+            animation: compassSpin 20s linear infinite;
+        }
+        
+        .compass::before {
+            content: '↑';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--canopy-dark);
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        @keyframes compassSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Main chat area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, var(--jungle-green) 0%, var(--canopy-dark) 100%);
+            position: relative;
+        }
+        
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(126,211,33,0.1)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,107,53,0.1)"/><circle cx="60" cy="70" r="2.5" fill="rgba(106,76,147,0.1)"/><circle cx="30" cy="80" r="1" fill="rgba(244,208,63,0.1)"/></svg>');
+            background-size: 100px 100px;
+            pointer-events: none;
+        }
+        
+        .chat-header {
+            padding: 20px;
+            border-bottom: 2px solid var(--tropical-lime);
+            background: var(--mist-white);
+            backdrop-filter: blur(20px);
+        }
+        
+        .header-title {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 24px;
+            color: var(--tropical-lime);
+            text-shadow: 0 0 10px var(--tropical-lime);
+        }
+        
+        .location-info {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+        }
+        
+        .coordinates {
+            background: var(--canopy-dark);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-family: 'Orbitron', monospace;
+            color: var(--bamboo-yellow);
+        }
+        
+        .weather {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--leaf-light);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            position: relative;
+            animation: messageSlide 0.5s ease-out;
+        }
+        
+        @keyframes messageSlide {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--exotic-orange), var(--jungle-purple));
+            color: white;
+            border: 1px solid var(--exotic-orange);
+        }
+        
+        .message.ai {
+            align-self: flex-start;
+            background: var(--mist-white);
+            border: 1px solid var(--tropical-lime);
+            color: var(--leaf-light);
+        }
+        
+        .message.discovery {
+            align-self: center;
+            background: linear-gradient(135deg, var(--bamboo-yellow), var(--earth-brown));
+            color: var(--canopy-dark);
+            border: 2px solid var(--tropical-lime);
+            box-shadow: 0 0 20px rgba(126, 211, 33, 0.5);
+            animation: discoveryPulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes discoveryPulse {
+            0% { box-shadow: 0 0 20px rgba(126, 211, 33, 0.5); }
+            100% { box-shadow: 0 0 30px rgba(255, 107, 53, 0.7); }
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .timestamp {
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .discovery-card {
+            background: var(--canopy-dark);
+            border: 1px solid var(--tropical-lime);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .species-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .species-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background: linear-gradient(45deg, var(--tropical-lime), var(--leaf-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .species-details h4 {
+            color: var(--bamboo-yellow);
+            margin-bottom: 5px;
+        }
+        
+        .species-details p {
+            font-size: 12px;
+            color: var(--leaf-light);
+        }
+        
+        .expedition-route {
+            background: var(--canopy-dark);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .route-points {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .route-point {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--tropical-lime);
+            position: relative;
+        }
+        
+        .route-point.active {
+            background: var(--exotic-orange);
+            animation: routeActive 1s ease-in-out infinite alternate;
+        }
+        
+        @keyframes routeActive {
+            0% { box-shadow: 0 0 5px var(--exotic-orange); }
+            100% { box-shadow: 0 0 15px var(--exotic-orange); }
+        }
+        
+        .route-line {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--tropical-lime), var(--leaf-light));
+            margin: 0 5px;
+        }
+        
+        .chat-input {
+            padding: 20px;
+            background: var(--mist-white);
+            backdrop-filter: blur(20px);
+            border-top: 2px solid var(--tropical-lime);
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .message-input {
+            flex: 1;
+            background: var(--canopy-dark);
+            border: 2px solid var(--tropical-lime);
+            border-radius: 25px;
+            padding: 15px 20px;
+            color: var(--leaf-light);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .message-input:focus {
+            border-color: var(--exotic-orange);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+        }
+        
+        .message-input::placeholder {
+            color: rgba(144, 238, 144, 0.5);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--tropical-lime);
+            background: linear-gradient(135deg, var(--jungle-green), var(--canopy-dark));
+            color: var(--tropical-lime);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn:hover {
+            background: linear-gradient(135deg, var(--exotic-orange), var(--jungle-purple));
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+        }
+        
+        .danger-alert {
+            background: linear-gradient(135deg, #ff4757, #ff3838);
+            border: 2px solid #ff6b35;
+            color: white;
+            animation: dangerPulse 1s ease-in-out infinite alternate;
+        }
+        
+        @keyframes dangerPulse {
+            0% { box-shadow: 0 0 10px #ff4757; }
+            100% { box-shadow: 0 0 25px #ff3838; }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 250px;
+            }
+            
+            .chat-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: 200px;
+                flex-direction: row;
+                overflow-x: auto;
+            }
+            
+            .exploration-tools {
+                display: flex;
+                gap: 20px;
+                padding: 10px 20px;
+            }
+            
+            .tool-section {
+                min-width: 150px;
+                margin-bottom: 0;
+            }
+        }
+        
+        .scrollbar-custom::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .scrollbar-custom::-webkit-scrollbar-track {
+            background: var(--canopy-dark);
+            border-radius: 10px;
+        }
+        
+        .scrollbar-custom::-webkit-scrollbar-thumb {
+            background: var(--tropical-lime);
+            border-radius: 10px;
+        }
+        
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+            background: var(--exotic-orange);
+        }
+    </style>
+</head>
+<body>
+    <div class="jungle-bg"></div>
+    <div class="floating-leaves">
+        <div class="leaf"></div>
+        <div class="leaf"></div>
+        <div class="leaf"></div>
+        <div class="leaf"></div>
+    </div>
+    
+    <div class="chat-container">
+        <aside class="sidebar">
+            <div class="user-profile">
+                <div class="avatar">🌿</div>
+                <div class="user-name">Maya Explorer</div>
+                <div class="status">🧭 Deep Jungle Expedition</div>
+            </div>
+            
+            <div class="exploration-tools">
+                <div class="tool-section">
+                    <div class="tool-header">
+                        📍 Navigation
+                    </div>
+                    <div class="compass"></div>
+                    <div class="tool-item">
+                        <strong>Current Route</strong><br>
+                        <small>Canopy Trail → Hidden Falls</small>
+                    </div>
+                    <div class="tool-item">
+                        <strong>Waypoints</strong><br>
+                        <small>7 marked, 3 discovered</small>
+                    </div>
+                </div>
+                
+                <div class="tool-section">
+                    <div class="tool-header">
+                        🔬 Discovery Log
+                    </div>
+                    <div class="tool-item">
+                        <strong>Species Found</strong><br>
+                        <small>23 cataloged today</small>
+                    </div>
+                    <div class="tool-item">
+                        <strong>Photo Gallery</strong><br>
+                        <small>156 expedition photos</small>
+                    </div>
+                </div>
+                
+                <div class="tool-section">
+                    <div class="tool-header">
+                        ⚡ Live Data
+                    </div>
+                    <div class="tool-item">
+                        <strong>Weather</strong><br>
+                        <small>🌧️ 78°F, Humid, Rain in 2hrs</small>
+                    </div>
+                    <div class="tool-item">
+                        <strong>Terrain Analysis</strong><br>
+                        <small>Moderate difficulty, muddy</small>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <header class="chat-header">
+                <h1 class="header-title">Jungle Explorer Command</h1>
+                <div class="location-info">
+                    <span class="coordinates">12.4°S, 69.0°W</span>
+                    <div class="weather">
+                        <span>🌡️ 78°F</span>
+                        <span>💧 85% Humidity</span>
+                        <span>🌿 Dense Canopy</span>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="chat-messages scrollbar-custom">
+                <div class="message ai">
+                    <div class="message-header">
+                        <span>🤖 Jungle AI</span>
+                        <span class="timestamp">08:23</span>
+                    </div>
+                    Good morning, Explorer! I've analyzed the terrain ahead. There's a 73% chance of discovering new species along the river bend. Weather conditions are optimal for the next 3 hours.
+                </div>
+                
+                <div class="message user">
+                    <div class="message-header">
+                        <span>📱 You</span>
+                        <span class="timestamp">08:25</span>
+                    </div>
+                    Perfect! Let's document everything we find. Starting with that unusual bird call I'm hearing.
+                </div>
+                
+                <div class="message discovery">
+                    <div class="message-header">
+                        <span>🔍 Discovery Alert</span>
+                        <span class="timestamp">08:31</span>
+                    </div>
+                    <strong>New Species Detected!</strong>
+                    <div class="discovery-card">
+                        <div class="species-info">
+                            <div class="species-image">🦜</div>
+                            <div class="species-details">
+                                <h4>Crimson-bellied Parakeet</h4>
+                                <p><em>Pyrrhura perlata</em></p>
+                                <p>Confidence: 94% • First sighting in this region</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message ai">
+                    <div class="message-header">
+                        <span>🗺️ Route Optimizer</span>
+                        <span class="timestamp">08:35</span>
+                    </div>
+                    Excellent find! I've updated your expedition route to include optimal bird watching spots. Here's the suggested path:
+                    <div class="expedition-route">
+                        <div class="route-points">
+                            <div class="route-point"></div>
+                            <div class="route-line"></div>
+                            <div class="route-point active"></div>
+                            <div class="route-line"></div>
+                            <div class="route-point"></div>
+                            <div class="route-line"></div>
+                            <div class="route-point"></div>
+                        </div>
+                        <small>River Bend → Bird Observatory → Hidden Falls → Base Camp</small>
+                    </div>
+                </div>
+                
+                <div class="message user">
+                    <div class="message-header">
+                        <span>📸 You</span>
+                        <span class="timestamp">08:42</span>
+                    </div>
+                    Got some amazing shots! The lighting through the canopy is incredible. Can you analyze the plant life in photo #47?
+                </div>
+                
+                <div class="message ai">
+                    <div class="message-header">
+                        <span>🌱 Flora Identifier</span>
+                        <span class="timestamp">08:43</span>
+                    </div>
+                    Analyzing photo #47... Identified: <strong>Cecropia Tree</strong> with symbiotic ant colonies. This is a keystone species! The ants provide protection while the tree provides shelter. Ecological significance: High.
+                </div>
+                
+                <div class="message danger-alert">
+                    <div class="message-header">
+                        <span>⚠️ Safety Alert</span>
+                        <span class="timestamp">09:15</span>
+                    </div>
+                    <strong>Weather Warning:</strong> Heavy rainfall approaching from the east. Recommend seeking shelter within 45 minutes. Flash flood risk: Moderate. Nearest shelter: 0.8km northeast.
+                </div>
+                
+                <div class="message user">
+                    <div class="message-header">
+                        <span>🎒 You</span>
+                        <span class="timestamp">09:17</span>
+                    </div>
+                    Thanks for the heads up! Adjusting route to the shelter. This has been an incredible morning of discoveries!
+                </div>
+                
+                <div class="message ai">
+                    <div class="message-header">
+                        <span>📊 Expedition Summary</span>
+                        <span class="timestamp">09:18</span>
+                    </div>
+                    Today's achievements: 4 new species documented, 23 photos cataloged, 2.3km explored, 1 ecological interaction recorded. Weather forced early conclusion, but highly successful expedition! 🌟
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <div class="input-container">
+                    <input type="text" class="message-input" placeholder="Document discovery, ask AI, or plan next expedition...">
+                    <div class="quick-actions">
+                        <button class="action-btn" title="Camera/Document">📷</button>
+                        <button class="action-btn" title="Location Share">📍</button>
+                        <button class="action-btn" title="Species ID">🔬</button>
+                        <button class="action-btn" title="Weather Check">🌤️</button>
+                        <button class="action-btn" title="Emergency">🚨</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Simulate real-time updates
+        const messages = document.querySelector('.chat-messages');
+        const input = document.querySelector('.message-input');
+        const actionBtns = document.querySelectorAll('.action-btn');
+        
+        // Auto-scroll to bottom
+        function scrollToBottom() {
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        // Simulate incoming messages
+        const explorerMessages = [
+            { type: 'ai', icon: '🌿', sender: 'Plant Identifier', text: 'New medicinal plant detected nearby. Botanical name: Uncaria tomentosa (Cat\'s Claw). Traditional uses: Immune system support.' },
+            { type: 'discovery', icon: '🔍', sender: 'Motion Sensor', text: 'Large animal movement detected 50m south. Possibly jaguar based on track patterns.' },
+            { type: 'ai', icon: '🗺️', sender: 'Terrain Analysis', text: 'Underground cave system mapped. 3 entrances found. Geological formation suggests rich mineral deposits.' }
+        ];
+        
+        let messageIndex = 0;
+        
+        function addRandomMessage() {
+            if (messageIndex < explorerMessages.length) {
+                const msg = explorerMessages[messageIndex];
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.type}`;
+                
+                const currentTime = new Date().toLocaleTimeString('en-US', { 
+                    hour12: false, 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <span>${msg.icon} ${msg.sender}</span>
+                        <span class="timestamp">${currentTime}</span>
+                    </div>
+                    ${msg.text}
+                `;
+                
+                messages.appendChild(messageDiv);
+                scrollToBottom();
+                messageIndex++;
+            }
+        }
+        
+        // Add messages at intervals
+        setInterval(addRandomMessage, 15000);
+        
+        // Handle input submission
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message user';
+                
+                const currentTime = new Date().toLocaleTimeString('en-US', { 
+                    hour12: false, 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <span>📱 You</span>
+                        <span class="timestamp">${currentTime}</span>
+                    </div>
+                    ${this.value}
+                `;
+                
+                messages.appendChild(messageDiv);
+                scrollToBottom();
+                this.value = '';
+                
+                // Simulate AI response
+                setTimeout(() => {
+                    const aiResponse = document.createElement('div');
+                    aiResponse.className = 'message ai';
+                    aiResponse.innerHTML = `
+                        <div class="message-header">
+                            <span>🤖 Jungle AI</span>
+                            <span class="timestamp">${new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                        Understood! I've noted your observation in the expedition log. Would you like me to cross-reference this with our species database?
+                    `;
+                    messages.appendChild(aiResponse);
+                    scrollToBottom();
+                }, 1500);
+            }
+        });
+        
+        // Action button handlers
+        actionBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const title = this.getAttribute('title');
+                const responses = {
+                    'Camera/Document': 'Photo captured and auto-tagged with GPS coordinates and timestamp.',
+                    'Location Share': 'Current location shared: Deep Jungle Sector 7, Elevation 847m',
+                    'Species ID': 'AI Species Identifier activated. Point camera at subject to analyze.',
+                    'Weather Check': 'Current: 78°F, Humid. Next 4 hours: Partly cloudy, light rain possible.',
+                    'Emergency': 'Emergency beacon activated. Nearest ranger station notified.'
+                };
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message ai';
+                
+                const currentTime = new Date().toLocaleTimeString('en-US', { 
+                    hour12: false, 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <span>🤖 System</span>
+                        <span class="timestamp">${currentTime}</span>
+                    </div>
+                    ${responses[title]}
+                `;
+                
+                messages.appendChild(messageDiv);
+                scrollToBottom();
+            });
+        });
+        
+        // Update coordinates periodically to simulate movement
+        const coordinatesEl = document.querySelector('.coordinates');
+        let lat = -12.4;
+        let lng = -69.0;
+        
+        setInterval(() => {
+            lat += (Math.random() - 0.5) * 0.001;
+            lng += (Math.random() - 0.5) * 0.001;
+            coordinatesEl.textContent = `${lat.toFixed(3)}°S, ${Math.abs(lng).toFixed(3)}°W`;
+        }, 30000);
+        
+        // Initial scroll to bottom
+        scrollToBottom();
+    </script>
+</body>
+</html>

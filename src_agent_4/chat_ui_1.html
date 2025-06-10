@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero Command Center - Cyberpunk Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #00ffff;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+        
+        /* Cyberpunk Grid Background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridPulse 4s ease-in-out infinite alternate;
+        }
+        
+        @keyframes gridPulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.6; }
+        }
+        
+        /* Main Container */
+        .hero-interface {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            grid-template-rows: 80px 1fr 100px;
+            height: 100vh;
+            gap: 2px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Header Bar */
+        .header-bar {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 100%);
+            border-bottom: 2px solid #00ffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+        }
+        
+        .hero-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 24px;
+            font-weight: 900;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; }
+            100% { text-shadow: 0 0 20px #00ffff, 0 0 30px #00ffff, 0 0 40px #ff00ff; }
+        }
+        
+        .hero-status {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ffff;
+            border-radius: 20px;
+            font-size: 14px;
+            animation: statusPulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes statusPulse {
+            0%, 100% { border-color: #00ffff; box-shadow: 0 0 10px rgba(0, 255, 255, 0.3); }
+            50% { border-color: #ff00ff; box-shadow: 0 0 15px rgba(255, 0, 255, 0.5); }
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: dotPulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes dotPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        /* Side Panels */
+        .team-panel, .mission-panel {
+            background: linear-gradient(180deg, rgba(0, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .panel-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: #ff00ff;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px #ff00ff;
+            border-bottom: 1px solid #ff00ff;
+            padding-bottom: 10px;
+        }
+        
+        .team-member, .mission-item {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .team-member:hover, .mission-item:hover {
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            transform: translateX(5px);
+        }
+        
+        .member-name, .mission-title {
+            font-weight: 700;
+            color: #00ffff;
+            margin-bottom: 8px;
+        }
+        
+        .member-status, .mission-status {
+            font-size: 12px;
+            color: #ff00ff;
+            margin-bottom: 5px;
+        }
+        
+        .ability-bar, .progress-bar {
+            height: 6px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .ability-fill, .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            border-radius: 3px;
+            animation: barGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes barGlow {
+            0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
+            100% { box-shadow: 0 0 15px rgba(255, 0, 255, 0.8); }
+        }
+        
+        /* Main Chat Area */
+        .main-chat {
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(26, 26, 46, 0.8) 100%);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 100%);
+            padding: 20px;
+            border-bottom: 1px solid #00ffff;
+            text-align: center;
+        }
+        
+        .chat-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: radial-gradient(circle at center, rgba(0, 255, 255, 0.05) 0%, transparent 70%);
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            animation: messageSlide 0.5s ease-out;
+        }
+        
+        @keyframes messageSlide {
+            0% { opacity: 0; transform: translateX(-20px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        
+        .message.hero {
+            flex-direction: row-reverse;
+        }
+        
+        .message.hero .message-content {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(255, 0, 255, 0.2) 100%);
+            border: 1px solid #00ffff;
+        }
+        
+        .message-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00ffff, #ff00ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            animation: avatarPulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes avatarPulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(255, 0, 255, 0.8); }
+        }
+        
+        .message-content {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            position: relative;
+        }
+        
+        .message-sender {
+            font-weight: 700;
+            color: #ff00ff;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .message-text {
+            color: #00ffff;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            color: rgba(0, 255, 255, 0.6);
+            text-align: right;
+        }
+        
+        .message-type {
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        /* Input Area */
+        .input-area {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 100%);
+            border-top: 2px solid #00ffff;
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .input-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        .message-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 15px 20px;
+            color: #00ffff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .message-input:focus {
+            border-color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+        
+        .message-input::placeholder {
+            color: rgba(0, 255, 255, 0.5);
+        }
+        
+        .send-button, .voice-button, .scan-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #00ffff;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(255, 0, 255, 0.2) 100%);
+            color: #00ffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .send-button:hover, .voice-button:hover, .scan-button:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.4) 0%, rgba(255, 0, 255, 0.4) 100%);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+        
+        /* Holographic Effects */
+        .hologram-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hologram-effect::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            animation: holoScan 3s linear infinite;
+        }
+        
+        @keyframes holoScan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Scan Lines Effect */
+        .scan-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 255, 0.03) 2px,
+                rgba(0, 255, 255, 0.03) 4px
+            );
+            pointer-events: none;
+            animation: scanMove 0.1s linear infinite;
+        }
+        
+        @keyframes scanMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .hero-interface {
+                grid-template-columns: 250px 1fr 280px;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .hero-interface {
+                grid-template-columns: 1fr;
+                grid-template-rows: 80px 200px 1fr 100px;
+            }
+            
+            .team-panel {
+                grid-row: 2;
+            }
+            
+            .mission-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-interface">
+        <!-- Header Bar -->
+        <div class="header-bar">
+            <div class="hero-title">NEXUS COMMAND</div>
+            <div class="hero-status">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>ACTIVE</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot" style="background: #ff00ff;"></div>
+                    <span>SECURE</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot" style="background: #ffff00;"></div>
+                    <span>MISSION READY</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Team Panel -->
+        <div class="team-panel hologram-effect">
+            <div class="panel-title">TEAM STATUS</div>
+            <div class="team-member">
+                <div class="member-name">CIPHER</div>
+                <div class="member-status">Hacker • Online</div>
+                <div>Skills: Infiltration, Data Mining</div>
+                <div class="ability-bar">
+                    <div class="ability-fill" style="width: 95%;"></div>
+                </div>
+            </div>
+            <div class="team-member">
+                <div class="member-name">NOVA</div>
+                <div class="member-status">Enforcer • Field Active</div>
+                <div>Skills: Combat, Tactics</div>
+                <div class="ability-bar">
+                    <div class="ability-fill" style="width: 87%;"></div>
+                </div>
+            </div>
+            <div class="team-member">
+                <div class="member-name">ECHO</div>
+                <div class="member-status">Support • Standby</div>
+                <div>Skills: Medic, Tech Support</div>
+                <div class="ability-bar">
+                    <div class="ability-fill" style="width: 78%;"></div>
+                </div>
+            </div>
+            <div class="team-member">
+                <div class="member-name">WRAITH</div>
+                <div class="member-status">Scout • Reconnaissance</div>
+                <div>Skills: Stealth, Intel</div>
+                <div class="ability-bar">
+                    <div class="ability-fill" style="width: 92%;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Chat Area -->
+        <div class="main-chat">
+            <div class="scan-lines"></div>
+            <div class="chat-header">
+                <div class="chat-title">SECURE COMMUNICATIONS</div>
+            </div>
+            <div class="chat-messages">
+                <div class="message">
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content">
+                        <div class="message-type">SYSTEM</div>
+                        <div class="message-sender">NEXUS AI</div>
+                        <div class="message-text">Welcome to the command center, Commander. All systems are operational and team members are standing by.</div>
+                        <div class="message-time">14:32</div>
+                    </div>
+                </div>
+                
+                <div class="message">
+                    <div class="message-avatar">C</div>
+                    <div class="message-content">
+                        <div class="message-type">INTEL</div>
+                        <div class="message-sender">CIPHER</div>
+                        <div class="message-text">I've successfully infiltrated their network. Found some interesting data on Project Lazarus. Uploading encrypted files now.</div>
+                        <div class="message-time">14:35</div>
+                    </div>
+                </div>
+                
+                <div class="message hero">
+                    <div class="message-avatar">H</div>
+                    <div class="message-content">
+                        <div class="message-type">COMMAND</div>
+                        <div class="message-sender">HERO</div>
+                        <div class="message-text">Excellent work, Cipher. Nova, what's your current position? We need to move on the facility before they realize we're onto them.</div>
+                        <div class="message-time">14:36</div>
+                    </div>
+                </div>
+                
+                <div class="message">
+                    <div class="message-avatar">N</div>
+                    <div class="message-content">
+                        <div class="message-type">TACTICAL</div>
+                        <div class="message-sender">NOVA</div>
+                        <div class="message-text">Two clicks out from the target. Security seems light, but something feels off. Recommend proceeding with caution.</div>
+                        <div class="message-time">14:38</div>
+                    </div>
+                </div>
+                
+                <div class="message">
+                    <div class="message-avatar">W</div>
+                    <div class="message-content">
+                        <div class="message-type">RECON</div>
+                        <div class="message-sender">WRAITH</div>
+                        <div class="message-text">Confirming Nova's assessment. Thermal scans show unusual heat signatures in the lower levels. Could be a trap.</div>
+                        <div class="message-time">14:39</div>
+                    </div>
+                </div>
+                
+                <div class="message hero">
+                    <div class="message-avatar">H</div>
+                    <div class="message-content">
+                        <div class="message-type">COMMAND</div>
+                        <div class="message-sender">HERO</div>
+                        <div class="message-text">Copy that. Echo, prep the extraction protocol. We're going in, but I want an exit strategy ready. This mission is too important to fail.</div>
+                        <div class="message-time">14:41</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mission Panel -->
+        <div class="mission-panel hologram-effect">
+            <div class="panel-title">ACTIVE MISSIONS</div>
+            <div class="mission-item">
+                <div class="mission-title">PROJECT LAZARUS</div>
+                <div class="mission-status">Priority: CRITICAL</div>
+                <div style="font-size: 12px; color: #00ffff; margin: 8px 0;">Infiltrate and extract classified data</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 73%;"></div>
+                </div>
+            </div>
+            <div class="mission-item">
+                <div class="mission-title">SECURE PERIMETER</div>
+                <div class="mission-status">Priority: HIGH</div>
+                <div style="font-size: 12px; color: #00ffff; margin: 8px 0;">Establish safe extraction route</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 45%;"></div>
+                </div>
+            </div>
+            <div class="mission-item">
+                <div class="mission-title">INTEL ANALYSIS</div>
+                <div class="mission-status">Priority: MEDIUM</div>
+                <div style="font-size: 12px; color: #00ffff; margin: 8px 0;">Process and verify stolen data</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 28%;"></div>
+                </div>
+            </div>
+            <div class="mission-item">
+                <div class="mission-title">THREAT ASSESSMENT</div>
+                <div class="mission-status">Priority: ONGOING</div>
+                <div style="font-size: 12px; color: #00ffff; margin: 8px 0;">Monitor enemy activity</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 89%;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Input Area -->
+        <div class="input-area">
+            <div class="input-container">
+                <input type="text" class="message-input" placeholder="Enter secure command or message...">
+            </div>
+            <button class="voice-button" title="Voice Command">🎤</button>
+            <button class="scan-button" title="Tactical Scan">📡</button>
+            <button class="send-button" title="Send Message">⚡</button>
+        </div>
+    </div>
+    
+    <script>
+        // Add interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageInput = document.querySelector('.message-input');
+            const sendButton = document.querySelector('.send-button');
+            const voiceButton = document.querySelector('.voice-button');
+            const scanButton = document.querySelector('.scan-button');
+            const messagesContainer = document.querySelector('.chat-messages');
+            
+            // Send message functionality
+            function sendMessage() {
+                const text = messageInput.value.trim();
+                if (text) {
+                    const message = createMessage('HERO', 'H', text, 'COMMAND');
+                    messagesContainer.appendChild(message);
+                    messageInput.value = '';
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    
+                    // Simulate AI response
+                    setTimeout(() => {
+                        const responses = [
+                            'Command received. Executing protocol.',
+                            'Analyzing tactical situation...',
+                            'Mission parameters updated.',
+                            'Team notified of new objectives.',
+                            'Threat assessment in progress.'
+                        ];
+                        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                        const aiMessage = createMessage('NEXUS AI', 'AI', randomResponse, 'SYSTEM');
+                        messagesContainer.appendChild(aiMessage);
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }, 1500);
+                }
+            }
+            
+            function createMessage(sender, avatar, text, type) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message' + (sender === 'HERO' ? ' hero' : '');
+                
+                const time = new Date().toLocaleTimeString('en-US', { 
+                    hour12: false, 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">${avatar}</div>
+                    <div class="message-content">
+                        <div class="message-type">${type}</div>
+                        <div class="message-sender">${sender}</div>
+                        <div class="message-text">${text}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+                
+                return messageDiv;
+            }
+            
+            // Event listeners
+            sendButton.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            voiceButton.addEventListener('click', function() {
+                this.style.background = 'linear-gradient(135deg, rgba(255, 0, 255, 0.4) 0%, rgba(0, 255, 255, 0.4) 100%)';
+                setTimeout(() => {
+                    this.style.background = 'linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(255, 0, 255, 0.2) 100%)';
+                }, 200);
+                
+                // Simulate voice command
+                const voiceCommands = [
+                    'Initiating voice recognition...',
+                    'Voice command received.',
+                    'Processing audio input...'
+                ];
+                const command = voiceCommands[Math.floor(Math.random() * voiceCommands.length)];
+                const voiceMessage = createMessage('NEXUS AI', 'AI', command, 'VOICE');
+                messagesContainer.appendChild(voiceMessage);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            });
+            
+            scanButton.addEventListener('click', function() {
+                this.style.background = 'linear-gradient(135deg, rgba(255, 255, 0, 0.4) 0%, rgba(0, 255, 255, 0.4) 100%)';
+                setTimeout(() => {
+                    this.style.background = 'linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(255, 0, 255, 0.2) 100%)';
+                }, 200);
+                
+                // Simulate tactical scan
+                const scanResults = [
+                    'Tactical scan initiated. Analyzing environment...',
+                    'Threat level: Moderate. 3 hostiles detected.',
+                    'Environmental scan complete. No hazards found.',
+                    'Scanning for electronic signatures...'
+                ];
+                const result = scanResults[Math.floor(Math.random() * scanResults.length)];
+                const scanMessage = createMessage('NEXUS AI', 'AI', result, 'SCAN');
+                messagesContainer.appendChild(scanMessage);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            });
+            
+            // Simulate periodic updates
+            setInterval(() => {
+                const updates = [
+                    { sender: 'CIPHER', avatar: 'C', text: 'Network surveillance active. No intrusions detected.', type: 'SECURITY' },
+                    { sender: 'NOVA', avatar: 'N', text: 'Perimeter secure. All access points monitored.', type: 'TACTICAL' },
+                    { sender: 'ECHO', avatar: 'E', text: 'Medical bay ready. All equipment operational.', type: 'SUPPORT' },
+                    { sender: 'WRAITH', avatar: 'W', text: 'Long-range sensors detecting movement. Investigating.', type: 'RECON' }
+                ];
+                
+                if (Math.random() < 0.3) { // 30% chance every interval
+                    const update = updates[Math.floor(Math.random() * updates.length)];
+                    const updateMessage = createMessage(update.sender, update.avatar, update.text, update.type);
+                    messagesContainer.appendChild(updateMessage);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            }, 15000); // Every 15 seconds
+        });
+    </script>
+</body>
+</html>

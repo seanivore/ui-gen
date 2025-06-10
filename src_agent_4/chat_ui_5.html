@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Jester's Comedy Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3);
+            background-size: 300% 300%;
+            animation: rainbowShift 8s ease infinite;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @keyframes rainbowShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 0 20px 20px 0;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transform: translateX(-10px);
+            animation: slideInBounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes slideInBounce {
+            0% { transform: translateX(-300px); }
+            70% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+
+        .jester-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            animation: jesterBounce 2s ease-in-out infinite;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .jester-avatar:hover {
+            transform: scale(1.2) rotate(15deg);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.5);
+        }
+
+        @keyframes jesterBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(5deg); }
+            75% { transform: translateY(-5px) rotate(-3deg); }
+        }
+
+        .mode-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            padding: 12px 8px;
+            border: none;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .mode-btn.comedy { background: linear-gradient(45deg, #ff6b6b, #ff9ff3); color: white; }
+        .mode-btn.prank { background: linear-gradient(45deg, #feca57, #ff9068); color: white; }
+        .mode-btn.entertainment { background: linear-gradient(45deg, #4ecdc4, #96ceb4); color: white; }
+        .mode-btn.mood { background: linear-gradient(45deg, #45b7d1, #a8e6cf); color: white; }
+
+        .mode-btn:hover {
+            transform: scale(1.1) rotate(3deg);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .mode-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+            animation: activeGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes activeGlow {
+            0% { box-shadow: 0 0 20px rgba(255, 107, 107, 0.6); }
+            100% { box-shadow: 0 0 30px rgba(255, 107, 107, 0.9); }
+        }
+
+        .joke-of-day {
+            background: linear-gradient(135deg, #feca57, #ff9068);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            animation: jokeWiggle 3s ease-in-out infinite;
+        }
+
+        @keyframes jokeWiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(1deg); }
+            75% { transform: rotate(-1deg); }
+        }
+
+        .joke-text {
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.9);
+            margin: 20px;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            animation: chatSlideIn 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes chatSlideIn {
+            0% { transform: translateY(50px) scale(0.9); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .chat-header {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #feca57);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: titleBounce 1s ease-out;
+        }
+
+        @keyframes titleBounce {
+            0% { transform: translateY(-30px); opacity: 0; }
+            60% { transform: translateY(5px); }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            animation: messageSlideIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: left center;
+        }
+
+        @keyframes messageSlideIn {
+            0% { transform: translateX(-50px) scale(0.8); opacity: 0; }
+            70% { transform: translateX(5px) scale(1.05); }
+            100% { transform: translateX(0) scale(1); opacity: 1; }
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(45deg, #ff6b6b, #ff9ff3);
+            margin-left: auto;
+        }
+
+        .message-bubble {
+            display: inline-block;
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #4ecdc4, #96ceb4);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .message-bubble:hover {
+            transform: scale(1.05) rotate(1deg);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .message-emoji {
+            font-size: 24px;
+            margin: 0 5px;
+            display: inline-block;
+            animation: emojiDance 2s ease-in-out infinite;
+        }
+
+        @keyframes emojiDance {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(10deg) scale(1.1); }
+            75% { transform: rotate(-10deg) scale(0.9); }
+        }
+
+        .input-container {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-top: 3px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+        }
+
+        .input-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #feca57);
+            animation: borderRainbow 3s linear infinite;
+        }
+
+        @keyframes borderRainbow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 3px solid transparent;
+            border-radius: 25px;
+            font-size: 16px;
+            font-family: inherit;
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(45deg, #ff6b6b, #4ecdc4) border-box;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .message-input:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .send-btn, .surprise-btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .send-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff9ff3);
+            color: white;
+        }
+
+        .surprise-btn {
+            background: linear-gradient(45deg, #feca57, #ff9068);
+            color: white;
+        }
+
+        .send-btn:hover, .surprise-btn:hover {
+            transform: scale(1.2) rotate(15deg);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .floating-emoji {
+            position: absolute;
+            font-size: 30px;
+            pointer-events: none;
+            animation: floatUp 3s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-200px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .prank-tools {
+            display: none;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .prank-tools.active {
+            display: grid;
+        }
+
+        .prank-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            background: linear-gradient(45deg, #feca57, #ff9068);
+            color: white;
+        }
+
+        .prank-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .mood-meter {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .mood-bar {
+            height: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #feca57);
+            border-radius: 10px;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mood-indicator {
+            position: absolute;
+            top: 0;
+            left: 75%;
+            width: 6px;
+            height: 100%;
+            background: white;
+            border-radius: 3px;
+            animation: moodPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes moodPulse {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.2); }
+        }
+
+        .ai-suggestions {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            border: 2px dashed #ff6b6b;
+        }
+
+        .ai-suggestions.active {
+            display: block;
+            animation: suggestionBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes suggestionBounce {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .suggestion-btn {
+            display: block;
+            width: 100%;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #45b7d1, #a8e6cf);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-btn:hover {
+            transform: translateX(10px) scale(1.05);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-radius: 0;
+                height: auto;
+            }
+            
+            .main-chat {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .mode-buttons {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="jester-avatar" onclick="triggerSurprise()">🤡</div>
+            
+            <div class="mode-buttons">
+                <button class="mode-btn comedy active" onclick="switchMode('comedy')">Comedy</button>
+                <button class="mode-btn prank" onclick="switchMode('prank')">Pranks</button>
+                <button class="mode-btn entertainment" onclick="switchMode('entertainment')">Fun</button>
+                <button class="mode-btn mood" onclick="switchMode('mood')">Mood</button>
+            </div>
+
+            <div class="joke-of-day">
+                <div class="joke-text" id="jokeText">
+                    Why don't scientists trust atoms? Because they make up everything! 😂
+                </div>
+            </div>
+
+            <div class="mood-meter">
+                <h4 style="color: #333; margin-bottom: 10px;">Fun Level</h4>
+                <div class="mood-bar">
+                    <div class="mood-indicator"></div>
+                </div>
+                <small style="color: #666;">Laughing Level: Hysterical! 😂</small>
+            </div>
+
+            <div class="prank-tools" id="prankTools">
+                <button class="prank-btn" onclick="sendPrankMessage('🎉 SURPRISE! You\'ve been pranked!')">Surprise</button>
+                <button class="prank-btn" onclick="sendPrankMessage('🤔 Did you know gullible isn\'t in the dictionary?')">Gullible</button>
+                <button class="prank-btn" onclick="triggerConfetti()">Confetti</button>
+                <button class="prank-btn" onclick="sendPrankMessage('🔄 Your screen has been flipped... just kidding!')">Flip</button>
+            </div>
+        </div>
+
+        <div class="main-chat">
+            <div class="chat-header">
+                <div class="chat-title" id="chatTitle">The Jester's Comedy Hub 🎭</div>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <div class="message">
+                    <div class="message-bubble">
+                        Welcome to the Comedy Hub! <span class="message-emoji">🎪</span> Ready for some laughs?
+                    </div>
+                </div>
+                
+                <div class="message user">
+                    <div class="message-bubble">
+                        I need a good laugh today! <span class="message-emoji">😄</span>
+                    </div>
+                </div>
+                
+                <div class="message">
+                    <div class="message-bubble">
+                        Perfect! Here's one: Why did the scarecrow win an award? <span class="message-emoji">🏆</span>
+                    </div>
+                </div>
+                
+                <div class="message user">
+                    <div class="message-bubble">
+                        I don't know, why? <span class="message-emoji">🤔</span>
+                    </div>
+                </div>
+                
+                <div class="message">
+                    <div class="message-bubble">
+                        Because he was outstanding in his field! <span class="message-emoji">🌾</span><span class="message-emoji">😂</span>
+                    </div>
+                </div>
+
+                <div class="message user">
+                    <div class="message-bubble">
+                        That's terrible... but I love it! <span class="message-emoji">🤣</span>
+                    </div>
+                </div>
+
+                <div class="message">
+                    <div class="message-bubble">
+                        Want to plan a harmless prank for your friends? I've got some mischievous ideas! <span class="message-emoji">😈</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-suggestions" id="aiSuggestions">
+                <h4 style="color: #333; margin-bottom: 10px;">AI Comedy Suggestions:</h4>
+                <button class="suggestion-btn" onclick="useSuggestion('Tell me a dad joke')">Tell me a dad joke</button>
+                <button class="suggestion-btn" onclick="useSuggestion('Share a funny meme')">Share a funny meme</button>
+                <button class="suggestion-btn" onclick="useSuggestion('Plan a harmless prank')">Plan a harmless prank</button>
+                <button class="suggestion-btn" onclick="useSuggestion('Cheer me up!')">Cheer me up!</button>
+            </div>
+
+            <div class="input-container">
+                <div class="input-row">
+                    <input type="text" class="message-input" id="messageInput" 
+                           placeholder="Share a joke, plan mischief, or spread joy..." 
+                           onkeypress="handleKeyPress(event)">
+                    <button class="surprise-btn" onclick="triggerAISuggestions()" title="AI Comedy Helper">🎯</button>
+                    <button class="send-btn" onclick="sendMessage()" title="Send Message">🚀</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'comedy';
+        let messageCount = 0;
+        
+        const jokes = [
+            "Why don't scientists trust atoms? Because they make up everything! 😂",
+            "I told my wife she was drawing her eyebrows too high. She looked surprised! 🤨",
+            "Why don't eggs tell jokes? They'd crack each other up! 🥚",
+            "What do you call a bear with no teeth? A gummy bear! 🐻",
+            "Why did the math book look so sad? Because it had too many problems! 📚"
+        ];
+
+        const prankIdeas = [
+            "🎈 Fill someone's office with balloons while they're away!",
+            "📱 Change their phone wallpaper to a funny selfie of you!",
+            "🖱️ Put tape under their computer mouse!",
+            "🍫 Replace cookies with vegetable crackers (temporarily)!",
+            "📺 Change TV channels using universal remote from another room!"
+        ];
+
+        const moodBoosters = [
+            "🌟 You're amazing just the way you are!",
+            "😊 Your smile could light up the whole room!",
+            "🚀 Today is your day to shine bright!",
+            "🌈 You bring color to everyone's world!",
+            "⭐ You're the star of your own story!"
+        ];
+
+        function switchMode(mode) {
+            // Update active button
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.mode-btn.${mode}`).classList.add('active');
+            
+            currentMode = mode;
+            
+            // Update chat title and show/hide tools
+            const titles = {
+                comedy: "The Jester's Comedy Hub 🎭",
+                prank: "Mischief Planning Center 😈",
+                entertainment: "Entertainment Station 🎪",
+                mood: "Mood Lifting Chamber ☀️"
+            };
+            
+            document.getElementById('chatTitle').textContent = titles[mode];
+            
+            // Show/hide prank tools
+            const prankTools = document.getElementById('prankTools');
+            if (mode === 'prank') {
+                prankTools.classList.add('active');
+            } else {
+                prankTools.classList.remove('active');
+            }
+            
+            // Add mode-specific message
+            const modeMessages = {
+                comedy: "Let's share some laughs! 😂",
+                prank: "Time for some harmless mischief! 😈",
+                entertainment: "What kind of fun are we having today? 🎪",
+                mood: "Let's brighten your day! ☀️"
+            };
+            
+            addBotMessage(modeMessages[mode]);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addUserMessage(message);
+                input.value = '';
+                
+                // Generate AI response based on current mode
+                setTimeout(() => {
+                    generateAIResponse(message);
+                }, 1000 + Math.random() * 1000);
+            }
+        }
+
+        function addUserMessage(message) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user';
+            
+            const emojis = ['😄', '🤣', '😂', '😊', '🎉', '✨'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    ${message} <span class="message-emoji">${randomEmoji}</span>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Create floating emoji
+            createFloatingEmoji(randomEmoji);
+            messageCount++;
+        }
+
+        function addBotMessage(message) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            const emojis = ['🤡', '🎭', '🎪', '✨', '🌟', '🎈'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    ${message} <span class="message-emoji">${randomEmoji}</span>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function generateAIResponse(userMessage) {
+            let responses = [];
+            
+            switch(currentMode) {
+                case 'comedy':
+                    responses = [
+                        "Here's a joke for you: " + jokes[Math.floor(Math.random() * jokes.length)],
+                        "That reminds me of a funny story... 😄",
+                        "You know what's funny? Life! But seriously, here's a joke...",
+                        "Comedy gold coming right up! ✨"
+                    ];
+                    break;
+                case 'prank':
+                    responses = [
+                        prankIdeas[Math.floor(Math.random() * prankIdeas.length)],
+                        "Ooh, mischievous! Here's what we could do... 😈",
+                        "I love a good harmless prank! How about this...",
+                        "Prank level: Expert! Ready for this idea?"
+                    ];
+                    break;
+                case 'entertainment':
+                    responses = [
+                        "Let's watch some funny videos together! 📺",
+                        "Have you seen the latest memes? They're hilarious! 🤣",
+                        "Time for some entertainment magic! ✨",
+                        "I've got the perfect thing to make you smile! 😊"
+                    ];
+                    break;
+                case 'mood':
+                    responses = [
+                        moodBoosters[Math.floor(Math.random() * moodBoosters.length)],
+                        "You're absolutely wonderful! Keep shining! ✨",
+                        "Here's a virtual hug and some positive vibes! 🤗",
+                        "Your day is about to get so much better! 🌈"
+                    ];
+                    break;
+            }
+            
+            const response = responses[Math.floor(Math.random() * responses.length)];
+            addBotMessage(response);
+        }
+
+        function sendPrankMessage(prankText) {
+            addBotMessage(prankText);
+            triggerSurprise();
+        }
+
+        function triggerSurprise() {
+            // Change joke of the day
+            const jokeElement = document.getElementById('jokeText');
+            const newJoke = jokes[Math.floor(Math.random() * jokes.length)];
+            jokeElement.textContent = newJoke;
+            
+            // Create multiple floating emojis
+            const surpriseEmojis = ['🎉', '🎊', '✨', '🎈', '🌟', '💫'];
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createFloatingEmoji(surpriseEmojis[Math.floor(Math.random() * surpriseEmojis.length)]);
+                }, i * 200);
+            }
+            
+            // Play sound effect (visual representation)
+            addBotMessage("🎺 *SURPRISE SOUND EFFECT* 🎺");
+        }
+
+        function triggerConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 50);
+            }
+            
+            addBotMessage("🎊 CONFETTI EXPLOSION! 🎊");
+        }
+
+        function createFloatingEmoji(emoji) {
+            const floatingEmoji = document.createElement('div');
+            floatingEmoji.className = 'floating-emoji';
+            floatingEmoji.textContent = emoji;
+            floatingEmoji.style.left = Math.random() * 80 + 10 + '%';
+            floatingEmoji.style.animationDelay = Math.random() * 1 + 's';
+            document.body.appendChild(floatingEmoji);
+            
+            setTimeout(() => {
+                floatingEmoji.remove();
+            }, 3000);
+        }
+
+        function triggerAISuggestions() {
+            const suggestions = document.getElementById('aiSuggestions');
+            suggestions.classList.toggle('active');
+        }
+
+        function useSuggestion(suggestion) {
+            document.getElementById('messageInput').value = suggestion;
+            document.getElementById('aiSuggestions').classList.remove('active');
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Random surprise events
+        setInterval(() => {
+            if (Math.random() < 0.1) { // 10% chance every 5 seconds
+                const surprises = [
+                    () => createFloatingEmoji('✨'),
+                    () => addBotMessage("Random joke incoming! Why did the cookie go to the doctor? It felt crumbly! 🍪"),
+                    () => {
+                        const jester = document.querySelector('.jester-avatar');
+                        jester.style.transform = 'scale(1.2) rotate(360deg)';
+                        setTimeout(() => {
+                            jester.style.transform = '';
+                        }, 1000);
+                    }
+                ];
+                
+                const randomSurprise = surprises[Math.floor(Math.random() * surprises.length)];
+                randomSurprise();
+            }
+        }, 5000);
+
+        // Initialize with a welcome message
+        setTimeout(() => {
+            addBotMessage("Welcome to the ultimate comedy experience! I'm your AI jester, ready to make you laugh, plan harmless pranks, and lift your spirits! What's your pleasure today? 🎭");
+        }, 1000);
+    </script>
+</body>
+</html>

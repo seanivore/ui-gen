@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Artist - Neon Creative Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --neon-pink: #ff0080;
+            --neon-blue: #00ffff;
+            --neon-purple: #8000ff;
+            --neon-yellow: #ffff00;
+            --neon-green: #00ff80;
+            --electric-orange: #ff4000;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --glow-intensity: 0 0 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: radial-gradient(circle at 20% 50%, var(--neon-purple) 0%, transparent 50%), 
+                        radial-gradient(circle at 80% 20%, var(--neon-pink) 0%, transparent 50%), 
+                        radial-gradient(circle at 40% 80%, var(--neon-blue) 0%, transparent 50%), 
+                        var(--dark-bg);
+            background-attachment: fixed;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            grid-template-rows: 70px 1fr;
+            height: 100vh;
+            gap: 2px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .neon-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(45deg, rgba(255, 0, 128, 0.1), rgba(0, 255, 255, 0.1));
+            border-bottom: 2px solid var(--neon-pink);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .neon-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 0, 128, 0.1), transparent);
+            animation: headerGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes headerGlow {
+            0%, 100% { transform: translateX(-100%) rotate(0deg); }
+            50% { transform: translateX(100%) rotate(180deg); }
+        }
+
+        .app-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--neon-pink);
+            text-shadow: var(--glow-intensity) var(--neon-pink);
+            z-index: 2;
+            position: relative;
+        }
+
+        .mood-indicator {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            z-index: 2;
+            position: relative;
+        }
+
+        .mood-orb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        .mood-creative { background: var(--neon-purple); box-shadow: var(--glow-intensity) var(--neon-purple); }
+        .mood-inspired { background: var(--neon-yellow); box-shadow: var(--glow-intensity) var(--neon-yellow); }
+        .mood-trending { background: var(--neon-green); box-shadow: var(--glow-intensity) var(--neon-green); }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .sidebar {
+            background: rgba(0, 0, 0, 0.6);
+            border-right: 1px solid var(--neon-blue);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-shadow: var(--glow-intensity) var(--neon-blue);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .collab-room {
+            background: rgba(255, 0, 128, 0.1);
+            border: 1px solid var(--neon-pink);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .collab-room::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 128, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .collab-room:hover::before {
+            left: 100%;
+        }
+
+        .collab-room:hover {
+            box-shadow: var(--glow-intensity) var(--neon-pink);
+            transform: scale(1.02);
+        }
+
+        .room-name {
+            font-weight: 600;
+            color: var(--neon-pink);
+            margin-bottom: 4px;
+        }
+
+        .room-members {
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .trend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            margin-bottom: 8px;
+            background: rgba(0, 255, 255, 0.1);
+            border-left: 3px solid var(--neon-blue);
+            border-radius: 4px;
+        }
+
+        .trend-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            box-shadow: var(--glow-intensity) var(--neon-blue);
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .main-workspace {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workspace-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid var(--neon-purple);
+        }
+
+        .workspace-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-right: 1px solid rgba(128, 0, 255, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .workspace-tab.active {
+            background: rgba(128, 0, 255, 0.2);
+            color: var(--neon-purple);
+            text-shadow: var(--glow-intensity) var(--neon-purple);
+        }
+
+        .workspace-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--neon-purple);
+            box-shadow: var(--glow-intensity) var(--neon-purple);
+        }
+
+        .workspace-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .canvas-area {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px dashed var(--neon-purple);
+            border-radius: 12px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-area::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink), var(--neon-blue), var(--neon-purple));
+            z-index: -1;
+            border-radius: 12px;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .canvas-placeholder {
+            font-family: 'Orbitron', monospace;
+            font-size: 18px;
+            color: var(--neon-purple);
+            text-shadow: var(--glow-intensity) var(--neon-purple);
+            animation: flicker 2s ease-in-out infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .chat-messages {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--neon-green);
+            border-radius: 8px;
+            height: 250px;
+            overflow-y: auto;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            animation: messageGlow 0.5s ease-out;
+        }
+
+        @keyframes messageGlow {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .message-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+            box-shadow: var(--glow-intensity) var(--neon-pink);
+        }
+
+        .message-author {
+            font-weight: 600;
+            color: var(--neon-green);
+            text-shadow: var(--glow-intensity) var(--neon-green);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .message-content {
+            color: #fff;
+            line-height: 1.4;
+        }
+
+        .inspiration-panel {
+            background: rgba(0, 0, 0, 0.6);
+            border-left: 1px solid var(--neon-yellow);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .inspiration-feed {
+            margin-bottom: 30px;
+        }
+
+        .inspiration-item {
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid var(--neon-yellow);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .inspiration-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-yellow), var(--electric-orange), var(--neon-yellow));
+            animation: inspirationFlow 2s ease-in-out infinite;
+        }
+
+        @keyframes inspirationFlow {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .inspiration-title {
+            font-weight: 700;
+            color: var(--neon-yellow);
+            text-shadow: var(--glow-intensity) var(--neon-yellow);
+            margin-bottom: 8px;
+        }
+
+        .inspiration-desc {
+            font-size: 14px;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .color-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.2);
+            box-shadow: var(--glow-intensity) currentColor;
+        }
+
+        .input-area {
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 1px solid var(--neon-green);
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--neon-green);
+            border-radius: 20px;
+            padding: 10px 15px;
+            color: #fff;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            box-shadow: var(--glow-intensity) var(--neon-green);
+            border-color: var(--neon-green);
+        }
+
+        .send-btn {
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            color: #000;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: var(--glow-intensity) var(--neon-green);
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 0 30px var(--neon-green);
+        }
+
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            box-shadow: var(--glow-intensity) var(--neon-blue);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(50px) rotate(360deg); opacity: 0; }
+        }
+
+        .ai-assistant {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, var(--neon-purple), var(--neon-pink));
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--glow-intensity) var(--neon-purple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            animation: aiPulse 3s ease-in-out infinite;
+            z-index: 1000;
+        }
+
+        @keyframes aiPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); box-shadow: 0 0 40px var(--neon-purple); }
+        }
+
+        /* Portfolio Gallery Styles */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .portfolio-item {
+            aspect-ratio: 1;
+            background: linear-gradient(45deg, rgba(255, 0, 128, 0.2), rgba(0, 255, 255, 0.2));
+            border: 1px solid var(--neon-pink);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neon-pink);
+            font-weight: 600;
+            text-shadow: var(--glow-intensity) var(--neon-pink);
+        }
+
+        .portfolio-item:hover {
+            transform: scale(1.05);
+            box-shadow: var(--glow-intensity) var(--neon-pink);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 250px 1fr 280px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 70px 1fr;
+            }
+            
+            .sidebar, .inspiration-panel {
+                display: none;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+            border-radius: 4px;
+            box-shadow: var(--glow-intensity) var(--neon-purple);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <div class="app-container">
+        <header class="neon-header">
+            <h1 class="app-title">NEON STUDIO</h1>
+            <div class="mood-indicator">
+                <div class="mood-orb mood-creative"></div>
+                <div class="mood-orb mood-inspired"></div>
+                <div class="mood-orb mood-trending"></div>
+                <span style="font-family: 'Orbitron', monospace; font-size: 12px; color: var(--neon-green); text-shadow: var(--glow-intensity) var(--neon-green);">CREATIVE MODE</span>
+            </div>
+        </header>
+
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="section-title">Active Collaborations</h3>
+                <div class="collab-room">
+                    <div class="room-name">Cyberpunk Portrait Series</div>
+                    <div class="room-members">3 artists online</div>
+                </div>
+                <div class="collab-room">
+                    <div class="room-name">Neon Typography Lab</div>
+                    <div class="room-members">7 artists online</div>
+                </div>
+                <div class="collab-room">
+                    <div class="room-name">Digital Fashion Experiment</div>
+                    <div class="room-members">2 artists online</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="section-title">Trending Now</h3>
+                <div class="trend-item">
+                    <div class="trend-icon"></div>
+                    <div>
+                        <div style="font-weight: 600; color: var(--neon-blue);">Holographic Textures</div>
+                        <div style="font-size: 11px; color: #888;">+245% engagement</div>
+                    </div>
+                </div>
+                <div class="trend-item">
+                    <div class="trend-icon"></div>
+                    <div>
+                        <div style="font-weight: 600; color: var(--neon-blue);">Y2K Revival</div>
+                        <div style="font-size: 11px; color: #888;">+180% mentions</div>
+                    </div>
+                </div>
+                <div class="trend-item">
+                    <div class="trend-icon"></div>
+                    <div>
+                        <div style="font-weight: 600; color: var(--neon-blue);">AI-Human Fusion</div>
+                        <div style="font-size: 11px; color: #888;">+320% interest</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-workspace">
+            <div class="workspace-tabs">
+                <div class="workspace-tab active">Collaborate</div>
+                <div class="workspace-tab">Portfolio</div>
+                <div class="workspace-tab">Trends</div>
+                <div class="workspace-tab">AI Studio</div>
+            </div>
+
+            <div class="workspace-content">
+                <div class="canvas-area">
+                    <div class="canvas-placeholder">◊ SHARED CREATIVE SPACE ◊</div>
+                </div>
+
+                <div class="chat-messages">
+                    <div class="message">
+                        <div class="message-header">
+                            <div class="message-avatar"></div>
+                            <div class="message-author">VoidArtist</div>
+                            <div class="message-time">2:34 PM</div>
+                        </div>
+                        <div class="message-content">Just dropped some holographic shader experiments in the canvas. The lighting interaction is *chef's kiss* ✨</div>
+                    </div>
+
+                    <div class="message">
+                        <div class="message-header">
+                            <div class="message-avatar" style="background: linear-gradient(45deg, var(--neon-yellow), var(--electric-orange));"></div>
+                            <div class="message-author">NeonDreamer</div>
+                            <div class="message-time">2:36 PM</div>
+                        </div>
+                        <div class="message-content">OMG yes! The way it catches the purple undertones... we need to push this further. What if we add some glitch distortion?</div>
+                    </div>
+
+                    <div class="message">
+                        <div class="message-header">
+                            <div class="message-avatar" style="background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));"></div>
+                            <div class="message-author">PixelWitch</div>
+                            <div class="message-time">2:38 PM</div>
+                        </div>
+                        <div class="message-content">AI analysis suggests this style could trend 300% higher with slight chromatic aberration. Want me to generate some variations?</div>
+                    </div>
+
+                    <div class="message">
+                        <div class="message-header">
+                            <div class="message-avatar" style="background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));"></div>
+                            <div class="message-author">CyberCreative</div>
+                            <div class="message-time">2:41 PM</div>
+                        </div>
+                        <div class="message-content">This is giving me serious early 2000s tech aesthetics but with a modern twist. Perfect for the Y2K revival trend we're tracking!</div>
+                    </div>
+                </div>
+
+                <div class="input-area">
+                    <input type="text" class="chat-input" placeholder="Share your creative vision...">
+                    <button class="send-btn">↗</button>
+                </div>
+            </div>
+        </main>
+
+        <aside class="inspiration-panel">
+            <div class="sidebar-section">
+                <h3 class="section-title">Daily Inspiration</h3>
+                <div class="inspiration-feed">
+                    <div class="inspiration-item">
+                        <div class="inspiration-title">Chromatic Rebellion</div>
+                        <div class="inspiration-desc">Bold color clashes that create visual tension and emotional impact. Perfect for breaking conventional design rules.</div>
+                        <div class="color-palette">
+                            <div class="color-swatch" style="background: var(--neon-pink);"></div>
+                            <div class="color-swatch" style="background: var(--neon-yellow);"></div>
+                            <div class="color-swatch" style="background: var(--neon-blue);"></div>
+                            <div class="color-swatch" style="background: var(--electric-orange);"></div>
+                        </div>
+                    </div>
+
+                    <div class="inspiration-item">
+                        <div class="inspiration-title">Digital Metamorphosis</div>
+                        <div class="inspiration-desc">Exploring the boundary between human and digital identity through fluid transformations and glitch aesthetics.</div>
+                        <div class="color-palette">
+                            <div class="color-swatch" style="background: var(--neon-purple);"></div>
+                            <div class="color-swatch" style="background: var(--neon-green);"></div>
+                            <div class="color-swatch" style="background: #ff00ff;"></div>
+                            <div class="color-swatch" style="background: #00ffff;"></div>
+                        </div>
+                    </div>
+
+                    <div class="inspiration-item">
+                        <div class="inspiration-title">Retro-Future Fusion</div>
+                        <div class="inspiration-desc">Combining nostalgic elements with futuristic concepts to create timeless yet progressive visual narratives.</div>
+                        <div class="color-palette">
+                            <div class="color-swatch" style="background: var(--neon-blue);"></div>
+                            <div class="color-swatch" style="background: var(--neon-pink);"></div>
+                            <div class="color-swatch" style="background: var(--neon-yellow);"></div>
+                            <div class="color-swatch" style="background: var(--neon-purple);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="section-title">AI Creative Insights</h3>
+                <div style="background: rgba(128, 0, 255, 0.1); border: 1px solid var(--neon-purple); border-radius: 8px; padding: 15px; font-size: 14px; line-height: 1.4;">
+                    <div style="color: var(--neon-purple); font-weight: 600; margin-bottom: 8px;">Style Prediction</div>
+                    <div style="color: #ccc;">Neo-brutalist design elements are gaining momentum. Consider incorporating harsh geometric shapes with soft neon glows for maximum impact.</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <div class="ai-assistant" id="aiAssistant">🎨</div>
+
+    <script>
+        // Floating particles animation
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 6 + 's';
+            particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+            
+            const colors = ['var(--neon-pink)', 'var(--neon-blue)', 'var(--neon-purple)', 'var(--neon-yellow)', 'var(--neon-green)'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.background = color;
+            particle.style.boxShadow = `var(--glow-intensity) ${color}`;
+            
+            document.getElementById('particles').appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 10000);
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 2000);
+        
+        // Initial particles
+        for (let i = 0; i < 5; i++) {
+            setTimeout(createParticle, i * 400);
+        }
+
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.workspace-tab');
+            const workspaceContent = document.querySelector('.workspace-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Add visual feedback
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 100);
+                    
+                    // Update workspace content based on tab
+                    updateWorkspaceContent(this.textContent.trim());
+                });
+            });
+        });
+
+        function updateWorkspaceContent(tabName) {
+            const workspaceContent = document.querySelector('.workspace-content');
+            const canvasArea = workspaceContent.querySelector('.canvas-area');
+            const canvasPlaceholder = canvasArea.querySelector('.canvas-placeholder');
+            
+            switch(tabName) {
+                case 'Portfolio':
+                    canvasPlaceholder.innerHTML = '◊ PORTFOLIO SHOWCASE ◊';
+                    break;
+                case 'Trends':
+                    canvasPlaceholder.innerHTML = '◊ TREND ANALYSIS DASHBOARD ◊';
+                    break;
+                case 'AI Studio':
+                    canvasPlaceholder.innerHTML = '◊ AI CREATIVE LABORATORY ◊';
+                    break;
+                default:
+                    canvasPlaceholder.innerHTML = '◊ SHARED CREATIVE SPACE ◊';
+            }
+        }
+
+        // Chat input functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatInput = document.querySelector('.chat-input');
+            const sendBtn = document.querySelector('.send-btn');
+            const chatMessages = document.querySelector('.chat-messages');
+            
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message';
+                    messageDiv.innerHTML = `
+                        <div class="message-header">
+                            <div class="message-avatar" style="background: linear-gradient(45deg, var(--neon-green), var(--neon-yellow));"></div>
+                            <div class="message-author">You</div>
+                            <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        </div>
+                        <div class="message-content">${message}</div>
+                    `;
+                    
+                    chatMessages.appendChild(messageDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    chatInput.value = '';
+                }
+            }
+            
+            sendBtn.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+
+        // AI Assistant interaction
+        document.getElementById('aiAssistant').addEventListener('click', function() {
+            this.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+            
+            // Simulate AI interaction
+            const responses = [
+                "🎨 I've analyzed your recent work - try adding more chromatic aberration for that cyberpunk edge!",
+                "✨ Your color harmony is improving! The neon palette is 87% more engaging than last week.",
+                "🚀 Trending alert: Holographic textures are gaining 200% more traction. Want me to generate some samples?",
+                "💡 Creative suggestion: Your current style could benefit from asymmetrical compositions.",
+                "🔥 Your artistic growth rate is 156% above average. Keep pushing those boundaries!"
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            // Add AI message to chat
+            const chatMessages = document.querySelector('.chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <div class="message-avatar" style="background: radial-gradient(circle, var(--neon-purple), var(--neon-pink));"></div>
+                    <div class="message-author" style="color: var(--neon-purple);">NeonAI</div>
+                    <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                </div>
+                <div class="message-content">${randomResponse}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+
+        // Dynamic mood indicator changes
+        setInterval(() => {
+            const moodOrbs = document.querySelectorAll('.mood-orb');
+            moodOrbs.forEach(orb => {
+                if (Math.random() > 0.7) {
+                    orb.style.animationDuration = (1 + Math.random() * 2) + 's';
+                }
+            });
+        }, 3000);
+
+        // Collaboration room interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            const collabRooms = document.querySelectorAll('.collab-room');
+            
+            collabRooms.forEach(room => {
+                room.addEventListener('click', function() {
+                    const roomName = this.querySelector('.room-name').textContent;
+                    
+                    // Visual feedback
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 100);
+                    
+                    // Update canvas area
+                    const canvasPlaceholder = document.querySelector('.canvas-placeholder');
+                    canvasPlaceholder.innerHTML = `◊ CONNECTED TO: ${roomName.toUpperCase()} ◊`;
+                    
+                    // Add notification message
+                    const chatMessages = document.querySelector('.chat-messages');
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message';
+                    messageDiv.innerHTML = `
+                        <div class="message-header">
+                            <div class="message-avatar" style="background: linear-gradient(45deg, var(--neon-blue), var(--neon-green));"></div>
+                            <div class="message-author" style="color: var(--neon-blue);">System</div>
+                            <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        </div>
+                        <div class="message-content">🔗 Connected to ${roomName}. Start collaborating!</div>
+                    `;
+                    
+                    chatMessages.appendChild(messageDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+            });
+        });
+
+        // Color palette interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            const colorSwatches = document.querySelectorAll('.color-swatch');
+            
+            colorSwatches.forEach(swatch => {
+                swatch.addEventListener('click', function() {
+                    const color = getComputedStyle(this).backgroundColor;
+                    
+                    // Add color selection feedback
+                    this.style.transform = 'scale(1.3)';
+                    this.style.boxShadow = `0 0 25px ${color}`;
+                    
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                        this.style.boxShadow = '';
+                    }, 300);
+                    
+                    // Add notification
+                    const chatMessages = document.querySelector('.chat-messages');
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message';
+                    messageDiv.innerHTML = `
+                        <div class="message-header">
+                            <div class="message-avatar" style="background: ${color};"></div>
+                            <div class="message-author" style="color: var(--neon-yellow);">ColorBot</div>
+                            <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        </div>
+                        <div class="message-content">🎨 Color added to your active palette! This shade pairs beautifully with complementary neons.</div>
+                    `;
+                    
+                    chatMessages.appendChild(messageDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

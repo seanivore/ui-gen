@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Mystic's Sanctum - Art Deco Magical Communication</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:wght@400;700;900&display=swap');
+        
+        :root {
+            --art-deco-gold: #D4AF37;
+            --art-deco-deep-gold: #B8860B;
+            --art-deco-black: #1A1A1A;
+            --art-deco-ivory: #F5F5DC;
+            --art-deco-emerald: #50C878;
+            --art-deco-purple: #663399;
+            --art-deco-copper: #B87333;
+            --shadow-gold: rgba(212, 175, 55, 0.3);
+            --shadow-purple: rgba(102, 51, 153, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(135deg, var(--art-deco-black) 0%, #2D1B69 50%, var(--art-deco-black) 100%);
+            color: var(--art-deco-ivory);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, var(--shadow-gold) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, var(--shadow-purple) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .mystical-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            grid-template-rows: auto 1fr;
+            gap: 20px;
+            height: 100vh;
+        }
+
+        .art-deco-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, var(--art-deco-black), var(--art-deco-deep-gold), var(--art-deco-black));
+            border: 2px solid var(--art-deco-gold);
+            border-radius: 0;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .art-deco-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--art-deco-gold) 0%, transparent 70%);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            opacity: 0.3;
+        }
+
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--art-deco-gold);
+            text-shadow: 2px 2px 4px var(--art-deco-black);
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: var(--art-deco-ivory);
+            letter-spacing: 3px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .mystical-sidebar {
+            background: linear-gradient(180deg, var(--art-deco-black) 0%, var(--art-deco-purple) 100%);
+            border: 2px solid var(--art-deco-gold);
+            border-radius: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: inset 0 0 20px var(--shadow-gold);
+        }
+
+        .spell-management {
+            background: linear-gradient(135deg, var(--art-deco-black), var(--art-deco-copper));
+            border: 1px solid var(--art-deco-gold);
+            padding: 15px;
+            border-radius: 0;
+        }
+
+        .spell-management h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--art-deco-gold);
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .spell-card {
+            background: linear-gradient(45deg, var(--art-deco-black), var(--art-deco-deep-gold));
+            border: 1px solid var(--art-deco-gold);
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spell-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--shadow-gold), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .spell-card:hover::before {
+            left: 100%;
+        }
+
+        .spell-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px var(--shadow-gold);
+        }
+
+        .spell-name {
+            font-weight: 600;
+            color: var(--art-deco-gold);
+            margin-bottom: 5px;
+        }
+
+        .spell-type {
+            font-size: 0.8rem;
+            color: var(--art-deco-emerald);
+        }
+
+        .consultation-panel {
+            background: linear-gradient(180deg, var(--art-deco-black) 0%, #2D1B69 100%);
+            border: 2px solid var(--art-deco-gold);
+            border-radius: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .consultation-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 20px,
+                var(--shadow-gold) 20px,
+                var(--shadow-gold) 21px
+            );
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .consultation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--art-deco-gold);
+            position: relative;
+            z-index: 2;
+        }
+
+        .consultation-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--art-deco-gold);
+            font-weight: 700;
+        }
+
+        .mystical-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: linear-gradient(45deg, var(--art-deco-gold), var(--art-deco-deep-gold));
+            color: var(--art-deco-black);
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--art-deco-ivory);
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+        }
+
+        .control-btn:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .control-btn:hover {
+            color: var(--art-deco-black);
+            transform: scale(1.1);
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            animation: mysticalAppear 0.5s ease-out;
+        }
+
+        @keyframes mysticalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--art-deco-purple), var(--art-deco-emerald));
+            border: 1px solid var(--art-deco-gold);
+        }
+
+        .message.assistant .message-content {
+            background: linear-gradient(135deg, var(--art-deco-black), var(--art-deco-deep-gold));
+            border: 1px solid var(--art-deco-gold);
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .message-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--art-deco-gold), transparent, var(--art-deco-gold));
+        }
+
+        .message-text {
+            color: var(--art-deco-ivory);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: var(--art-deco-gold);
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        .mystical-input-area {
+            padding: 20px;
+            background: linear-gradient(90deg, var(--art-deco-black), var(--art-deco-purple), var(--art-deco-black));
+            border-top: 2px solid var(--art-deco-gold);
+            position: relative;
+            z-index: 2;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .mystical-input {
+            flex: 1;
+            background: linear-gradient(135deg, var(--art-deco-black), #2D1B69);
+            border: 2px solid var(--art-deco-gold);
+            color: var(--art-deco-ivory);
+            padding: 15px 20px;
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            border-radius: 0;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .mystical-input:focus {
+            box-shadow: 0 0 20px var(--shadow-gold);
+            border-color: var(--art-deco-emerald);
+        }
+
+        .mystical-input::placeholder {
+            color: var(--art-deco-gold);
+            opacity: 0.7;
+        }
+
+        .send-btn {
+            background: linear-gradient(45deg, var(--art-deco-gold), var(--art-deco-emerald));
+            color: var(--art-deco-black);
+            border: none;
+            padding: 15px 25px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .send-btn::before {
+            content: '✦';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover::before {
+            transform: translate(-50%, -50%) scale(1) rotate(360deg);
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px var(--shadow-gold);
+        }
+
+        .divination-tools {
+            background: linear-gradient(180deg, var(--art-deco-purple) 0%, var(--art-deco-black) 100%);
+            border: 2px solid var(--art-deco-gold);
+            border-radius: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: inset 0 0 20px var(--shadow-purple);
+        }
+
+        .divination-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--art-deco-gold);
+            text-align: center;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .tarot-spread {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tarot-card {
+            aspect-ratio: 2/3;
+            background: linear-gradient(135deg, var(--art-deco-black), var(--art-deco-deep-gold));
+            border: 1px solid var(--art-deco-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tarot-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, var(--shadow-gold) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .tarot-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .tarot-card:hover {
+            transform: rotateY(15deg) scale(1.05);
+            box-shadow: 0 10px 20px var(--shadow-gold);
+        }
+
+        .card-symbol {
+            font-size: 2rem;
+            color: var(--art-deco-gold);
+        }
+
+        .crystal-ball {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle at 30% 30%, var(--art-deco-ivory), var(--art-deco-purple), var(--art-deco-black));
+            border-radius: 50%;
+            margin: 20px auto;
+            border: 2px solid var(--art-deco-gold);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crystal-ball::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 25%;
+            width: 30%;
+            height: 30%;
+            background: radial-gradient(circle, var(--art-deco-ivory), transparent);
+            border-radius: 50%;
+            animation: mysticalGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes mysticalGlow {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .crystal-ball:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--shadow-purple);
+        }
+
+        .arcane-library {
+            background: linear-gradient(135deg, var(--art-deco-black), var(--art-deco-copper));
+            border: 1px solid var(--art-deco-gold);
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .library-title {
+            color: var(--art-deco-gold);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .book-shelf {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 40px;
+        }
+
+        .mystical-book {
+            width: 25px;
+            background: linear-gradient(180deg, var(--art-deco-gold), var(--art-deco-deep-gold));
+            border: 1px solid var(--art-deco-black);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .mystical-book:nth-child(odd) {
+            height: 35px;
+            background: linear-gradient(180deg, var(--art-deco-emerald), var(--art-deco-purple));
+        }
+
+        .mystical-book:nth-child(even) {
+            height: 30px;
+        }
+
+        .mystical-book:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 5px 10px var(--shadow-gold);
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--art-deco-gold);
+            border-radius: 50%;
+            animation: float 6s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .mystical-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <div class="mystical-container">
+        <header class="art-deco-header">
+            <h1 class="header-title">THE MYSTIC'S SANCTUM</h1>
+            <p class="header-subtitle">ART DECO MAGICAL COMMUNICATION</p>
+        </header>
+
+        <aside class="mystical-sidebar">
+            <div class="spell-management">
+                <h3>Active Spells</h3>
+                <div class="spell-card" onclick="castSpell('protection')">
+                    <div class="spell-name">Ward of Protection</div>
+                    <div class="spell-type">Defense • Level 3</div>
+                </div>
+                <div class="spell-card" onclick="castSpell('divination')">
+                    <div class="spell-name">Scrying Vision</div>
+                    <div class="spell-type">Divination • Level 5</div>
+                </div>
+                <div class="spell-card" onclick="castSpell('illusion')">
+                    <div class="spell-name">Glamour Veil</div>
+                    <div class="spell-type">Illusion • Level 4</div>
+                </div>
+                <div class="spell-card" onclick="castSpell('enchantment')">
+                    <div class="spell-name">Charm of Persuasion</div>
+                    <div class="spell-type">Enchantment • Level 6</div>
+                </div>
+            </div>
+
+            <div class="arcane-library">
+                <h4 class="library-title">Arcane Library</h4>
+                <div class="book-shelf">
+                    <div class="mystical-book" onclick="openBook('grimoire')" title="Ancient Grimoire"></div>
+                    <div class="mystical-book" onclick="openBook('prophecies')" title="Book of Prophecies"></div>
+                    <div class="mystical-book" onclick="openBook('rituals')" title="Sacred Rituals"></div>
+                    <div class="mystical-book" onclick="openBook('alchemy')" title="Alchemical Formulas"></div>
+                    <div class="mystical-book" onclick="openBook('spirits')" title="Communion with Spirits"></div>
+                    <div class="mystical-book" onclick="openBook('astral')" title="Astral Projection Guide"></div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="consultation-panel">
+            <div class="consultation-header">
+                <h2 class="consultation-title">Mystical Consultation</h2>
+                <div class="mystical-controls">
+                    <button class="control-btn" onclick="newConsultation()">New Reading</button>
+                    <button class="control-btn" onclick="saveSession()">Archive</button>
+                    <button class="control-btn" onclick="summonSpirit()">Summon</button>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <div class="message assistant">
+                    <div class="message-content">
+                        <div class="message-text">Welcome to the Sanctum, seeker. The veil between worlds grows thin tonight. What mysteries shall we unveil together? I sense great potential in your aura... ✦</div>
+                        <div class="message-time">21:33 - Witching Hour</div>
+                    </div>
+                </div>
+
+                <div class="message user">
+                    <div class="message-content">
+                        <div class="message-text">I seek guidance about a decision that weighs heavily upon my mind. The paths before me seem shrouded in uncertainty.</div>
+                        <div class="message-time">21:35</div>
+                    </div>
+                </div>
+
+                <div class="message assistant">
+                    <div class="message-content">
+                        <div class="message-text">Ah, the crossroads of fate... *waves hand over crystal ball* I see three paths illuminated by starlight. Let me consult the Tarot of Destinies. The cards whisper of transformation and hidden opportunities. Tell me, what element calls to your soul - Fire, Water, Earth, or Air?</div>
+                        <div class="message-time">21:36</div>
+                    </div>
+                </div>
+
+                <div class="message user">
+                    <div class="message-content">
+                        <div class="message-text">Water has always resonated with me. I feel drawn to its fluid nature and emotional depths.</div>
+                        <div class="message-time">21:37</div>
+                    </div>
+                </div>
+
+                <div class="message assistant">
+                    <div class="message-content">
+                        <div class="message-text">*The crystal ball swirls with aquamarine mists* Excellent... Water speaks of intuition, adaptation, and emotional wisdom. I draw the Cup of Reflection for you - it reveals that your answer lies not in forcing a decision, but in allowing the current to guide you. Trust your inner tides. The decision will crystallize when the time is right, like dew forming at dawn. 🌙</div>
+                        <div class="message-time">21:39</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mystical-input-area">
+                <div class="input-container">
+                    <input type="text" class="mystical-input" placeholder="Speak your query into the ethereal realm..." id="messageInput" onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" onclick="sendMessage()">Cast</button>
+                </div>
+            </div>
+        </main>
+
+        <aside class="divination-tools">
+            <h3 class="divination-title">Divination Tools</h3>
+            
+            <div class="tarot-spread">
+                <div class="tarot-card" onclick="drawCard('past')" title="Past Influences">
+                    <span class="card-symbol">⚱</span>
+                </div>
+                <div class="tarot-card" onclick="drawCard('present')" title="Present Moment">
+                    <span class="card-symbol">☽</span>
+                </div>
+                <div class="tarot-card" onclick="drawCard('future')" title="Future Potential">
+                    <span class="card-symbol">✦</span>
+                </div>
+            </div>
+
+            <div class="crystal-ball" onclick="gazeIntoFuture()" title="Scry the Future"></div>
+
+            <div class="arcane-library">
+                <h4 class="library-title">Quick Divination</h4>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button class="control-btn" onclick="castRunes()" style="font-size: 0.8rem;">Cast Runes</button>
+                    <button class="control-btn" onclick="pendulumReading()" style="font-size: 0.8rem;">Pendulum</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Floating particles effect
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const numberOfParticles = 15;
+
+            for (let i = 0; i < numberOfParticles; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Message handling
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const messagesContainer = document.getElementById('messagesContainer');
+            const message = input.value.trim();
+
+            if (message) {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user';
+                userMessage.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-text">${message}</div>
+                        <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    </div>
+                `;
+                messagesContainer.appendChild(userMessage);
+
+                // Clear input
+                input.value = '';
+
+                // Simulate mystical response
+                setTimeout(() => {
+                    const responses = [
+                        "The spirits whisper your answer through the cosmic winds... *consulting ancient texts* ✦",
+                        "I see visions forming in the crystal mists... The path becomes clearer... 🌙",
+                        "The cards have spoken! A powerful energy surrounds your query... *shuffling ethereal deck*",
+                        "The veil between worlds grows thin... I sense great wisdom in your seeking... ⚱",
+                        "By the light of the celestial bodies, guidance shall be yours... *casting mystical energies*"
+                    ];
+                    
+                    const assistantMessage = document.createElement('div');
+                    assistantMessage.className = 'message assistant';
+                    assistantMessage.innerHTML = `
+                        <div class="message-content">
+                            <div class="message-text">${responses[Math.floor(Math.random() * responses.length)]}</div>
+                            <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        </div>
+                    `;
+                    messagesContainer.appendChild(assistantMessage);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 1500);
+
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Spell casting functionality
+        function castSpell(spellType) {
+            const spellMessages = {
+                protection: "✦ Ward of Protection activated! A shimmering barrier of golden light surrounds you...",
+                divination: "🔮 Scrying Vision cast! The mists of time part to reveal hidden truths...",
+                illusion: "✨ Glamour Veil woven! Reality bends to your artistic will...",
+                enchantment: "💫 Charm of Persuasion flows through the ethereal realm..."
+            };
+
+            addSystemMessage(spellMessages[spellType] || "Ancient magic courses through the sanctum...");
+        }
+
+        // Tarot card drawing
+        function drawCard(position) {
+            const cards = [
+                "The Magician - Manifestation and power flow through you",
+                "The High Priestess - Trust your inner wisdom and intuition",
+                "The Star - Hope and inspiration illuminate your path",
+                "The Moon - Illusions fade, revealing hidden truths",
+                "The Sun - Joy and success crown your endeavors"
+            ];
+
+            const card = cards[Math.floor(Math.random() * cards.length)];
+            addSystemMessage(`🃏 ${position.toUpperCase()} CARD: ${card}`);
+        }
+
+        // Crystal ball gazing
+        function gazeIntoFuture() {
+            const visions = [
+                "I see golden opportunities approaching on silver wings...",
+                "The crystal reveals a convergence of fortunate energies...",
+                "Mystical currents carry whispers of transformation...",
+                "The future shimmers with possibilities yet unspoken..."
+            ];
+            
+            addSystemMessage(`🔮 CRYSTAL VISION: ${visions[Math.floor(Math.random() * visions.length)]}`);
+        }
+
+        // Rune casting
+        function castRunes() {
+            const runes = [
+                "ᚠ Fehu - Wealth and abundance flow toward you",
+                "ᚱ Raidho - A journey of significance awaits",
+                "ᛗ Mannaz - Seek wisdom through human connection",
+                "ᛚ Laguz - Flow with life's natural currents"
+            ];
+            
+            addSystemMessage(`🪨 RUNE CAST: ${runes[Math.floor(Math.random() * runes.length)]}`);
+        }
+
+        // Pendulum reading
+        function pendulumReading() {
+            const readings = [
+                "The pendulum swings YES with powerful conviction",
+                "A gentle NO emerges from the ethereal motion",
+                "The pendulum circles - the answer requires patience",
+                "Strong energy detected - the path is clear"
+            ];
+            
+            addSystemMessage(`⚖️ PENDULUM: ${readings[Math.floor(Math.random() * readings.length)]}`);
+        }
+
+        // Book opening
+        function openBook(bookType) {
+            const books = {
+                grimoire: "📜 Ancient Grimoire opens... 'The secret of transformation lies within'",
+                prophecies: "🔮 Book of Prophecies reveals... 'Three moons hence, change arrives'",
+                rituals: "⚱ Sacred Rituals speaks... 'Honor the elements, embrace the divine'",
+                alchemy: "🧪 Alchemical Formulas whispers... 'As above, so below'",
+                spirits: "👻 Communion with Spirits echoes... 'The ancestors smile upon you'",
+                astral: "✨ Astral Projection Guide illuminates... 'Your soul knows no boundaries'"
+            };
+            
+            addSystemMessage(books[bookType] || "The mystical tome reveals its secrets...");
+        }
+
+        // Control functions
+        function newConsultation() {
+            addSystemMessage("🌟 New consultation begins... The cosmic energies align for fresh insights");
+        }
+
+        function saveSession() {
+            addSystemMessage("📚 Session archived in the Akashic Records... Your wisdom is preserved");
+        }
+
+        function summonSpirit() {
+            addSystemMessage("👻 Calling upon spirit guides... A benevolent presence enters the sanctum...");
+        }
+
+        // Helper function to add system messages
+        function addSystemMessage(text) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const systemMessage = document.createElement('div');
+            systemMessage.className = 'message assistant';
+            systemMessage.innerHTML = `
+                <div class="message-content">
+                    <div class="message-text">${text}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                </div>
+            `;
+            messagesContainer.appendChild(systemMessage);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Initialize particles when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+        });
+    </script>
+</body>
+</html>

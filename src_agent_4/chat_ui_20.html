@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industrial Creative Hub - The Artist</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --steel-gray: #2c3e50;
+            --copper-brown: #b7610a;
+            --brass-gold: #b8860b;
+            --iron-black: #1a1a1a;
+            --titanium-silver: #c0c0c0;
+            --oxidized-copper: #7d4f0a;
+            --brushed-steel: #4a4a4a;
+            --chrome-white: #f8f8f8;
+            --rust-orange: #cd853f;
+            --dark-metal: #0f0f0f;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, var(--steel-gray), var(--iron-black));
+            color: var(--chrome-white);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(183, 97, 10, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(184, 134, 11, 0.1) 0%, transparent 50%),
+                linear-gradient(45deg, transparent 49%, rgba(192, 192, 192, 0.02) 50%, transparent 51%);
+            background-size: 100% 100%, 100% 100%, 20px 20px;
+            pointer-events: none;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            grid-template-rows: 80px 1fr 120px;
+            height: 100vh;
+            gap: 2px;
+            background: var(--dark-metal);
+            position: relative;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, var(--iron-black), var(--steel-gray), var(--iron-black));
+            border-bottom: 2px solid var(--brass-gold);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.2), transparent);
+            animation: scanline 4s infinite ease-in-out;
+        }
+
+        @keyframes scanline {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 24px;
+            color: var(--brass-gold);
+            text-shadow: 0 0 10px rgba(184, 134, 11, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo::before {
+            content: '⚙';
+            font-size: 28px;
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .status-panel {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: rgba(183, 97, 10, 0.2);
+            border: 1px solid var(--copper-brown);
+            border-radius: 3px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--brass-gold);
+            box-shadow: 0 0 8px var(--brass-gold);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .sidebar-left {
+            background: linear-gradient(180deg, var(--steel-gray), var(--brushed-steel));
+            border-right: 2px solid var(--copper-brown);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .sidebar-left::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(184, 134, 11, 0.1) 2px,
+                rgba(184, 134, 11, 0.1) 4px
+            );
+            pointer-events: none;
+        }
+
+        .tool-palette {
+            padding: 20px;
+            border-bottom: 1px solid var(--copper-brown);
+        }
+
+        .tool-palette h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            color: var(--brass-gold);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .tool-btn {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--iron-black), var(--steel-gray));
+            border: 1px solid var(--titanium-silver);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--titanium-silver);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-btn:hover {
+            background: linear-gradient(135deg, var(--copper-brown), var(--brass-gold));
+            color: var(--iron-black);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(183, 97, 10, 0.4);
+        }
+
+        .tool-btn::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--brass-gold), var(--copper-brown), var(--brass-gold));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tool-btn:hover::before {
+            opacity: 1;
+        }
+
+        .project-list {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .project-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(26, 26, 26, 0.8);
+            border-left: 4px solid var(--brass-gold);
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .project-item:hover {
+            background: rgba(183, 97, 10, 0.2);
+            transform: translateX(5px);
+        }
+
+        .project-title {
+            font-weight: 600;
+            color: var(--chrome-white);
+            margin-bottom: 5px;
+        }
+
+        .project-meta {
+            font-size: 12px;
+            color: var(--titanium-silver);
+            opacity: 0.8;
+        }
+
+        .chat-area {
+            background: linear-gradient(180deg, var(--brushed-steel), var(--steel-gray));
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 50% 0%, rgba(184, 134, 11, 0.1) 0%, transparent 50%),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 50px,
+                    rgba(192, 192, 192, 0.02) 50px,
+                    rgba(192, 192, 192, 0.02) 52px
+                );
+            pointer-events: none;
+        }
+
+        .chat-header {
+            padding: 20px 30px;
+            border-bottom: 2px solid var(--copper-brown);
+            background: rgba(26, 26, 26, 0.8);
+        }
+
+        .chat-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 20px;
+            color: var(--brass-gold);
+            margin-bottom: 5px;
+        }
+
+        .chat-subtitle {
+            font-size: 14px;
+            color: var(--titanium-silver);
+            opacity: 0.8;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            max-width: 80%;
+            position: relative;
+        }
+
+        .message.own {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, var(--copper-brown), var(--brass-gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--iron-black);
+            font-weight: bold;
+            border: 2px solid var(--titanium-silver);
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(74, 74, 74, 0.9));
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--titanium-silver);
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .message.own .message-content {
+            background: linear-gradient(135deg, rgba(183, 97, 10, 0.8), rgba(184, 134, 11, 0.8));
+            color: var(--iron-black);
+        }
+
+        .message-text {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        .message.own .message-time {
+            color: var(--iron-black);
+        }
+
+        .ai-message {
+            border-left: 4px solid var(--brass-gold);
+            background: linear-gradient(135deg, rgba(184, 134, 11, 0.1), rgba(183, 97, 10, 0.1));
+        }
+
+        .sidebar-right {
+            background: linear-gradient(180deg, var(--steel-gray), var(--brushed-steel));
+            border-left: 2px solid var(--copper-brown);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .sidebar-right::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(184, 134, 11, 0.1) 2px,
+                rgba(184, 134, 11, 0.1) 4px
+            );
+            pointer-events: none;
+        }
+
+        .specs-panel {
+            padding: 20px;
+            border-bottom: 1px solid var(--copper-brown);
+        }
+
+        .specs-panel h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            color: var(--brass-gold);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(192, 192, 192, 0.2);
+            font-size: 13px;
+        }
+
+        .spec-label {
+            color: var(--titanium-silver);
+        }
+
+        .spec-value {
+            color: var(--brass-gold);
+            font-weight: 600;
+        }
+
+        .network-panel {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .network-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(26, 26, 26, 0.6);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .network-item:hover {
+            background: rgba(183, 97, 10, 0.2);
+            transform: translateX(-3px);
+        }
+
+        .network-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--brass-gold);
+            box-shadow: 0 0 6px var(--brass-gold);
+        }
+
+        .network-info {
+            flex: 1;
+        }
+
+        .network-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--chrome-white);
+        }
+
+        .network-type {
+            font-size: 11px;
+            color: var(--titanium-silver);
+            opacity: 0.8;
+        }
+
+        .input-area {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, var(--iron-black), var(--steel-gray), var(--iron-black));
+            border-top: 2px solid var(--brass-gold);
+            padding: 25px 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            position: relative;
+        }
+
+        .input-area::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--brass-gold), transparent);
+            animation: scanline-bottom 3s infinite ease-in-out;
+        }
+
+        @keyframes scanline-bottom {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+
+        .input-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--copper-brown), var(--brass-gold));
+            border: none;
+            border-radius: 6px;
+            color: var(--iron-black);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(183, 97, 10, 0.4);
+        }
+
+        .message-input {
+            flex: 1;
+            background: rgba(26, 26, 26, 0.8);
+            border: 2px solid var(--titanium-silver);
+            border-radius: 8px;
+            padding: 15px 20px;
+            color: var(--chrome-white);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: var(--brass-gold);
+            box-shadow: 0 0 15px rgba(184, 134, 11, 0.3);
+        }
+
+        .message-input::placeholder {
+            color: var(--titanium-silver);
+            opacity: 0.6;
+        }
+
+        .send-btn {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--brass-gold), var(--copper-brown));
+            border: none;
+            border-radius: 8px;
+            color: var(--iron-black);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(184, 134, 11, 0.5);
+        }
+
+        .mechanical-element {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, var(--titanium-silver), var(--brushed-steel));
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: mechanical-rotate 8s linear infinite;
+        }
+
+        .mechanical-element:nth-child(1) {
+            top: 10%;
+            right: 15%;
+            animation-delay: 0s;
+        }
+
+        .mechanical-element:nth-child(2) {
+            bottom: 20%;
+            left: 10%;
+            animation-delay: -2s;
+        }
+
+        .mechanical-element:nth-child(3) {
+            top: 60%;
+            right: 8%;
+            animation-delay: -4s;
+        }
+
+        @keyframes mechanical-rotate {
+            from { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            to { transform: rotate(360deg) scale(1); }
+        }
+
+        /* Gender-fluid adaptive elements */
+        .adaptive-element {
+            position: relative;
+            transition: all 0.5s ease;
+        }
+
+        .adaptive-element::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--brass-gold), var(--copper-brown), var(--titanium-silver), var(--brass-gold));
+            background-size: 400% 400%;
+            z-index: -1;
+            border-radius: inherit;
+            opacity: 0;
+            animation: gradient-shift 3s ease-in-out infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; opacity: 0; }
+            50% { background-position: 100% 50%; opacity: 0.3; }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--iron-black);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--copper-brown), var(--brass-gold));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--brass-gold), var(--copper-brown));
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 280px 1fr 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 80px 1fr 120px;
+            }
+            
+            .sidebar-left,
+            .sidebar-right {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mechanical-element"></div>
+    <div class="mechanical-element"></div>
+    <div class="mechanical-element"></div>
+
+    <div class="main-container">
+        <header class="header">
+            <div class="logo">
+                <span>INDUSTRIAL CREATIVE HUB</span>
+            </div>
+            <div class="status-panel">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>FABRICATING</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>AI DESIGN ASSIST</span>
+                </div>
+            </div>
+        </header>
+
+        <aside class="sidebar-left">
+            <div class="tool-palette">
+                <h3>Manufacturing Tools</h3>
+                <div class="tool-grid">
+                    <button class="tool-btn adaptive-element" title="3D Modeling">📐</button>
+                    <button class="tool-btn adaptive-element" title="CNC Programming">⚙️</button>
+                    <button class="tool-btn adaptive-element" title="Welding Sim">🔥</button>
+                    <button class="tool-btn adaptive-element" title="Material Testing">🔬</button>
+                    <button class="tool-btn adaptive-element" title="Assembly Tools">🔧</button>
+                    <button class="tool-btn adaptive-element" title="Quality Control">✓</button>
+                    <button class="tool-btn adaptive-element" title="Design Analysis">📊</button>
+                    <button class="tool-btn adaptive-element" title="Prototyping">🛠️</button>
+                    <button class="tool-btn adaptive-element" title="Innovation Lab">💡</button>
+                </div>
+            </div>
+            
+            <div class="project-list">
+                <h3 style="font-family: 'Orbitron', monospace; font-size: 14px; color: var(--brass-gold); margin-bottom: 15px; text-transform: uppercase;">Active Projects</h3>
+                <div class="project-item adaptive-element">
+                    <div class="project-title">Kinetic Sculpture Series</div>
+                    <div class="project-meta">Steel & Copper • 73% Complete</div>
+                </div>
+                <div class="project-item adaptive-element">
+                    <div class="project-title">Industrial Furniture Line</div>
+                    <div class="project-meta">Mixed Metals • Design Phase</div>
+                </div>
+                <div class="project-item adaptive-element">
+                    <div class="project-title">Mechanical Clock Commission</div>
+                    <div class="project-meta">Brass Mechanisms • Assembly</div>
+                </div>
+                <div class="project-item adaptive-element">
+                    <div class="project-title">Art Installation: Gears</div>
+                    <div class="project-meta">Titanium Alloy • Concept</div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="chat-area">
+            <div class="chat-header">
+                <div class="chat-title">Creative Manufacturing Network</div>
+                <div class="chat-subtitle">Precision engineering meets artistic innovation</div>
+            </div>
+            
+            <div class="messages-container">
+                <div class="message">
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content ai-message">
+                        <div class="message-text">Good morning! I've analyzed your kinetic sculpture project. The torque calculations for the main drive mechanism show we can reduce weight by 23% using titanium alloy instead of steel for the central shaft.</div>
+                        <div class="message-time">09:15 AM</div>
+                    </div>
+                </div>
+
+                <div class="message own">
+                    <div class="message-avatar">A</div>
+                    <div class="message-content">
+                        <div class="message-text">Interesting! What about the cost implications? And will that affect the patina development over time?</div>
+                        <div class="message-time">09:16 AM</div>
+                    </div>
+                </div>
+
+                <div class="message">
+                    <div class="message-avatar">MC</div>
+                    <div class="message-content">
+                        <div class="message-text">Hey! Saw your furniture sketches on the maker forum. That industrial-organic fusion is exactly what we've been exploring at the collective. Want to collaborate on the metal finishing techniques?</div>
+                        <div class="message-time">09:18 AM</div>
+                    </div>
+                </div>
+
+                <div class="message">
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content ai-message">
+                        <div class="message-text">Cost increase: 340%. However, titanium offers superior corrosion resistance and will maintain aesthetic integrity longer. For patina development, I recommend hybrid approach: titanium structure with copper accent panels for controlled oxidation effects.</div>
+                        <div class="message-time">09:19 AM</div>
+                    </div>
+                </div>
+
+                <div class="message own">
+                    <div class="message-avatar">A</div>
+                    <div class="message-content">
+                        <div class="message-text">@MC Absolutely! Your plasma cutting work on Instagram is phenomenal. Let's sync on the chemical patina processes - I'm experimenting with salt spray acceleration.</div>
+                        <div class="message-time">09:21 AM</div>
+                    </div>
+                </div>
+
+                <div class="message">
+                    <div class="message-avatar">DE</div>
+                    <div class="message-content">
+                        <div class="message-text">Design Engineering here - I've run your mechanical clock through stress analysis. The escapement mechanism needs reinforcement at the pivot points. Sending detailed CAD modifications now.</div>
+                        <div class="message-time">09:23 AM</div>
+                    </div>
+                </div>
+
+                <div class="message own">
+                    <div class="message-avatar">A</div>
+                    <div class="message-content">
+                        <div class="message-text">Perfect timing! I was feeling something was off with the gear train harmonics. Your engineering precision combined with my aesthetic vision - this is why I love interdisciplinary collaboration.</div>
+                        <div class="message-time">09:25 AM</div>
+                    </div>
+                </div>
+
+                <div class="message">
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content ai-message">
+                        <div class="message-text">I've scheduled your CNC machine time for tomorrow 2-6 PM. Material delivery tracking shows brass stock arriving Thursday. Shall I optimize the cutting patterns to minimize waste and maximize grain direction for strength?</div>
+                        <div class="message-time">09:27 AM</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="sidebar-right">
+            <div class="specs-panel">
+                <h3>Project Specifications</h3>
+                <div class="spec-item">
+                    <span class="spec-label">Material</span>
+                    <span class="spec-value">Ti-6Al-4V</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Tolerance</span>
+                    <span class="spec-value">±0.05mm</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Finish</span>
+                    <span class="spec-value">Brushed</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Weight</span>
+                    <span class="spec-value">2.3 kg</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Hardness</span>
+                    <span class="spec-value">HRC 45</span>
+                </div>
+            </div>
+            
+            <div class="network-panel">
+                <h3 style="font-family: 'Orbitron', monospace; font-size: 14px; color: var(--brass-gold); margin-bottom: 15px; text-transform: uppercase;">Maker Network</h3>
+                
+                <div class="network-item">
+                    <div class="network-status"></div>
+                    <div class="network-info">
+                        <div class="network-name">MetalCraft Collective</div>
+                        <div class="network-type">Fabrication Guild</div>
+                    </div>
+                </div>
+                
+                <div class="network-item">
+                    <div class="network-status"></div>
+                    <div class="network-info">
+                        <div class="network-name">Design Engineering</div>
+                        <div class="network-type">Technical Partner</div>
+                    </div>
+                </div>
+                
+                <div class="network-item">
+                    <div class="network-status"></div>
+                    <div class="network-info">
+                        <div class="network-name">AI Design Assistant</div>
+                        <div class="network-type">Optimization AI</div>
+                    </div>
+                </div>
+                
+                <div class="network-item">
+                    <div class="network-status"></div>
+                    <div class="network-info">
+                        <div class="network-name">Industrial Arts Forum</div>
+                        <div class="network-type">Creative Community</div>
+                    </div>
+                </div>
+                
+                <div class="network-item">
+                    <div class="network-status"></div>
+                    <div class="network-info">
+                        <div class="network-name">Material Suppliers</div>
+                        <div class="network-type">Supply Chain</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="input-area">
+            <div class="input-controls">
+                <button class="control-btn adaptive-element" title="Voice Message">🎤</button>
+                <button class="control-btn adaptive-element" title="CAD File">📎</button>
+                <button class="control-btn adaptive-element" title="Material Sample">📸</button>
+                <button class="control-btn adaptive-element" title="AR Preview">👁️</button>
+            </div>
+            
+            <input type="text" class="message-input" placeholder="Describe your creative engineering vision or ask for technical assistance...">
+            
+            <button class="send-btn adaptive-element">
+                <span>⚡</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Mechanical animation effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add mechanical breathing effect to tool buttons
+            const toolButtons = document.querySelectorAll('.tool-btn');
+            toolButtons.forEach((btn, index) => {
+                btn.style.animationDelay = `${index * 0.1}s`;
+                btn.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            // Simulate real-time project updates
+            const projectItems = document.querySelectorAll('.project-item');
+            setInterval(() => {
+                const randomProject = projectItems[Math.floor(Math.random() * projectItems.length)];
+                randomProject.style.borderLeftColor = 'var(--copper-brown)';
+                setTimeout(() => {
+                    randomProject.style.borderLeftColor = 'var(--brass-gold)';
+                }, 1000);
+            }, 5000);
+
+            // Input field focus effects
+            const messageInput = document.querySelector('.message-input');
+            messageInput.addEventListener('focus', function() {
+                this.parentElement.style.background = 'linear-gradient(90deg, var(--iron-black), rgba(183, 97, 10, 0.1), var(--iron-black))';
+            });
+            
+            messageInput.addEventListener('blur', function() {
+                this.parentElement.style.background = 'linear-gradient(90deg, var(--iron-black), var(--steel-gray), var(--iron-black))';
+            });
+
+            // Send button functionality
+            const sendBtn = document.querySelector('.send-btn');
+            const messagesContainer = document.querySelector('.messages-container');
+            
+            function sendMessage() {
+                const input = document.querySelector('.message-input');
+                if (input.value.trim() === '') return;
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message own';
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">A</div>
+                    <div class="message-content">
+                        <div class="message-text">${input.value}</div>
+                        <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    </div>
+                `;
+                
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                input.value = '';
+                
+                // Simulate AI response
+                setTimeout(() => {
+                    const aiResponse = document.createElement('div');
+                    aiResponse.className = 'message';
+                    aiResponse.innerHTML = `
+                        <div class="message-avatar">AI</div>
+                        <div class="message-content ai-message">
+                            <div class="message-text">I'm analyzing your request and cross-referencing with material properties database. Let me run some calculations...</div>
+                            <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        </div>
+                    `;
+                    messagesContainer.appendChild(aiResponse);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 1500);
+            }
+            
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Adaptive gender-fluid color transitions
+            const adaptiveElements = document.querySelectorAll('.adaptive-element');
+            setInterval(() => {
+                adaptiveElements.forEach(element => {
+                    if (Math.random() > 0.7) {
+                        element.style.filter = 'hue-rotate(20deg) saturate(1.2)';
+                        setTimeout(() => {
+                            element.style.filter = '';
+                        }, 2000);
+                    }
+                });
+            }, 3000);
+
+            // Network status simulation
+            const networkStatuses = document.querySelectorAll('.network-status');
+            setInterval(() => {
+                networkStatuses.forEach(status => {
+                    if (Math.random() > 0.8) {
+                        status.style.background = 'var(--copper-brown)';
+                        setTimeout(() => {
+                            status.style.background = 'var(--brass-gold)';
+                        }, 500);
+                    }
+                });
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

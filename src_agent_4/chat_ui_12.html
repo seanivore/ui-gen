@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whimsical Wanderer - Jester + Bohemian Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Dancing+Script:wght@400;700&family=Fredoka+One&family=Kalam:wght@300;400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --earth-brown: #8B4513;
+            --sunset-orange: #FF6B35;
+            --mystical-purple: #6A4C93;
+            --forest-green: #2D5016;
+            --bohemian-red: #A0522D;
+            --cream: #F5F5DC;
+            --gold: #DAA520;
+            --deep-teal: #2F4F4F;
+            --warm-amber: #FFBF00;
+            --sage-green: #9CAF88;
+        }
+
+        body {
+            font-family: 'Kalam', cursive;
+            background: linear-gradient(45deg, 
+                var(--earth-brown) 0%, 
+                var(--mystical-purple) 25%, 
+                var(--forest-green) 50%, 
+                var(--bohemian-red) 75%, 
+                var(--sunset-orange) 100%);
+            background-size: 400% 400%;
+            animation: bohemianGradient 20s ease infinite;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @keyframes bohemianGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-element {
+            position: absolute;
+            opacity: 0.7;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .floating-element:nth-child(2) { top: 20%; right: 15%; animation-delay: 2s; }
+        .floating-element:nth-child(3) { bottom: 30%; left: 20%; animation-delay: 4s; }
+        .floating-element:nth-child(4) { bottom: 20%; right: 10%; animation-delay: 6s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-rows: auto 1fr auto;
+            height: 100vh;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            background: rgba(245, 245, 220, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 25px 5px 25px 5px;
+            padding: 15px;
+            text-align: center;
+            border: 3px dashed var(--mystical-purple);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .header-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, var(--sunset-orange), var(--mystical-purple), var(--forest-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: wiggle 3s ease-in-out infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+        }
+
+        .sidebar-left {
+            background: rgba(106, 76, 147, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px 30px 15px 30px;
+            padding: 20px;
+            overflow-y: auto;
+            border: 2px solid var(--gold);
+        }
+
+        .sidebar-right {
+            background: rgba(139, 69, 19, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 30px 15px 30px 15px;
+            padding: 20px;
+            overflow-y: auto;
+            border: 2px solid var(--warm-amber);
+        }
+
+        .chat-main {
+            background: rgba(245, 245, 220, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 3px solid var(--sunset-orange);
+            box-shadow: 0 0 30px rgba(255, 107, 53, 0.3);
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+            background: rgba(245, 245, 220, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            border: 2px dashed var(--cream);
+        }
+
+        .sidebar-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--cream);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .story-prompt {
+            background: linear-gradient(135deg, var(--sunset-orange), var(--warm-amber));
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            font-family: 'Pacifico', cursive;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .story-prompt:hover {
+            transform: scale(1.05) rotate(1deg);
+            border-color: var(--mystical-purple);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .mischief-plan {
+            background: linear-gradient(135deg, var(--mystical-purple), var(--forest-green));
+            color: var(--cream);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mischief-plan:hover {
+            transform: translateX(5px) rotate(-1deg);
+            box-shadow: -5px 5px 10px rgba(0,0,0,0.2);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(106, 76, 147, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(45, 80, 22, 0.1) 0%, transparent 50%);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            border-radius: 25px 5px 25px 5px;
+            max-width: 80%;
+            position: relative;
+            animation: messageAppear 0.5s ease-out;
+        }
+
+        @keyframes messageAppear {
+            from { opacity: 0; transform: translateY(20px) scale(0.8); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .message-user {
+            background: linear-gradient(135deg, var(--sunset-orange), var(--warm-amber));
+            align-self: flex-end;
+            margin-left: auto;
+            color: white;
+            border-radius: 5px 25px 5px 25px;
+            font-family: 'Amatic SC', cursive;
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        .message-ai {
+            background: linear-gradient(135deg, var(--mystical-purple), var(--deep-teal));
+            align-self: flex-start;
+            color: var(--cream);
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.05em;
+        }
+
+        .message-story {
+            background: linear-gradient(135deg, var(--forest-green), var(--sage-green));
+            align-self: center;
+            margin: 20px auto;
+            color: var(--cream);
+            font-family: 'Kalam', cursive;
+            border: 3px dashed var(--gold);
+            text-align: center;
+        }
+
+        .message-mischief {
+            background: linear-gradient(135deg, var(--bohemian-red), var(--earth-brown));
+            color: var(--cream);
+            font-family: 'Pacifico', cursive;
+            font-size: 0.95em;
+            transform: rotate(-1deg);
+        }
+
+        .message::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px solid transparent;
+            border-radius: inherit;
+            background: linear-gradient(45deg, var(--gold), var(--warm-amber), var(--sunset-orange), var(--mystical-purple));
+            background-size: 400% 400%;
+            animation: borderGlow 4s ease infinite;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .chat-input {
+            padding: 20px;
+            background: rgba(245, 245, 220, 0.9);
+            border-top: 3px wavy var(--mystical-purple);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 3px solid var(--sunset-orange);
+            border-radius: 25px;
+            font-family: 'Kalam', cursive;
+            font-size: 1.1em;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--earth-brown);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: var(--mystical-purple);
+            box-shadow: 0 0 20px rgba(106, 76, 147, 0.3);
+            transform: scale(1.02);
+        }
+
+        .send-button {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, var(--sunset-orange), var(--mystical-purple));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-button:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .mode-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .mode-tab {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            font-family: 'Amatic SC', cursive;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--earth-brown);
+        }
+
+        .mode-tab.active {
+            background: var(--sunset-orange);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .mode-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .canvas-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .art-canvas {
+            width: 100%;
+            height: 150px;
+            border: 2px dashed var(--mystical-purple);
+            border-radius: 10px;
+            cursor: crosshair;
+        }
+
+        .creative-tools {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tool-button {
+            padding: 8px 12px;
+            background: var(--sage-green);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-family: 'Kalam', cursive;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .tool-button:hover {
+            background: var(--forest-green);
+            transform: scale(1.05);
+        }
+
+        .connection-card {
+            background: linear-gradient(135deg, var(--warm-amber), var(--gold));
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            color: var(--earth-brown);
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .connection-card:hover {
+            transform: scale(1.02) rotate(0.5deg);
+            border-color: var(--mystical-purple);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .whimsy-indicator {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            background: var(--sunset-orange);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-family: 'Pacifico', cursive;
+            animation: pulse 2s ease-in-out infinite;
+            z-index: 1000;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .surprise-element {
+            position: absolute;
+            font-size: 2em;
+            animation: surpriseAppear 3s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        @keyframes surpriseAppear {
+            0%, 90%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+            10%, 80% { opacity: 1; transform: scale(1) rotate(360deg); }
+        }
+
+        .bohemian-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: 
+                radial-gradient(circle at 25% 25%, var(--mystical-purple) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, var(--sunset-orange) 1px, transparent 1px),
+                radial-gradient(circle at 50% 50%, var(--forest-green) 1.5px, transparent 1.5px);
+            background-size: 50px 50px, 30px 30px, 40px 40px;
+            animation: patternShift 15s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes patternShift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto;
+            }
+            
+            .sidebar-left, .sidebar-right {
+                display: none;
+            }
+            
+            .header-title {
+                font-size: 2em;
+            }
+        }
+
+        /* Special Jester Elements */
+        .jester-hat {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 1.5em;
+            animation: jesterDance 2s ease-in-out infinite;
+        }
+
+        @keyframes jesterDance {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .bohemian-border {
+            border: 3px solid;
+            border-image: linear-gradient(45deg, var(--sunset-orange), var(--mystical-purple), var(--forest-green), var(--bohemian-red)) 1;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-element">🎭</div>
+        <div class="floating-element">🌙</div>
+        <div class="floating-element">🎨</div>
+        <div class="floating-element">✨</div>
+    </div>
+
+    <div class="bohemian-pattern"></div>
+
+    <div class="whimsy-indicator">
+        Mischief Level: High ✨
+    </div>
+
+    <div class="main-container">
+        <header class="header">
+            <h1 class="header-title">Whimsical Wanderer 🎭✨</h1>
+            <p style="font-family: 'Dancing Script', cursive; font-size: 1.2em; color: var(--mystical-purple); margin-top: 5px;">
+                Where stories bloom and adventures begin...
+            </p>
+        </header>
+
+        <div class="sidebar-left">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">🎨 Creative Sparks</h3>
+                <div class="canvas-container">
+                    <canvas class="art-canvas" id="artCanvas"></canvas>
+                    <div class="creative-tools">
+                        <button class="tool-button">Sketch</button>
+                        <button class="tool-button">Poetry</button>
+                        <button class="tool-button">Colors</button>
+                        <button class="tool-button">Dreams</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📚 Story Seeds</h3>
+                <div class="story-prompt">Once upon a time in a world where colors had feelings...</div>
+                <div class="story-prompt">The last unicorn opened a coffee shop and...</div>
+                <div class="story-prompt">In a library where books read themselves...</div>
+                <div class="story-prompt">A dragon who collected vintage postcards...</div>
+            </div>
+        </div>
+
+        <main class="chat-main">
+            <div class="mode-tabs">
+                <div class="mode-tab active">💬 Chat</div>
+                <div class="mode-tab">📖 Story</div>
+                <div class="mode-tab">🎭 Mischief</div>
+                <div class="mode-tab">🌟 Connect</div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message message-ai">
+                    <div class="jester-hat">🎪</div>
+                    Welcome to your whimsical wandering space! I'm your creative companion, ready to weave tales, spark adventures, and paint the world with imagination. What magical mischief shall we conjure today? ✨
+                </div>
+
+                <div class="message message-user">
+                    I want to start a collaborative story about a traveling circus that appears only during solar eclipses! 🌙
+                </div>
+
+                <div class="message message-story">
+                    <strong>🎪 Eclipse Circus Chronicles 🌙</strong><br>
+                    Chapter 1: "The Shadow Arrives"<br><br>
+                    As the moon began its celestial dance across the sun, the first tent materialized from the gathering darkness. Purple silk rippled in the otherworldly breeze, and the scent of starlight cotton candy filled the air...
+                </div>
+
+                <div class="message message-ai">
+                    Oh, what a deliciously mysterious beginning! I can already see the ringmaster - perhaps they wear a coat made of captured moonbeams? And the performers... maybe they're beings who exist only in the liminal space between light and shadow? 🎭✨
+                </div>
+
+                <div class="message message-mischief">
+                    <div class="jester-hat">🃏</div>
+                    Mischief Alert: Planning surprise flash mob poetry reading in the town square at sunset! Who's in for some beautiful chaos? 📚💫
+                </div>
+
+                <div class="message message-user">
+                    Count me in! Let's add some interpretive dance and maybe some sidewalk chalk mandalas? 🎨
+                </div>
+
+                <div class="message message-ai">
+                    Perfect! I've generated a list of whimsical poems about everyday objects having secret lives. Imagine - "The Melancholy of Monday Morning Coffee Cups" performed with flowing scarves under the golden hour light! 🌅☕
+                </div>
+            </div>
+
+            <div class="chat-input">
+                <div class="input-container">
+                    <input type="text" class="message-input" placeholder="Whisper your wildest wonders..." />
+                    <button class="send-button">🚀</button>
+                </div>
+            </div>
+        </main>
+
+        <div class="sidebar-right">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">🎭 Mischief Plans</h3>
+                <div class="mischief-plan">Leave encouraging sticky notes in library books</div>
+                <div class="mischief-plan">Organize a random acts of poetry day</div>
+                <div class="mischief-plan">Create a neighborhood chalk art gallery</div>
+                <div class="mischief-plan">Start a "compliment a stranger" movement</div>
+                <div class="mischief-plan">Flash mob meditation in the park</div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">🌟 Kindred Spirits</h3>
+                <div class="connection-card">
+                    <strong>Luna the Dreamweaver</strong><br>
+                    Currently: Collecting forgotten lullabies<br>
+                    Vibe: Cosmic storyteller ✨
+                </div>
+                <div class="connection-card">
+                    <strong>Felix the Word-Dancer</strong><br>
+                    Currently: Teaching trees to write poetry<br>
+                    Vibe: Nature's scribe 🌳
+                </div>
+                <div class="connection-card">
+                    <strong>Aurora the Color-Whisperer</strong><br>
+                    Currently: Painting emotions on clouds<br>
+                    Vibe: Sky artist 🎨
+                </div>
+                <div class="connection-card">
+                    <strong>Sage the Chaos-Gardener</strong><br>
+                    Currently: Growing wildflower surprises<br>
+                    Vibe: Beautiful disorder 🌻
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="surprise-element" style="top: 20%; left: 10%;">🦋</div>
+    <div class="surprise-element" style="top: 60%; right: 15%;">🌸</div>
+    <div class="surprise-element" style="bottom: 30%; left: 80%;">⭐</div>
+
+    <script>
+        // Jester + Bohemian Interactive Features
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageInput = document.querySelector('.message-input');
+            const sendButton = document.querySelector('.send-button');
+            const modeTabs = document.querySelectorAll('.mode-tab');
+            const artCanvas = document.getElementById('artCanvas');
+            const surpriseElements = document.querySelectorAll('.surprise-element');
+
+            // Bohemian Art Canvas
+            const ctx = artCanvas.getContext('2d');
+            let isDrawing = false;
+            let currentColor = '#FF6B35';
+
+            const colors = ['#FF6B35', '#6A4C93', '#2D5016', '#A0522D', '#DAA520'];
+            let colorIndex = 0;
+
+            artCanvas.addEventListener('mousedown', startDrawing);
+            artCanvas.addEventListener('mousemove', draw);
+            artCanvas.addEventListener('mouseup', stopDrawing);
+
+            function startDrawing(e) {
+                isDrawing = true;
+                currentColor = colors[colorIndex % colors.length];
+                colorIndex++;
+                draw(e);
+            }
+
+            function draw(e) {
+                if (!isDrawing) return;
+                
+                const rect = artCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            }
+
+            function stopDrawing() {
+                isDrawing = false;
+                ctx.beginPath();
+            }
+
+            // Mode switching
+            modeTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    modeTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Add whimsical feedback
+                    this.style.transform = 'scale(1.1) rotate(5deg)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+
+            // Message sending with personality
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (!message) return;
+
+                // Create user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message message-user';
+                userMessage.textContent = message;
+                chatMessages.appendChild(userMessage);
+
+                // Random Jester responses
+                const jesterResponses = [
+                    "What a delightfully twisted idea! Let's add some sparkle to it... ✨",
+                    "Ooh, I can feel the mischief brewing! This calls for interpretive dance! 💃",
+                    "Your imagination is painting the most beautiful chaos! Tell me more! 🎨",
+                    "That's the kind of wonderful weirdness that makes my jester heart sing! 🎭",
+                    "I'm getting visions of rainbow-colored adventures! Should we make them reality? 🌈"
+                ];
+
+                // AI response
+                setTimeout(() => {
+                    const aiMessage = document.createElement('div');
+                    aiMessage.className = 'message message-ai';
+                    const randomResponse = jesterResponses[Math.floor(Math.random() * jesterResponses.length)];
+                    aiMessage.innerHTML = `<div class="jester-hat">🎪</div>${randomResponse}`;
+                    chatMessages.appendChild(aiMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+
+                messageInput.value = '';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            sendButton.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Story prompts interaction
+            document.querySelectorAll('.story-prompt').forEach(prompt => {
+                prompt.addEventListener('click', function() {
+                    const storyMessage = document.createElement('div');
+                    storyMessage.className = 'message message-story';
+                    storyMessage.innerHTML = `<strong>🌟 Story Spark Activated! 🌟</strong><br><br>"${this.textContent}" <br><br>Let's weave this tale together! What happens next in this whimsical world?`;
+                    chatMessages.appendChild(storyMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+            });
+
+            // Mischief plans interaction
+            document.querySelectorAll('.mischief-plan').forEach(plan => {
+                plan.addEventListener('click', function() {
+                    const mischiefMessage = document.createElement('div');
+                    mischiefMessage.className = 'message message-mischief';
+                    mischiefMessage.innerHTML = `<div class="jester-hat">🃏</div>Mischief Mission Activated: "${this.textContent}" - Who's ready to spread some beautiful chaos? 🎭✨`;
+                    chatMessages.appendChild(mischiefMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+            });
+
+            // Connection cards interaction
+            document.querySelectorAll('.connection-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const name = this.querySelector('strong').textContent;
+                    const connectionMessage = document.createElement('div');
+                    connectionMessage.className = 'message message-ai';
+                    connectionMessage.innerHTML = `<div class="jester-hat">🌟</div>Cosmic connection initiated with ${name}! The universe is conspiring to bring kindred spirits together. Shall I help you craft a whimsical introduction? 💫`;
+                    chatMessages.appendChild(connectionMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+            });
+
+            // Creative tools interaction
+            document.querySelectorAll('.tool-button').forEach(tool => {
+                tool.addEventListener('click', function() {
+                    const toolName = this.textContent;
+                    const toolMessage = document.createElement('div');
+                    toolMessage.className = 'message message-ai';
+                    toolMessage.innerHTML = `<div class="jester-hat">🎨</div>Activating ${toolName} mode! Let your creativity flow like a bohemian river of imagination. What masterpiece shall we birth into existence? ✨`;
+                    chatMessages.appendChild(toolMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+            });
+
+            // Spontaneous surprise elements
+            function createSpontaneousSurprise() {
+                const surprises = ['🎭', '✨', '🦋', '🌸', '⭐', '🌙', '🎨', '🎪', '🌈', '💫'];
+                const surprise = document.createElement('div');
+                surprise.className = 'surprise-element';
+                surprise.textContent = surprises[Math.floor(Math.random() * surprises.length)];
+                surprise.style.top = Math.random() * 80 + '%';
+                surprise.style.left = Math.random() * 80 + '%';
+                document.body.appendChild(surprise);
+                
+                setTimeout(() => {
+                    surprise.remove();
+                }, 3000);
+            }
+
+            // Create surprises periodically
+            setInterval(createSpontaneousSurprise, 8000);
+
+            // Whimsical input placeholder changes
+            const placeholders = [
+                "Whisper your wildest wonders...",
+                "Paint your thoughts with stardust...",
+                "What mischief shall we manifest?",
+                "Share your bohemian dreams...",
+                "Unleash your inner storyteller...",
+                "What chaos needs creating today?",
+                "Speak in colors and cosmos...",
+                "Let your words dance freely..."
+            ];
+
+            setInterval(() => {
+                const randomPlaceholder = placeholders[Math.floor(Math.random() * placeholders.length)];
+                messageInput.placeholder = randomPlaceholder;
+            }, 5000);
+
+            // Dynamic whimsy level
+            const whimsyLevels = ['Brewing', 'Moderate', 'High', 'Maximum', 'Cosmic', 'Transcendent'];
+            const whimsyIndicator = document.querySelector('.whimsy-indicator');
+            
+            setInterval(() => {
+                const level = whimsyLevels[Math.floor(Math.random() * whimsyLevels.length)];
+                whimsyIndicator.textContent = `Mischief Level: ${level} ✨`;
+            }, 10000);
+
+            // Bohemian element interactions
+            document.querySelectorAll('.floating-element').forEach(element => {
+                element.addEventListener('mouseover', function() {
+                    this.style.transform = 'scale(1.5) rotate(180deg)';
+                    this.style.transition = 'all 0.5s ease';
+                });
+                
+                element.addEventListener('mouseout', function() {
+                    this.style.transform = '';
+                });
+            });
+
+            // Random jester interruptions
+            const jesterInterruptions = [
+                "🎭 Plot twist incoming! What if that story took a completely unexpected turn?",
+                "✨ Cosmic reminder: Today is perfect for creating beautiful chaos!",
+                "🎨 Inspiration alert: The colors around you are whispering secrets...",
+                "🌙 Midnight mischief idea: Leave anonymous poetry for strangers to find!",
+                "🦋 Gentle chaos suggestion: Dance like no one's watching, even if they are!"
+            ];
+
+            setInterval(() => {
+                if (Math.random() < 0.3) { // 30% chance every interval
+                    const interruption = document.createElement('div');
+                    interruption.className = 'message message-ai';
+                    const randomInterruption = jesterInterruptions[Math.floor(Math.random() * jesterInterruptions.length)];
+                    interruption.innerHTML = `<div class="jester-hat">🎪</div>${randomInterruption}`;
+                    chatMessages.appendChild(interruption);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }, 30000); // Every 30 seconds
+
+            // Initial scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+    </script>
+</body>
+</html>

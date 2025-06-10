@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorer + Bohemian Chat Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600;700&family=Dancing+Script:wght@400;600;700&family=Caveat:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --earth-brown: #8B4513;
+            --sunset-orange: #FF6B35;
+            --mystical-purple: #7B68EE;
+            --forest-green: #228B22;
+            --wanderer-blue: #4682B4;
+            --dusty-rose: #BC8F8F;
+            --golden-sand: #F4A460;
+            --deep-teal: #008B8B;
+            --cream: #F5F5DC;
+            --charcoal: #36454F;
+        }
+        
+        body {
+            font-family: 'Comfortaa', cursive;
+            background: linear-gradient(135deg, var(--earth-brown) 0%, var(--sunset-orange) 25%, var(--mystical-purple) 50%, var(--forest-green) 75%, var(--wanderer-blue) 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 12s ease infinite;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .floating-shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .shape-1 {
+            top: 10%;
+            left: 5%;
+            width: 60px;
+            height: 60px;
+            background: var(--sunset-orange);
+            border-radius: 50% 30% 70% 40%;
+            animation-delay: -2s;
+        }
+        
+        .shape-2 {
+            top: 30%;
+            right: 10%;
+            width: 80px;
+            height: 40px;
+            background: var(--mystical-purple);
+            border-radius: 20px 50px 30px 70px;
+            animation-delay: -4s;
+        }
+        
+        .shape-3 {
+            bottom: 20%;
+            left: 15%;
+            width: 50px;
+            height: 70px;
+            background: var(--forest-green);
+            border-radius: 40% 60% 30% 50%;
+            animation-delay: -6s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .main-container {
+            position: relative;
+            z-index: 2;
+            max-width: 480px;
+            margin: 0 auto;
+            height: 100vh;
+            background: rgba(245, 245, 220, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(139, 69, 19, 0.3);
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, var(--earth-brown), var(--sunset-orange));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            border-radius: 28px 28px 0 0;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, var(--mystical-purple), var(--forest-green), var(--wanderer-blue));
+            border-radius: 35px 35px 0 0;
+            z-index: -1;
+            opacity: 0.3;
+            animation: headerGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes headerGlow {
+            0% { opacity: 0.2; }
+            100% { opacity: 0.5; }
+        }
+        
+        .header h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .navigation-tabs {
+            display: flex;
+            background: rgba(139, 69, 19, 0.1);
+            border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 15px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .nav-tab:hover::before {
+            left: 100%;
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--sunset-orange), var(--mystical-purple));
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .nav-tab .icon {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(180deg, rgba(245, 245, 220, 0.8) 0%, rgba(188, 143, 143, 0.1) 100%);
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            animation: messageSlide 0.5s ease-out;
+        }
+        
+        @keyframes messageSlide {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+        
+        .message.sent {
+            text-align: right;
+        }
+        
+        .message.received {
+            text-align: left;
+        }
+        
+        .message-bubble {
+            display: inline-block;
+            max-width: 80%;
+            padding: 15px 18px;
+            border-radius: 25px;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, var(--sunset-orange), var(--golden-sand));
+            color: white;
+            border-bottom-right-radius: 8px;
+            margin-left: auto;
+        }
+        
+        .message.received .message-bubble {
+            background: linear-gradient(135deg, var(--mystical-purple), var(--wanderer-blue));
+            color: white;
+            border-bottom-left-radius: 8px;
+        }
+        
+        .message.system .message-bubble {
+            background: linear-gradient(135deg, var(--forest-green), var(--deep-teal));
+            color: white;
+            border-radius: 15px;
+            font-style: italic;
+            text-align: center;
+            margin: 0 auto;
+            max-width: 90%;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 5px;
+            font-family: 'Caveat', cursive;
+        }
+        
+        .location-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid var(--earth-brown);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .location-card h4 {
+            color: var(--earth-brown);
+            font-family: 'Dancing Script', cursive;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        
+        .location-card p {
+            font-size: 13px;
+            color: var(--charcoal);
+            line-height: 1.4;
+        }
+        
+        .cultural-exchange {
+            background: linear-gradient(45deg, var(--dusty-rose), var(--cream));
+            border-radius: 20px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px dashed var(--earth-brown);
+        }
+        
+        .cultural-exchange .flag {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 20px;
+        }
+        
+        .wanderlust-suggestion {
+            background: rgba(123, 104, 238, 0.1);
+            border-radius: 20px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid var(--mystical-purple);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wanderlust-suggestion::before {
+            content: '✨';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 16px;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .input-container {
+            padding: 20px;
+            background: linear-gradient(45deg, rgba(139, 69, 19, 0.1), rgba(255, 107, 53, 0.1));
+            border-top: 1px solid rgba(139, 69, 19, 0.2);
+            border-radius: 0 0 28px 28px;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 25px;
+            padding: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .input-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--sunset-orange), var(--mystical-purple), var(--forest-green));
+            border-radius: 27px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .input-wrapper:focus-within::before {
+            opacity: 0.5;
+        }
+        
+        .message-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 12px 15px;
+            font-family: 'Comfortaa', cursive;
+            font-size: 14px;
+            background: transparent;
+            color: var(--charcoal);
+        }
+        
+        .message-input::placeholder {
+            color: rgba(54, 69, 79, 0.6);
+            font-style: italic;
+        }
+        
+        .send-button {
+            background: linear-gradient(135deg, var(--sunset-orange), var(--mystical-purple));
+            border: none;
+            border-radius: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .send-button:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .send-button:active {
+            transform: scale(0.95);
+        }
+        
+        .attachment-buttons {
+            display: flex;
+            gap: 8px;
+            margin-right: 10px;
+        }
+        
+        .attachment-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .attachment-btn.location {
+            background: linear-gradient(135deg, var(--earth-brown), var(--golden-sand));
+            color: white;
+        }
+        
+        .attachment-btn.photo {
+            background: linear-gradient(135deg, var(--forest-green), var(--deep-teal));
+            color: white;
+        }
+        
+        .attachment-btn.culture {
+            background: linear-gradient(135deg, var(--mystical-purple), var(--wanderer-blue));
+            color: white;
+        }
+        
+        .attachment-btn:hover {
+            transform: scale(1.2) rotate(10deg);
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            background: var(--forest-green);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        .travel-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            margin: 10px 0;
+            border-radius: 15px;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .travel-stat {
+            flex: 1;
+        }
+        
+        .travel-stat .number {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--earth-brown);
+            font-family: 'Dancing Script', cursive;
+        }
+        
+        .travel-stat .label {
+            color: var(--charcoal);
+            opacity: 0.8;
+        }
+        
+        /* Scrollbar styling */
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-container::-webkit-scrollbar-track {
+            background: rgba(139, 69, 19, 0.1);
+            border-radius: 3px;
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--sunset-orange), var(--mystical-purple));
+            border-radius: 3px;
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--mystical-purple), var(--forest-green));
+        }
+        
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .main-container {
+                margin: 0;
+                border-radius: 0;
+                height: 100vh;
+            }
+            
+            .header {
+                border-radius: 0;
+            }
+            
+            .input-container {
+                border-radius: 0;
+            }
+        }
+        
+        /* Tab content visibility */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+    </div>
+    
+    <div class="main-container">
+        <div class="header">
+            <div class="status-indicator">📍 Roaming</div>
+            <h1>Wanderlust Connect</h1>
+            <p class="subtitle">Free spirits • Cultural bridges • Endless journeys</p>
+        </div>
+        
+        <div class="navigation-tabs">
+            <div class="nav-tab active" data-tab="stories">
+                <span class="icon">📖</span>
+                Stories
+            </div>
+            <div class="nav-tab" data-tab="exchange">
+                <span class="icon">🌍</span>
+                Exchange
+            </div>
+            <div class="nav-tab" data-tab="wanderlust">
+                <span class="icon">🧭</span>
+                Explore
+            </div>
+            <div class="nav-tab" data-tab="nomads">
+                <span class="icon">🎒</span>
+                Nomads
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <!-- Travel Stories Tab -->
+            <div class="tab-content active" id="stories">
+                <div class="travel-stats">
+                    <div class="travel-stat">
+                        <div class="number">47</div>
+                        <div class="label">Countries</div>
+                    </div>
+                    <div class="travel-stat">
+                        <div class="number">1.2k</div>
+                        <div class="label">Adventures</div>
+                    </div>
+                    <div class="travel-stat">
+                        <div class="number">89</div>
+                        <div class="label">Stories</div>
+                    </div>
+                </div>
+                
+                <div class="message system">
+                    <div class="message-bubble">
+                        ✨ Welcome to your journey sanctuary, fellow wanderer
+                    </div>
+                </div>
+                
+                <div class="message received">
+                    <div class="message-bubble">
+                        Just witnessed the most incredible sunset from a hidden temple in Bagan! 🌅 The locals call it "Buddha's Golden Hour"
+                        
+                        <div class="location-card">
+                            <h4>📍 Ancient Temple, Bagan</h4>
+                            <p>A 900-year-old pagoda discovered through wandering off the tourist path. The monks here have been protecting this secret view for generations.</p>
+                        </div>
+                    </div>
+                    <div class="message-time">Luna • Bagan, Myanmar • 2 hours ago</div>
+                </div>
+                
+                <div class="message sent">
+                    <div class="message-bubble">
+                        That sounds absolutely magical! I'm in the Moroccan Atlas right now and the stars here are telling their own ancient stories ⭐️
+                        
+                        <div class="location-card">
+                            <h4>🏔️ Atlas Mountains, Morocco</h4>
+                            <p>Camping with Berber nomads who've been reading the desert stars for millennia. They're teaching me celestial navigation!</p>
+                        </div>
+                    </div>
+                    <div class="message-time">You • High Atlas • Just now</div>
+                </div>
+                
+                <div class="message received">
+                    <div class="message-bubble">
+                        The universe is connecting us through these sacred moments! 🌟 Have you tried the traditional star tea ceremony?
+                    </div>
+                    <div class="message-time">Luna • 1 minute ago</div>
+                </div>
+            </div>
+            
+            <!-- Cultural Exchange Tab -->
+            <div class="tab-content" id="exchange">
+                <div class="message system">
+                    <div class="message-bubble">
+                        🌈 Cultural bridges await - connect across continents
+                    </div>
+                </div>
+                
+                <div class="message received">
+                    <div class="message-bubble">
+                        <div class="cultural-exchange">
+                            <span class="flag">🇯🇵</span>
+                            <strong>Kenji from Kyoto</strong> wants to teach you the art of forest bathing (Shinrin-yoku) in exchange for learning about Moroccan tea ceremonies!
+                        </div>
+                    </div>
+                    <div class="message-time">Cultural AI • 5 minutes ago</div>
+                </div>
+                
+                <div class="message sent">
+                    <div class="message-bubble">
+                        Perfect synchronicity! I'd love to learn about mindful forest connection. The Berbers here have similar practices with desert meditation 🏜️
+                    </div>
+                    <div class="message-time">You • Just now</div>
+                </div>
+                
+                <div class="message received">
+                    <div class="message-bubble">
+                        <div class="cultural-exchange">
+                            <span class="flag">🇵🇪</span>
+                            <strong>Isabella from Cusco</strong> is hosting a virtual coca leaf reading ceremony tonight at sunset (your time). She's seeking stories of mountain spirits from other cultures.
+                        </div>
+                    </div>
+                    <div class="message-time">Cultural AI • 2 minutes ago</div>
+                </div>
+                
+                <div class="message system">
+                    <div class="message-bubble">
+                        🔮 Your energy signature matches 3 shamanic traditions currently active. Joining ceremonies recommended during tonight's new moon.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Wanderlust Planning Tab -->
+            <div class="tab-content" id="wanderlust">
+                <div class="message system">
+                    <div class="message-bubble">
+                        🧭 Your next adventure calls - follow the unconventional path
+                    </div>
+                </div>
+                
+                <div class="message received">
+                    <div class="message-bubble">
+                        <div class="wanderlust-suggestion">
+                            <strong>Serendipitous Route Detected!</strong><br>
+                            From Morocco → Portugal's forgotten village of Monsanto → Romanian painted monasteries → Georgian wine caves
+                            <br><br>
+                            This path follows ancient pilgrimage routes mixed with modern nomad networks. Expected synchronicities: 87%
+                        </div>
+                    </div>
+                    <div class="message-time">Wanderlust AI • 10 minutes ago</div>
+                </div>
+                
+                <div class="message sent">
+                    <div class="message-bubble">
+                        This feels absolutely right! Those painted monasteries have been calling to me in dreams. What's the story behind the Romanian route? 🎨
+                    </div>
+                    <div class="message-time">You • Just now</div>
+                </div>
+                
+                <div class="message received">
+                    <div class="message-bubble">
+                        The Bucovina monasteries were painted by traveling monks who encoded mystical teachings in their art. Three current nomads report profound spiritual experiences there.
+                        
+                        <div class="location-card">
+                            <h4>🎨 Voroneț Monastery, Romania</h4>
+                            <p>"The Sistine Chapel of the East" - walls covered in 500-year-old frescoes depicting cosmic journeys. Best experienced during the "blue hour" when the famous Voroneț blue glows.</p>
+                        </div>
+                    </div>
+                    <div class="message-time">Wanderlust AI • 30 seconds ago</div>
+                </div>
+            </div>
+            
+            <!-- Nomadic Networks Tab -->
+            <div class="tab-content" id="nomads">
+                <div class="message system">
+                    <div class="message-bubble">
+                        🎒 Your tribe of free spirits spans the globe
+                    </div>
+                </div>
+                
+                <div class="message received">
+                    <div class="message-bubble">
+                        <strong>Atlas Collective Update:</strong><br>
+                        🇲🇦 You + 4 nomads in Morocco<br>
+                        🇵🇹 3 souls heading to Monsanto next week<br>
+                        🇷🇴 2 mystic seekers at Voroneț Monastery<br>
+                        🇬🇪 Wine ceremony circle forming in Kakheti
+                    </div>
+                    <div class="message-time">Network AI • 15 minutes ago</div>
+                </div>
+                
+                <div class="message received">
+                    <div class="message-bubble">
+                        <div class="cultural-exchange">
+                            <span class="flag">🌟</span>
+                            <strong>River from New Zealand</strong> just arrived in Essaouira! She's looking for fellow artists to join a sunset painting session on the beach.
+                        </div>
+                    </div>
+                    <div class="message-time">Nomad Network • 8 minutes ago</div>
+                </div>
+                
+                <div class="message sent">
+                    <div class="message-bubble">
+                        River! I remember her mystical landscapes from Instagram. I'm in the Atlas but could travel to Essaouira tomorrow. Is she still painting the wind patterns? 🎨
+                    </div>
+                    <div class="message-time">You • Just now</div>
+                </div>
+                
+                <div class="message received">
+                    <div class="message-bubble">
+                        Yes! She's evolved into capturing the "soul signatures" of places through color and movement. She says Morocco's coast is singing a new song she's never heard before.
+                    </div>
+                    <div class="message-time">Network AI • 10 seconds ago</div>
+                </div>
+                
+                <div class="message system">
+                    <div class="message-bubble">
+                        🌊 Synchronicity alert: Tomorrow's sunset in Essaouira aligns with a rare atmospheric phenomenon. Perfect timing for transcendent art creation.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <div class="input-wrapper">
+                <div class="attachment-buttons">
+                    <button class="attachment-btn location" title="Share Location Story">📍</button>
+                    <button class="attachment-btn photo" title="Add Journey Photo">📸</button>
+                    <button class="attachment-btn culture" title="Cultural Exchange">🌍</button>
+                </div>
+                <input type="text" class="message-input" placeholder="Share your wandering thoughts...">
+                <button class="send-button">
+                    ✈️
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Message sending functionality
+        const messageInput = document.querySelector('.message-input');
+        const sendButton = document.querySelector('.send-button');
+        const chatContainer = document.querySelector('.chat-container');
+        
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                // Create new message element
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message sent';
+                messageDiv.innerHTML = `
+                    <div class="message-bubble">
+                        ${message}
+                    </div>
+                    <div class="message-time">You • Just now</div>
+                `;
+                
+                // Add to active tab content
+                const activeTab = document.querySelector('.tab-content.active');
+                activeTab.appendChild(messageDiv);
+                
+                // Clear input
+                messageInput.value = '';
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Simulate AI response after delay
+                setTimeout(() => {
+                    simulateAIResponse(message);
+                }, 1500);
+            }
+        }
+        
+        function simulateAIResponse(userMessage) {
+            const responses = [
+                "The universe is conspiring to guide your next adventure! ✨",
+                "I sense a powerful synchronicity in your journey ahead 🌟",
+                "Your wanderer's spirit is calling you toward hidden treasures 🗺️",
+                "The nomadic collective feels your energy shift - something magical is coming! 🔮",
+                "Ancient paths are opening up for your free spirit to explore 🌈"
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message received';
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    ${randomResponse}
+                </div>
+                <div class="message-time">Cosmic Guide • Just now</div>
+            `;
+            
+            const activeTab = document.querySelector('.tab-content.active');
+            activeTab.appendChild(messageDiv);
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Send message on button click
+        sendButton.addEventListener('click', sendMessage);
+        
+        // Send message on Enter key press
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Attachment button functionality
+        document.querySelectorAll('.attachment-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const type = btn.classList.contains('location') ? 'location' : 
+                           btn.classList.contains('photo') ? 'photo' : 'culture';
+                
+                let message = '';
+                switch(type) {
+                    case 'location':
+                        message = '📍 Sharing my current mystical coordinates...';
+                        break;
+                    case 'photo':
+                        message = '📸 Capturing the soul of this moment...';
+                        break;
+                    case 'culture':
+                        message = '🌍 Opening cultural bridge for connection...';
+                        break;
+                }
+                
+                messageInput.value = message;
+                sendMessage();
+            });
+        });
+        
+        // Add some dynamic effects
+        setInterval(() => {
+            const shapes = document.querySelectorAll('.floating-shape');
+            shapes.forEach(shape => {
+                const randomColor = ['var(--sunset-orange)', 'var(--mystical-purple)', 'var(--forest-green)', 'var(--wanderer-blue)'][Math.floor(Math.random() * 4)];
+                shape.style.background = randomColor;
+            });
+        }, 8000);
+        
+        // Status indicator updates
+        const statusMessages = [
+            '📍 Roaming', '🌍 Connecting', '✨ Discovering', '🧭 Exploring', 
+            '🎒 Wandering', '🌟 Manifesting', '🔮 Seeking', '🌈 Creating'
+        ];
+        
+        let statusIndex = 0;
+        setInterval(() => {
+            const statusIndicator = document.querySelector('.status-indicator');
+            statusIndex = (statusIndex + 1) % statusMessages.length;
+            statusIndicator.textContent = statusMessages[statusIndex];
+        }, 5000);
+    </script>
+</body>
+</html>

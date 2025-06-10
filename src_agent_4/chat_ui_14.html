@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gothic War Command - Iteration 14</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Creepster&family=Metal+Mania&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --shadow-black: #0a0a0a;
+            --midnight-black: #1a1a1a;
+            --blood-red: #8b0000;
+            --crimson-glow: #dc143c;
+            --bone-white: #f5f5dc;
+            --steel-blue: #4682b4;
+            --shadow-gray: #2f2f2f;
+            --ethereal-mist: rgba(75, 0, 130, 0.3);
+        }
+        
+        body {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(135deg, var(--shadow-black) 0%, var(--midnight-black) 50%, #1f1f1f 100%);
+            color: var(--bone-white);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, var(--ethereal-mist) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .war-command-interface {
+            display: grid;
+            grid-template-columns: 300px 1fr 280px;
+            grid-template-rows: 80px 1fr 100px;
+            height: 100vh;
+            position: relative;
+            z-index: 2;
+            gap: 2px;
+            background: linear-gradient(45deg, transparent 48%, var(--blood-red) 49%, var(--blood-red) 51%, transparent 52%);
+        }
+        
+        .command-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, var(--shadow-black), var(--midnight-black), var(--shadow-black));
+            border-bottom: 3px solid var(--blood-red);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .command-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(220, 20, 60, 0.1), transparent);
+            animation: sweep 8s infinite;
+        }
+        
+        @keyframes sweep {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+        
+        .war-title {
+            font-family: 'Metal Mania', cursive;
+            font-size: 2.5em;
+            color: var(--crimson-glow);
+            text-shadow: 
+                0 0 10px var(--blood-red),
+                0 0 20px var(--blood-red),
+                2px 2px 4px var(--shadow-black);
+            position: relative;
+            z-index: 3;
+        }
+        
+        .status-indicators {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .status-orb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-orb.active { background: var(--crimson-glow); }
+        .status-orb.warning { background: #ff6b35; }
+        .status-orb.hostile { background: var(--blood-red); }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+        
+        .battle-orders {
+            background: linear-gradient(135deg, var(--midnight-black), var(--shadow-gray));
+            border-right: 2px solid var(--blood-red);
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .battle-orders::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 49px,
+                rgba(139, 0, 0, 0.1) 50px
+            );
+            pointer-events: none;
+        }
+        
+        .orders-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-header {
+            font-size: 1.2em;
+            color: var(--crimson-glow);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--blood-red);
+            padding-bottom: 5px;
+        }
+        
+        .order-item {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--shadow-gray);
+            border-left: 4px solid var(--blood-red);
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .order-item:hover {
+            background: rgba(139, 0, 0, 0.1);
+            border-left-color: var(--crimson-glow);
+            transform: translateX(5px);
+        }
+        
+        .order-priority {
+            color: var(--crimson-glow);
+            font-weight: bold;
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+        
+        .order-text {
+            margin-top: 5px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .main-battlefield {
+            background: var(--midnight-black);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tactical-display {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .tactical-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 74%, var(--shadow-gray) 75%, var(--shadow-gray) 76%, transparent 77%),
+                linear-gradient(-45deg, transparent 74%, var(--shadow-gray) 75%, var(--shadow-gray) 76%, transparent 77%);
+            background-size: 30px 30px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        .message-thread {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--shadow-gray);
+            border-radius: 0;
+            margin-bottom: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .message-thread::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--blood-red), var(--crimson-glow), var(--blood-red));
+        }
+        
+        .message-header {
+            background: linear-gradient(90deg, rgba(139, 0, 0, 0.2), transparent);
+            padding: 12px 12px 12px 20px;
+            border-bottom: 1px solid var(--shadow-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .commander-name {
+            font-weight: bold;
+            color: var(--crimson-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .battle-time {
+            color: var(--steel-blue);
+            font-size: 0.8em;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .message-content {
+            padding: 15px 15px 15px 25px;
+            line-height: 1.6;
+        }
+        
+        .tactical-keyword {
+            color: var(--crimson-glow);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .alliance-panel {
+            background: linear-gradient(135deg, var(--shadow-gray), var(--midnight-black));
+            border-left: 2px solid var(--blood-red);
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .alliance-section {
+            margin-bottom: 20px;
+        }
+        
+        .ally-contact {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--shadow-gray);
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .ally-contact:hover {
+            background: rgba(139, 0, 0, 0.1);
+            border-color: var(--blood-red);
+        }
+        
+        .ally-name {
+            font-weight: bold;
+            color: var(--bone-white);
+            margin-bottom: 4px;
+        }
+        
+        .ally-status {
+            font-size: 0.8em;
+            color: var(--steel-blue);
+        }
+        
+        .ally-status.online::before {
+            content: '⚔';
+            color: var(--crimson-glow);
+            margin-right: 5px;
+        }
+        
+        .command-input-zone {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, var(--shadow-black), var(--midnight-black), var(--shadow-black));
+            border-top: 3px solid var(--blood-red);
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .command-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--shadow-gray);
+            border-radius: 0;
+            padding: 15px 20px;
+            color: var(--bone-white);
+            font-family: 'Cinzel', serif;
+            font-size: 1em;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .command-input:focus {
+            border-color: var(--blood-red);
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.3);
+        }
+        
+        .command-input::placeholder {
+            color: var(--shadow-gray);
+            font-style: italic;
+        }
+        
+        .execute-button {
+            background: linear-gradient(135deg, var(--blood-red), var(--crimson-glow));
+            border: none;
+            padding: 15px 25px;
+            color: var(--bone-white);
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .execute-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .execute-button:hover::before {
+            left: 100%;
+        }
+        
+        .execute-button:hover {
+            background: linear-gradient(135deg, var(--crimson-glow), #ff1744);
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.5);
+        }
+        
+        .gothic-ornament {
+            position: absolute;
+            color: var(--blood-red);
+            opacity: 0.1;
+            font-size: 3em;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        .mist-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), var(--ethereal-mist) 0%, transparent 40%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--shadow-black);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--blood-red);
+            border-radius: 0;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--crimson-glow);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .war-command-interface {
+                grid-template-columns: 250px 1fr 220px;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .war-command-interface {
+                grid-template-columns: 1fr;
+                grid-template-rows: 80px 200px 1fr 100px;
+            }
+            
+            .battle-orders, .alliance-panel {
+                border: none;
+                border-bottom: 2px solid var(--blood-red);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="war-command-interface">
+        <header class="command-header">
+            <h1 class="war-title">⚔ DARK COMMAND ⚔</h1>
+            <div class="status-indicators">
+                <div class="status-orb active" title="Battle Ready"></div>
+                <div class="status-orb warning" title="Reconnaissance Active"></div>
+                <div class="status-orb hostile" title="Enemy Detected"></div>
+            </div>
+        </header>
+        
+        <aside class="battle-orders">
+            <div class="orders-section">
+                <h3 class="section-header">⚡ Immediate Orders</h3>
+                <div class="order-item">
+                    <div class="order-priority">CRITICAL</div>
+                    <div class="order-text">Secure eastern fortress before dawn. No survivors.</div>
+                </div>
+                <div class="order-item">
+                    <div class="order-priority">HIGH</div>
+                    <div class="order-text">Deploy shadow units to northern borders. Silent approach.</div>
+                </div>
+                <div class="order-item">
+                    <div class="order-priority">URGENT</div>
+                    <div class="order-text">Intercept enemy supply lines. Leave no trace.</div>
+                </div>
+            </div>
+            
+            <div class="orders-section">
+                <h3 class="section-header">🗡 Strategic Directives</h3>
+                <div class="order-item">
+                    <div class="order-priority">ONGOING</div>
+                    <div class="order-text">Maintain psychological warfare on western front.</div>
+                </div>
+                <div class="order-item">
+                    <div class="order-priority">INTEL</div>
+                    <div class="order-text">Gather intelligence on new enemy technologies.</div>
+                </div>
+            </div>
+            
+            <div class="orders-section">
+                <h3 class="section-header">🏴 Dark Operations</h3>
+                <div class="order-item">
+                    <div class="order-priority">CLASSIFIED</div>
+                    <div class="order-text">Execute Protocol Shadowfall at 0300 hours.</div>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="main-battlefield">
+            <div class="tactical-display">
+                <div class="message-thread">
+                    <div class="message-header">
+                        <span class="commander-name">GENERAL VEX</span>
+                        <span class="battle-time">23:47:12</span>
+                    </div>
+                    <div class="message-content">
+                        The <span class="tactical-keyword">CRIMSON LEGION</span> has breached their outer defenses. Enemy morale is breaking. Recommend immediate <span class="tactical-keyword">FULL ASSAULT</span> to capitalize on their weakness.
+                    </div>
+                </div>
+                
+                <div class="message-thread">
+                    <div class="message-header">
+                        <span class="commander-name">SHADOW OPERATIVE KAINE</span>
+                        <span class="battle-time">23:52:08</span>
+                    </div>
+                    <div class="message-content">
+                        Infiltration successful. Enemy command structure identified. Primary target is <span class="tactical-keyword">FORTRESS OBSIDIAN</span>. Awaiting orders to proceed with <span class="tactical-keyword">TERMINATION PROTOCOL</span>.
+                    </div>
+                </div>
+                
+                <div class="message-thread">
+                    <div class="message-header">
+                        <span class="commander-name">BATTLE AI CERBERUS</span>
+                        <span class="battle-time">23:58:33</span>
+                    </div>
+                    <div class="message-content">
+                        TACTICAL ANALYSIS COMPLETE: Enemy reinforcements detected 12km south. Estimated arrival in 47 minutes. Recommend <span class="tactical-keyword">SCORCHED EARTH</span> strategy to deny territorial advantage.
+                    </div>
+                </div>
+                
+                <div class="message-thread">
+                    <div class="message-header">
+                        <span class="commander-name">WARLORD NOCTIS</span>
+                        <span class="battle-time">00:03:17</span>
+                    </div>
+                    <div class="message-content">
+                        The blood moon rises. Our dark covenant grows stronger. <span class="tactical-keyword">NIGHTMARE SQUADRON</span> reports successful psychological operations. Enemy forces are in complete disarray.
+                    </div>
+                </div>
+                
+                <div class="message-thread">
+                    <div class="message-header">
+                        <span class="commander-name">INTEL WRAITH MORA</span>
+                        <span class="battle-time">00:07:42</span>
+                    </div>
+                    <div class="message-content">
+                        Intercepted enemy communications reveal panic in their ranks. They're calling for evacuation. This is our moment. <span class="tactical-keyword">STRIKE WITHOUT MERCY</span>.
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <aside class="alliance-panel">
+            <div class="alliance-section">
+                <h3 class="section-header">⚔ War Council</h3>
+                <div class="ally-contact">
+                    <div class="ally-name">GENERAL VEX</div>
+                    <div class="ally-status online">Leading frontal assault</div>
+                </div>
+                <div class="ally-contact">
+                    <div class="ally-name">SHADOW KAINE</div>
+                    <div class="ally-status online">Deep infiltration</div>
+                </div>
+                <div class="ally-contact">
+                    <div class="ally-name">WARLORD NOCTIS</div>
+                    <div class="ally-status online">Dark operations</div>
+                </div>
+            </div>
+            
+            <div class="alliance-section">
+                <h3 class="section-header">🏴 Dark Allies</h3>
+                <div class="ally-contact">
+                    <div class="ally-name">CRIMSON LEGION</div>
+                    <div class="ally-status online">Heavy combat unit</div>
+                </div>
+                <div class="ally-contact">
+                    <div class="ally-name">NIGHTMARE SQUADRON</div>
+                    <div class="ally-status online">Psychological warfare</div>
+                </div>
+                <div class="ally-contact">
+                    <div class="ally-name">VOID HUNTERS</div>
+                    <div class="ally-status">Reconnaissance</div>
+                </div>
+            </div>
+            
+            <div class="alliance-section">
+                <h3 class="section-header">🤖 AI Units</h3>
+                <div class="ally-contact">
+                    <div class="ally-name">BATTLE AI CERBERUS</div>
+                    <div class="ally-status online">Tactical analysis</div>
+                </div>
+                <div class="ally-contact">
+                    <div class="ally-name">INTEL WRAITH MORA</div>
+                    <div class="ally-status online">Intelligence gathering</div>
+                </div>
+            </div>
+        </aside>
+        
+        <footer class="command-input-zone">
+            <input type="text" class="command-input" placeholder="Issue battle commands... Type 'EXECUTE' to deploy forces">
+            <button class="execute-button">EXECUTE</button>
+        </footer>
+    </div>
+    
+    <!-- Gothic Ornaments -->
+    <div class="gothic-ornament" style="top: 20%; left: 10%;">†</div>
+    <div class="gothic-ornament" style="top: 60%; right: 15%; animation-delay: -2s;">⚜</div>
+    <div class="gothic-ornament" style="bottom: 30%; left: 20%; animation-delay: -4s;">🗡</div>
+    
+    <div class="mist-effect" id="mistEffect"></div>
+    
+    <script>
+        // Ethereal mist effect on mouse movement
+        document.addEventListener('mousemove', (e) => {
+            const mistEffect = document.getElementById('mistEffect');
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            
+            mistEffect.style.setProperty('--x', x + '%');
+            mistEffect.style.setProperty('--y', y + '%');
+            mistEffect.style.opacity = '0.3';
+            
+            setTimeout(() => {
+                mistEffect.style.opacity = '0';
+            }, 1000);
+        });
+        
+        // Battle order interaction
+        document.querySelectorAll('.order-item').forEach(order => {
+            order.addEventListener('click', () => {
+                order.style.background = 'rgba(139, 0, 0, 0.2)';
+                order.style.borderLeft = '4px solid #dc143c';
+                
+                setTimeout(() => {
+                    order.style.background = 'rgba(0, 0, 0, 0.4)';
+                    order.style.borderLeft = '4px solid #8b0000';
+                }, 500);
+            });
+        });
+        
+        // Alliance contact interaction
+        document.querySelectorAll('.ally-contact').forEach(contact => {
+            contact.addEventListener('click', () => {
+                const input = document.querySelector('.command-input');
+                const name = contact.querySelector('.ally-name').textContent;
+                input.value = `@${name} `;
+                input.focus();
+            });
+        });
+        
+        // Command execution
+        document.querySelector('.execute-button').addEventListener('click', () => {
+            const input = document.querySelector('.command-input');
+            if (input.value.trim()) {
+                // Create new message
+                const tacticalDisplay = document.querySelector('.tactical-display');
+                const newMessage = document.createElement('div');
+                newMessage.className = 'message-thread';
+                newMessage.innerHTML = `
+                    <div class="message-header">
+                        <span class="commander-name">SUPREME COMMANDER</span>
+                        <span class="battle-time">${new Date().toTimeString().slice(0, 8)}</span>
+                    </div>
+                    <div class="message-content">
+                        <span class="tactical-keyword">COMMAND ISSUED:</span> ${input.value}
+                    </div>
+                `;
+                
+                tacticalDisplay.appendChild(newMessage);
+                tacticalDisplay.scrollTop = tacticalDisplay.scrollHeight;
+                input.value = '';
+                
+                // Flash execute button
+                const button = document.querySelector('.execute-button');
+                button.style.background = 'linear-gradient(135deg, #ff1744, #ffab00)';
+                setTimeout(() => {
+                    button.style.background = 'linear-gradient(135deg, var(--blood-red), var(--crimson-glow))';
+                }, 200);
+            }
+        });
+        
+        // Enter key execution
+        document.querySelector('.command-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.querySelector('.execute-button').click();
+            }
+        });
+        
+        // Auto-scroll messages
+        const tacticalDisplay = document.querySelector('.tactical-display');
+        tacticalDisplay.scrollTop = tacticalDisplay.scrollHeight;
+        
+        // Simulate incoming intelligence reports
+        const battleReports = [
+            "Enemy supply convoy destroyed. No survivors.",
+            "Fortress Obsidian has fallen. Requesting new orders.",
+            "Psychological warfare proving effective. Enemy morale at 23%.",
+            "Shadow operatives report successful infiltration of command center.",
+            "Air superiority achieved. Requesting ground assault authorization."
+        ];
+        
+        let reportIndex = 0;
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                const tacticalDisplay = document.querySelector('.tactical-display');
+                const newMessage = document.createElement('div');
+                newMessage.className = 'message-thread';
+                newMessage.innerHTML = `
+                    <div class="message-header">
+                        <span class="commander-name">FIELD OPERATIVE</span>
+                        <span class="battle-time">${new Date().toTimeString().slice(0, 8)}</span>
+                    </div>
+                    <div class="message-content">
+                        <span class="tactical-keyword">FIELD REPORT:</span> ${battleReports[reportIndex % battleReports.length]}
+                    </div>
+                `;
+                
+                tacticalDisplay.appendChild(newMessage);
+                tacticalDisplay.scrollTop = tacticalDisplay.scrollHeight;
+                reportIndex++;
+            }
+        }, 15000);
+    </script>
+</body>
+</html>
