@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -176,7 +177,8 @@
             margin-top: 20px;
         }
 
-        .traditional, .innovative {
+        .traditional,
+        .innovative {
             padding: 20px;
             border-radius: 10px;
             border: 2px solid #ddd;
@@ -225,13 +227,27 @@
         }
 
         @keyframes grow {
-            from { height: 0; opacity: 0; }
-            to { height: var(--grow-height); opacity: 1; }
+            from {
+                height: 0;
+                opacity: 0;
+            }
+
+            to {
+                height: var(--grow-height);
+                opacity: 1;
+            }
         }
 
         @keyframes leafSway {
-            0%, 100% { transform: rotate(-5deg); }
-            50% { transform: rotate(5deg); }
+
+            0%,
+            100% {
+                transform: rotate(-5deg);
+            }
+
+            50% {
+                transform: rotate(5deg);
+            }
         }
 
         .leaf.animated {
@@ -242,18 +258,19 @@
             .comparison-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .innovation-meta {
                 flex-direction: column;
                 gap: 15px;
             }
-            
+
             .textseed-container {
                 height: 250px;
             }
         }
     </style>
 </head>
+
 <body>
     <header>
         <h1>UI Innovation: TextSeed - Organic Text Input</h1>
@@ -353,11 +370,11 @@
                 // Focus handling
                 this.container.addEventListener('click', () => this.focus());
                 this.container.addEventListener('keydown', (e) => this.handleKeyDown(e));
-                
+
                 // Hidden input for text capture
                 this.hiddenInput.addEventListener('input', (e) => this.handleInput(e));
                 this.hiddenInput.addEventListener('keydown', (e) => this.handleSpecialKeys(e));
-                
+
                 // Focus and blur events
                 this.hiddenInput.addEventListener('focus', () => this.setActive(true));
                 this.hiddenInput.addEventListener('blur', () => this.setActive(false));
@@ -370,8 +387,8 @@
 
             setActive(active) {
                 this.isActive = active;
-                this.container.style.boxShadow = active 
-                    ? '0 0 20px rgba(50, 205, 50, 0.5)' 
+                this.container.style.boxShadow = active
+                    ? '0 0 20px rgba(50, 205, 50, 0.5)'
                     : 'inset 0 5px 15px rgba(0, 0, 0, 0.1)';
             }
 
@@ -438,7 +455,7 @@
 
             updateLeaves(textLength) {
                 const targetLeaves = Math.floor(textLength / 5);
-                
+
                 // Remove excess leaves
                 while (this.leaves.length > targetLeaves) {
                     const leaf = this.leaves.pop();
@@ -459,16 +476,16 @@
             addLeaf(index) {
                 const leaf = document.createElement('div');
                 leaf.className = 'leaf animated';
-                
+
                 const side = index % 2 === 0 ? -1 : 1;
                 const height = 55 + (index * 15);
                 const offset = side * 20;
-                
+
                 leaf.style.bottom = height + 'px';
                 leaf.style.left = 'calc(50% + ' + offset + 'px)';
                 leaf.style.transform = 'rotate(' + (side * 20) + 'deg)';
                 leaf.style.animationDelay = (index * 0.2) + 's';
-                
+
                 this.container.appendChild(leaf);
                 this.leaves.push(leaf);
 
@@ -482,7 +499,7 @@
                 // Update ARIA properties
                 this.container.setAttribute('aria-valuenow', this.currentText.length);
                 this.container.setAttribute('aria-valuemax', this.maxLength);
-                this.container.setAttribute('aria-valuetext', 
+                this.container.setAttribute('aria-valuetext',
                     `${this.currentText.length} characters entered: ${this.currentText || 'empty'}`);
             }
 
@@ -529,4 +546,5 @@
         });
     </script>
 </body>
+
 </html>
