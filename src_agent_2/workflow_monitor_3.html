@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industrial Manufacturing Process Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        .main-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* Header - Static Monitor Display */
+        .header-monitor {
+            background: linear-gradient(145deg, #1a252f 0%, #2c3e50 100%);
+            padding: 12px 16px;
+            border-bottom: 3px solid #e67e22;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-monitor::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(230, 126, 34, 0.1), transparent);
+            animation: scanLine 3s infinite;
+        }
+        
+        @keyframes scanLine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .plant-overview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .plant-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e67e22;
+            text-shadow: 0 0 10px rgba(230, 126, 34, 0.3);
+        }
+        
+        .emergency-stop {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #e74c3c, #c0392b);
+            border: 3px solid #fff;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .emergency-stop:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 30px rgba(231, 76, 60, 0.8);
+        }
+        
+        .emergency-stop::after {
+            content: '⏹';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            color: white;
+        }
+        
+        .oee-dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .oee-metric {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .oee-metric::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            transition: width 0.5s ease;
+        }
+        
+        .oee-availability::before { width: 94%; }
+        .oee-performance::before { width: 87%; }
+        .oee-quality::before { width: 91%; }
+        
+        .oee-label {
+            font-size: 10px;
+            color: #bdc3c7;
+            margin-bottom: 2px;
+        }
+        
+        .oee-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #3498db;
+            text-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+        }
+        
+        /* Main Content Area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* Current Task Focus - Production Line */
+        .production-line {
+            background: linear-gradient(145deg, #34495e 0%, #2c3e50 100%);
+            margin: 8px;
+            border-radius: 12px;
+            padding: 16px;
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            flex: 0 0 45%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .conveyor-belt {
+            position: relative;
+            height: 60px;
+            background: linear-gradient(to right, #555, #666, #555);
+            border-radius: 4px;
+            margin: 12px 0;
+            overflow: hidden;
+            border: 2px solid #7f8c8d;
+        }
+        
+        .conveyor-belt::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent 0px,
+                transparent 10px,
+                rgba(127, 140, 141, 0.3) 10px,
+                rgba(127, 140, 141, 0.3) 12px
+            );
+            animation: conveyorMove 2s linear infinite;
+        }
+        
+        @keyframes conveyorMove {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0%); }
+        }
+        
+        .production-stations {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+        }
+        
+        .station {
+            flex: 1;
+            margin: 0 4px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 8px;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .station:active {
+            transform: scale(0.98);
+            background: rgba(52, 152, 219, 0.2);
+        }
+        
+        .station.active {
+            border-color: #e67e22;
+            box-shadow: 0 0 15px rgba(230, 126, 34, 0.4);
+        }
+        
+        .station.active::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #e67e22, #d35400, #e67e22);
+            border-radius: 8px;
+            z-index: -1;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .station-name {
+            font-size: 10px;
+            color: #bdc3c7;
+            margin-bottom: 4px;
+        }
+        
+        .station-status {
+            font-size: 12px;
+            font-weight: 600;
+            color: #27ae60;
+        }
+        
+        .station-throughput {
+            font-size: 8px;
+            color: #95a5a6;
+            margin-top: 2px;
+        }
+        
+        .quality-gates {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .quality-gate {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #27ae60;
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(39, 174, 96, 0.5);
+            position: relative;
+            animation: qualityPulse 1.5s infinite alternate;
+        }
+        
+        .quality-gate.warning {
+            background: #f39c12;
+            box-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+        }
+        
+        .quality-gate.error {
+            background: #e74c3c;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+        }
+        
+        @keyframes qualityPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+        
+        /* Activity Timeline Feed */
+        .activity-timeline {
+            background: rgba(0, 0, 0, 0.2);
+            margin: 0 8px 8px 8px;
+            border-radius: 12px;
+            flex: 1;
+            overflow: hidden;
+            border: 1px solid rgba(127, 140, 141, 0.3);
+        }
+        
+        .timeline-header {
+            background: linear-gradient(145deg, #1a252f, #2c3e50);
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(127, 140, 141, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .timeline-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #3498db;
+        }
+        
+        .shift-indicator {
+            font-size: 10px;
+            color: #95a5a6;
+            background: rgba(52, 152, 219, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+        
+        .timeline-content {
+            height: calc(100% - 60px);
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .timeline-item {
+            display: flex;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(127, 140, 141, 0.1);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .timeline-item:active {
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .timeline-time {
+            min-width: 50px;
+            font-size: 10px;
+            color: #95a5a6;
+            font-family: 'SF Mono', Consolas, monospace;
+        }
+        
+        .timeline-content-item {
+            flex: 1;
+            margin-left: 12px;
+        }
+        
+        .timeline-message {
+            font-size: 12px;
+            color: #ecf0f1;
+            margin-bottom: 2px;
+        }
+        
+        .timeline-details {
+            font-size: 10px;
+            color: #7f8c8d;
+        }
+        
+        .timeline-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #3498db;
+            margin-top: 6px;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
+        }
+        
+        .timeline-icon.success { background: #27ae60; box-shadow: 0 0 8px rgba(39, 174, 96, 0.5); }
+        .timeline-icon.warning { background: #f39c12; box-shadow: 0 0 8px rgba(243, 156, 18, 0.5); }
+        .timeline-icon.error { background: #e74c3c; box-shadow: 0 0 8px rgba(231, 76, 60, 0.5); }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            border: none;
+            box-shadow: 0 6px 20px rgba(230, 126, 34, 0.4);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .fab:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.6);
+        }
+        
+        /* Maintenance Alerts */
+        .maintenance-alerts {
+            position: absolute;
+            top: 80px;
+            right: 8px;
+            background: rgba(231, 76, 60, 0.9);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 10px;
+            color: white;
+            max-width: 120px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            transform: translateX(100%);
+            animation: slideAlert 0.5s ease forwards;
+        }
+        
+        @keyframes slideAlert {
+            to { transform: translateX(0); }
+        }
+        
+        /* Six Sigma Indicators */
+        .sigma-indicators {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            display: flex;
+            gap: 4px;
+        }
+        
+        .sigma-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #27ae60;
+            animation: sigmaPulse 2s infinite;
+        }
+        
+        .sigma-dot:nth-child(2) { animation-delay: 0.3s; }
+        .sigma-dot:nth-child(3) { animation-delay: 0.6s; }
+        .sigma-dot:nth-child(4) { animation-delay: 0.9s; }
+        .sigma-dot:nth-child(5) { animation-delay: 1.2s; }
+        .sigma-dot:nth-child(6) { animation-delay: 1.5s; }
+        
+        @keyframes sigmaPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* Haptic Feedback Classes */
+        .haptic-light { transition: all 0.1s ease; }
+        .haptic-medium { transition: all 0.15s ease; }
+        .haptic-heavy { transition: all 0.2s ease; }
+        
+        /* Lean Manufacturing Waste Indicator */
+        .waste-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid #2ecc71;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 8px;
+            color: #2ecc71;
+            font-weight: 600;
+        }
+        
+        /* Supply Chain Flow */
+        .supply-chain {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(90deg, #16a085 0%, #1abc9c 50%, #16a085 100%);
+            background-size: 200% 100%;
+            animation: flowAnimation 3s linear infinite;
+        }
+        
+        @keyframes flowAnimation {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header - Static Monitor Display -->
+        <header class="header-monitor">
+            <div class="plant-overview">
+                <h1 class="plant-title">Manufacturing Plant Alpha</h1>
+                <button class="emergency-stop haptic-heavy" onclick="triggerEmergencyStop()"></button>
+            </div>
+            
+            <div class="oee-dashboard">
+                <div class="oee-metric oee-availability">
+                    <div class="oee-label">AVAILABILITY</div>
+                    <div class="oee-value">94.2%</div>
+                </div>
+                <div class="oee-metric oee-performance">
+                    <div class="oee-label">PERFORMANCE</div>
+                    <div class="oee-value">87.6%</div>
+                </div>
+                <div class="oee-metric oee-quality">
+                    <div class="oee-label">QUALITY</div>
+                    <div class="oee-value">91.3%</div>
+                </div>
+            </div>
+            
+            <div class="waste-indicator">
+                WASTE: -12.4% ↓
+            </div>
+        </header>
+        
+        <!-- Main Content Area -->
+        <div class="content-area">
+            <!-- Current Task Focus - Production Line -->
+            <section class="production-line">
+                <div class="conveyor-belt"></div>
+                
+                <div class="production-stations">
+                    <div class="station active haptic-medium" onclick="selectStation(1)">
+                        <div class="station-name">PREP-01</div>
+                        <div class="station-status">RUNNING</div>
+                        <div class="station-throughput">245 units/hr</div>
+                    </div>
+                    <div class="station haptic-medium" onclick="selectStation(2)">
+                        <div class="station-name">PROC-02</div>
+                        <div class="station-status">ACTIVE</div>
+                        <div class="station-throughput">198 units/hr</div>
+                    </div>
+                    <div class="station haptic-medium" onclick="selectStation(3)">
+                        <div class="station-name">QC-03</div>
+                        <div class="station-status">INSPECT</div>
+                        <div class="station-throughput">156 units/hr</div>
+                    </div>
+                    <div class="station haptic-medium" onclick="selectStation(4)">
+                        <div class="station-name">PACK-04</div>
+                        <div class="station-status">READY</div>
+                        <div class="station-throughput">201 units/hr</div>
+                    </div>
+                </div>
+                
+                <div class="quality-gates">
+                    <div class="quality-gate"></div>
+                    <div class="quality-gate"></div>
+                    <div class="quality-gate warning"></div>
+                    <div class="quality-gate"></div>
+                    <div class="quality-gate"></div>
+                </div>
+                
+                <div class="sigma-indicators">
+                    <div class="sigma-dot"></div>
+                    <div class="sigma-dot"></div>
+                    <div class="sigma-dot"></div>
+                    <div class="sigma-dot"></div>
+                    <div class="sigma-dot"></div>
+                    <div class="sigma-dot"></div>
+                </div>
+                
+                <div class="supply-chain"></div>
+            </section>
+            
+            <!-- Activity Timeline Feed -->
+            <section class="activity-timeline">
+                <div class="timeline-header">
+                    <h2 class="timeline-title">Production Events</h2>
+                    <div class="shift-indicator">Shift A - Day 1</div>
+                </div>
+                
+                <div class="timeline-content" id="timelineContent">
+                    <div class="timeline-item haptic-light" onclick="showEventDetails('evt-001')">
+                        <div class="timeline-time">14:32</div>
+                        <div class="timeline-icon success"></div>
+                        <div class="timeline-content-item">
+                            <div class="timeline-message">Station PREP-01 completed batch #4471</div>
+                            <div class="timeline-details">Quality score: 97.2% • Cycle time: 142s</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item haptic-light" onclick="showEventDetails('evt-002')">
+                        <div class="timeline-time">14:28</div>
+                        <div class="timeline-icon warning"></div>
+                        <div class="timeline-content-item">
+                            <div class="timeline-message">QC-03 flagged tolerance deviation</div>
+                            <div class="timeline-details">Part #A4471-08 • Deviation: +0.02mm</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item haptic-light" onclick="showEventDetails('evt-003')">
+                        <div class="timeline-time">14:25</div>
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content-item">
+                            <div class="timeline-message">Predictive maintenance alert</div>
+                            <div class="timeline-details">PROC-02 vibration sensors trending high</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item haptic-light" onclick="showEventDetails('evt-004')">
+                        <div class="timeline-time">14:21</div>
+                        <div class="timeline-icon success"></div>
+                        <div class="timeline-content-item">
+                            <div class="timeline-message">Supply chain optimization complete</div>
+                            <div class="timeline-details">Lead time reduced by 8.3% • Inventory optimized</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item haptic-light" onclick="showEventDetails('evt-005')">
+                        <div class="timeline-time">14:18</div>
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content-item">
+                            <div class="timeline-message">Lean manufacturing milestone</div>
+                            <div class="timeline-details">Waste reduction target: 85% achieved</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item haptic-light" onclick="showEventDetails('evt-006')">
+                        <div class="timeline-time">14:15</div>
+                        <div class="timeline-icon success"></div>
+                        <div class="timeline-content-item">
+                            <div class="timeline-message">Six Sigma process improvement</div>
+                            <div class="timeline-details">Defect rate: 3.4 PPM • Target achieved</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item haptic-light" onclick="showEventDetails('evt-007')">
+                        <div class="timeline-time">14:12</div>
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content-item">
+                            <div class="timeline-message">Equipment effectiveness update</div>
+                            <div class="timeline-details">Overall OEE improved to 82.4%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item haptic-light" onclick="showEventDetails('evt-008')">
+                        <div class="timeline-time">14:09</div>
+                        <div class="timeline-icon success"></div>
+                        <div class="timeline-content-item">
+                            <div class="timeline-message">Assembly line synchronization</div>
+                            <div class="timeline-details">All stations aligned • Takt time: 156s</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Maintenance Alerts -->
+        <div class="maintenance-alerts" id="maintenanceAlert" style="display: none;">
+            <strong>⚠️ MAINTENANCE</strong><br>
+            PROC-02 requires attention<br>
+            Predicted failure: 72h
+        </div>
+        
+        <!-- Floating Action Button -->
+        <button class="fab haptic-heavy" onclick="showProcessControls()">⚙️</button>
+    </div>
+    
+    <script>
+        // Simulate real-time data updates
+        function updateMetrics() {
+            const oeeValues = {
+                availability: document.querySelector('.oee-availability .oee-value'),
+                performance: document.querySelector('.oee-performance .oee-value'),
+                quality: document.querySelector('.oee-quality .oee-value')
+            };
+            
+            // Simulate fluctuating metrics
+            setInterval(() => {
+                const availability = (93 + Math.random() * 3).toFixed(1);
+                const performance = (85 + Math.random() * 5).toFixed(1);
+                const quality = (89 + Math.random() * 4).toFixed(1);
+                
+                oeeValues.availability.textContent = availability + '%';
+                oeeValues.performance.textContent = performance + '%';
+                oeeValues.quality.textContent = quality + '%';
+            }, 3000);
+        }
+        
+        // Station selection functionality
+        let activeStation = 1;
+        function selectStation(stationId) {
+            // Remove active class from all stations
+            document.querySelectorAll('.station').forEach(station => {
+                station.classList.remove('active');
+            });
+            
+            // Add active class to selected station
+            document.querySelectorAll('.station')[stationId - 1].classList.add('active');
+            activeStation = stationId;
+            
+            // Simulate haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            // Update station details
+            updateStationDetails(stationId);
+        }
+        
+        function updateStationDetails(stationId) {
+            const stationData = {
+                1: { name: 'PREP-01', status: 'RUNNING', throughput: '245 units/hr' },
+                2: { name: 'PROC-02', status: 'ACTIVE', throughput: '198 units/hr' },
+                3: { name: 'QC-03', status: 'INSPECT', throughput: '156 units/hr' },
+                4: { name: 'PACK-04', status: 'READY', throughput: '201 units/hr' }
+            };
+            
+            console.log(`Station ${stationData[stationId].name} selected`);
+        }
+        
+        // Emergency stop functionality
+        function triggerEmergencyStop() {
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100, 50, 100]);
+            }
+            
+            alert('🚨 EMERGENCY STOP ACTIVATED\n\nAll production lines halted.\nSafety protocols engaged.');
+            
+            // Visual feedback
+            document.body.style.animation = 'none';
+            document.body.style.background = '#e74c3c';
+            
+            setTimeout(() => {
+                document.body.style.background = 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)';
+            }, 2000);
+        }
+        
+        // Process controls
+        function showProcessControls() {
+            if (navigator.vibrate) {
+                navigator.vibrate(100);
+            }
+            
+            const controls = [
+                '🔧 Maintenance Schedule',
+                '📊 Performance Analytics',
+                '⚡ Energy Management',
+                '🎯 Quality Parameters',
+                '📦 Inventory Control',
+                '🔄 Process Optimization'
+            ];
+            
+            const selectedControl = prompt('Select Process Control:\n\n' + 
+                controls.map((control, index) => `${index + 1}. ${control}`).join('\n'));
+            
+            if (selectedControl) {
+                console.log(`Process control selected: ${controls[selectedControl - 1]}`);
+            }
+        }
+        
+        // Event details
+        function showEventDetails(eventId) {
+            if (navigator.vibrate) {
+                navigator.vibrate(25);
+            }
+            
+            const eventDetails = {
+                'evt-001': 'Station PREP-01 Batch Completion\n\nBatch #4471 processed successfully\nUnits: 500\nQuality Score: 97.2%\nCycle Time: 142s (target: 150s)\nOperator: John D.\nNext Batch: #4472 queued',
+                'evt-002': 'Quality Control Alert\n\nPart #A4471-08 tolerance deviation detected\nDeviation: +0.02mm (limit: ±0.01mm)\nRoot Cause: Tool wear suspected\nAction: Tool inspection scheduled\nImpact: Minimal - within acceptable limits',
+                'evt-003': 'Predictive Maintenance Alert\n\nPROC-02 Vibration Analysis\nCurrent Level: 4.2mm/s (normal: <3.5mm/s)\nTrend: Increasing over 48h\nPredicted Failure: 72h\nRecommended Action: Schedule bearing replacement',
+                'evt-004': 'Supply Chain Optimization\n\nLead Time Improvement: 8.3%\nInventory Levels: Optimized\nCost Reduction: $12,400/month\nSupplier Performance: 98.7%\nNext Review: 7 days',
+                'evt-005': 'Lean Manufacturing Achievement\n\nWaste Reduction Target: 85% achieved\nCurrent Waste Level: 2.1%\nImprovement Areas: Material handling, Setup time\nCost Savings: $8,200/week\nNext Target: 90% by Q2',
+                'evt-006': 'Six Sigma Process Milestone\n\nDefect Rate: 3.4 PPM (target achieved)\nProcess Capability: Cpk = 1.67\nCustomer Satisfaction: 99.8%\nCost of Poor Quality: <0.1%\nCertification Status: Maintained',
+                'evt-007': 'Equipment Effectiveness Report\n\nOverall OEE: 82.4% (↑2.1%)\nAvailability: 94.2%\nPerformance: 87.6%\nQuality: 91.3%\nBest Performer: PACK-04 (89.7%)\nImprovement Focus: PROC-02',
+                'evt-008': 'Assembly Line Synchronization\n\nTakt Time: 156s (target: 150s)\nLine Balance: 96.2%\nBottleneck: QC-03 station\nWIP Inventory: Optimized\nThroughput: 201 units/hr\nEfficiency: 98.1%'
+            };
+            
+            alert(eventDetails[eventId] || 'Event details not available');
+        }
+        
+        // Add new timeline items
+        function addTimelineItem(time, type, message, details) {
+            const timeline = document.getElementById('timelineContent');
+            const item = document.createElement('div');
+            item.className = 'timeline-item haptic-light';
+            item.innerHTML = `
+                <div class="timeline-time">${time}</div>
+                <div class="timeline-icon ${type}"></div>
+                <div class="timeline-content-item">
+                    <div class="timeline-message">${message}</div>
+                    <div class="timeline-details">${details}</div>
+                </div>
+            `;
+            timeline.insertBefore(item, timeline.firstChild);
+            
+            // Remove old items to prevent overflow
+            if (timeline.children.length > 20) {
+                timeline.removeChild(timeline.lastChild);
+            }
+        }
+        
+        // Simulate real-time events
+        function simulateRealTimeEvents() {
+            const events = [
+                { type: 'success', message: 'Quality gate passed', details: 'Batch #4472 • Zero defects detected' },
+                { type: 'warning', message: 'Temperature variance detected', details: 'PROC-02 • +2°C above normal' },
+                { type: '', message: 'Shift change notification', details: 'Shift B starting in 30 minutes' },
+                { type: 'success', message: 'Efficiency milestone reached', details: 'Daily target: 95% achieved' },
+                { type: 'warning', message: 'Material shortage alert', details: 'Raw material A • 4 hours remaining' }
+            ];
+            
+            setInterval(() => {
+                const now = new Date();
+                const time = now.getHours().toString().padStart(2, '0') + ':' + 
+                           now.getMinutes().toString().padStart(2, '0');
+                const event = events[Math.floor(Math.random() * events.length)];
+                
+                addTimelineItem(time, event.type, event.message, event.details);
+            }, 15000);
+        }
+        
+        // Show maintenance alert
+        function showMaintenanceAlert() {
+            setTimeout(() => {
+                document.getElementById('maintenanceAlert').style.display = 'block';
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200]);
+                }
+                
+                setTimeout(() => {
+                    document.getElementById('maintenanceAlert').style.display = 'none';
+                }, 8000);
+            }, 5000);
+        }
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            updateMetrics();
+            simulateRealTimeEvents();
+            showMaintenanceAlert();
+            
+            // Add touch event listeners for iOS haptic feedback simulation
+            document.querySelectorAll('.haptic-light').forEach(element => {
+                element.addEventListener('touchstart', () => {
+                    if (navigator.vibrate) navigator.vibrate(10);
+                });
+            });
+            
+            document.querySelectorAll('.haptic-medium').forEach(element => {
+                element.addEventListener('touchstart', () => {
+                    if (navigator.vibrate) navigator.vibrate(25);
+                });
+            });
+            
+            document.querySelectorAll('.haptic-heavy').forEach(element => {
+                element.addEventListener('touchstart', () => {
+                    if (navigator.vibrate) navigator.vibrate(50);
+                });
+            });
+            
+            console.log('🏭 Industrial Manufacturing Process Monitor initialized');
+            console.log('📊 OEE Dashboard active');
+            console.log('🔄 Real-time monitoring enabled');
+            console.log('⚡ Predictive maintenance online');
+            console.log('📈 Six Sigma quality control active');
+        });
+    </script>
+</body>
+</html>

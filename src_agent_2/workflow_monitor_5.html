@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATC Workflow Monitor</title>
+    <style>
+        :root {
+            --radar-green: #00ff41;
+            --sky-blue: #1e90ff;
+            --warning-amber: #ffb347;
+            --runway-white: #f0f8ff;
+            --dark-bg: #0a0a0a;
+            --control-panel: #1a1a1a;
+            --emergency-red: #ff4444;
+            --clearance-blue: #4169e1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--runway-white);
+            overflow: hidden;
+            height: 100vh;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .atc-interface {
+            display: grid;
+            grid-template-rows: 60px 1fr 200px;
+            height: 100vh;
+            background: radial-gradient(circle at center, #0f0f0f 0%, #000000 100%);
+        }
+
+        /* Header Control Panel */
+        .control-header {
+            background: linear-gradient(90deg, var(--control-panel), #2a2a2a);
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            padding: 0 20px;
+            border-bottom: 2px solid var(--radar-green);
+            box-shadow: 0 2px 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .tower-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--radar-green);
+            text-shadow: 0 0 10px var(--radar-green);
+        }
+
+        .weather-display {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: var(--sky-blue);
+        }
+
+        .emergency-button {
+            background: var(--emergency-red);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            animation: emergency-pulse 2s infinite;
+        }
+
+        @keyframes emergency-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Main Radar Display */
+        .radar-section {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            padding: 20px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .radar-display {
+            position: relative;
+            background: radial-gradient(circle at center, #001100 0%, #000800 70%, #000000 100%);
+            border: 3px solid var(--radar-green);
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 
+                inset 0 0 50px rgba(0, 255, 65, 0.2),
+                0 0 30px rgba(0, 255, 65, 0.3);
+        }
+
+        .radar-sweep {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--radar-green));
+            transform-origin: left center;
+            animation: radar-sweep 4s linear infinite;
+            z-index: 10;
+        }
+
+        @keyframes radar-sweep {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .radar-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+
+        .radar-circle {
+            position: absolute;
+            border: 1px solid var(--radar-green);
+            border-radius: 50%;
+        }
+
+        .radar-circle:nth-child(1) {
+            width: 25%;
+            height: 25%;
+            top: 37.5%;
+            left: 37.5%;
+        }
+
+        .radar-circle:nth-child(2) {
+            width: 50%;
+            height: 50%;
+            top: 25%;
+            left: 25%;
+        }
+
+        .radar-circle:nth-child(3) {
+            width: 75%;
+            height: 75%;
+            top: 12.5%;
+            left: 12.5%;
+        }
+
+        .radar-circle:nth-child(4) {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .radar-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .radar-line {
+            position: absolute;
+            background: var(--radar-green);
+            opacity: 0.3;
+        }
+
+        .radar-line.horizontal {
+            width: 100%;
+            height: 1px;
+            top: 50%;
+        }
+
+        .radar-line.vertical {
+            width: 1px;
+            height: 100%;
+            left: 50%;
+        }
+
+        .aircraft {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--sky-blue);
+            border-radius: 2px;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .aircraft::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--sky-blue);
+            border-radius: 50%;
+            top: -4px;
+            left: -4px;
+            opacity: 0.5;
+        }
+
+        .aircraft.priority {
+            background: var(--warning-amber);
+            animation: priority-blink 1s infinite;
+        }
+
+        .aircraft.emergency {
+            background: var(--emergency-red);
+            animation: emergency-blink 0.5s infinite;
+        }
+
+        @keyframes priority-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes emergency-blink {
+            0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        .flight-path {
+            position: absolute;
+            stroke: var(--sky-blue);
+            stroke-width: 1;
+            fill: none;
+            opacity: 0.6;
+            stroke-dasharray: 5,5;
+            animation: dash 2s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -10; }
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: var(--control-panel);
+            border: 2px solid var(--radar-green);
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            margin-bottom: 20px;
+        }
+
+        .panel-title {
+            color: var(--radar-green);
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .flight-info {
+            background: rgba(30, 144, 255, 0.1);
+            border: 1px solid var(--sky-blue);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .flight-info:hover {
+            background: rgba(30, 144, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .flight-callsign {
+            color: var(--sky-blue);
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .flight-details {
+            font-size: 10px;
+            color: var(--runway-white);
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-active { background: var(--radar-green); }
+        .status-priority { background: var(--warning-amber); }
+        .status-emergency { background: var(--emergency-red); }
+        .status-clearance { background: var(--clearance-blue); }
+
+        /* Activity Timeline */
+        .activity-timeline {
+            background: linear-gradient(90deg, var(--control-panel), #1a1a1a);
+            border-top: 2px solid var(--radar-green);
+            padding: 15px 20px;
+            overflow-y: auto;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .timeline-title {
+            color: var(--radar-green);
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .timeline-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-button {
+            background: rgba(30, 144, 255, 0.2);
+            border: 1px solid var(--sky-blue);
+            color: var(--sky-blue);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-button:hover {
+            background: rgba(30, 144, 255, 0.4);
+        }
+
+        .control-button.active {
+            background: var(--sky-blue);
+            color: var(--dark-bg);
+        }
+
+        .timeline-feed {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .timeline-item {
+            min-width: 250px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--radar-green);
+            border-radius: 8px;
+            padding: 12px;
+            position: relative;
+        }
+
+        .timeline-time {
+            color: var(--radar-green);
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .timeline-event {
+            color: var(--runway-white);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .timeline-details {
+            color: var(--sky-blue);
+            font-size: 10px;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        /* Communication Panel */
+        .comm-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--control-panel);
+            border: 2px solid var(--radar-green);
+            border-radius: 10px;
+            padding: 15px;
+            width: 280px;
+            z-index: 100;
+        }
+
+        .comm-display {
+            background: black;
+            border: 1px solid var(--radar-green);
+            border-radius: 5px;
+            padding: 10px;
+            height: 100px;
+            overflow-y: auto;
+            font-size: 10px;
+            font-family: 'Courier New', monospace;
+            color: var(--radar-green);
+            margin-bottom: 10px;
+        }
+
+        .comm-input {
+            width: 100%;
+            background: black;
+            border: 1px solid var(--sky-blue);
+            border-radius: 5px;
+            padding: 8px;
+            color: var(--sky-blue);
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+        }
+
+        .comm-input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(30, 144, 255, 0.5);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .radar-section {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 250px;
+            }
+            
+            .control-panel {
+                height: 250px;
+            }
+            
+            .comm-panel {
+                bottom: 10px;
+                right: 10px;
+                width: calc(100% - 20px);
+                max-width: 300px;
+            }
+        }
+
+        /* Touch Interactions */
+        .touch-feedback {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .touch-feedback::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(0, 255, 65, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+
+        .touch-feedback:active::after {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="atc-interface">
+        <!-- Control Header -->
+        <div class="control-header">
+            <div class="tower-id">ATC-TOWER-01 • WORKFLOW CONTROL</div>
+            <div class="weather-display">
+                <div>WIND: 270°/15KT</div>
+                <div>VIS: 10SM</div>
+                <div>CEILING: CLR</div>
+                <div>TEMP: 15°C</div>
+            </div>
+            <button class="emergency-button touch-feedback" onclick="handleEmergency()">
+                EMERGENCY
+            </button>
+        </div>
+
+        <!-- Main Radar & Control Section -->
+        <div class="radar-section">
+            <!-- Radar Display -->
+            <div class="radar-display">
+                <div class="radar-sweep"></div>
+                <div class="radar-grid">
+                    <div class="radar-circle"></div>
+                    <div class="radar-circle"></div>
+                    <div class="radar-circle"></div>
+                    <div class="radar-circle"></div>
+                </div>
+                <div class="radar-lines">
+                    <div class="radar-line horizontal"></div>
+                    <div class="radar-line vertical"></div>
+                </div>
+                <svg class="flight-path" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                    <path d="M 20% 80% Q 50% 20% 80% 60%" class="flight-path"></path>
+                    <path d="M 10% 30% Q 60% 70% 90% 40%" class="flight-path"></path>
+                </svg>
+                
+                <!-- Aircraft Icons -->
+                <div class="aircraft status-active" style="top: 25%; left: 35%;" data-callsign="AI-001" onclick="selectAircraft('AI-001')"></div>
+                <div class="aircraft status-priority priority" style="top: 45%; left: 65%;" data-callsign="AI-002" onclick="selectAircraft('AI-002')"></div>
+                <div class="aircraft status-active" style="top: 70%; left: 25%;" data-callsign="AI-003" onclick="selectAircraft('AI-003')"></div>
+                <div class="aircraft status-emergency emergency" style="top: 60%; left: 80%;" data-callsign="AI-004" onclick="selectAircraft('AI-004')"></div>
+                <div class="aircraft status-clearance" style="top: 30%; left: 50%;" data-callsign="AI-005" onclick="selectAircraft('AI-005')"></div>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div class="panel-section">
+                    <div class="panel-title">Active Flights</div>
+                    <div class="flight-info touch-feedback" onclick="selectFlight('AI-001')">
+                        <div class="flight-callsign">
+                            <span class="status-indicator status-active"></span>
+                            AI-001 • DATA-PROC
+                        </div>
+                        <div class="flight-details">
+                            ALT: FL180 • SPD: 450KT<br>
+                            DEST: ANALYTICS • ETA: 14:30Z
+                        </div>
+                    </div>
+                    
+                    <div class="flight-info touch-feedback" onclick="selectFlight('AI-002')">
+                        <div class="flight-callsign">
+                            <span class="status-indicator status-priority"></span>
+                            AI-002 • ML-TRAIN
+                        </div>
+                        <div class="flight-details">
+                            ALT: FL240 • SPD: 380KT<br>
+                            DEST: MODEL-DEPLOY • ETA: 15:45Z
+                        </div>
+                    </div>
+                    
+                    <div class="flight-info touch-feedback" onclick="selectFlight('AI-003')">
+                        <div class="flight-callsign">
+                            <span class="status-indicator status-active"></span>
+                            AI-003 • API-SYNC
+                        </div>
+                        <div class="flight-details">
+                            ALT: FL120 • SPD: 520KT<br>
+                            DEST: INTEGRATION • ETA: 13:15Z
+                        </div>
+                    </div>
+                    
+                    <div class="flight-info touch-feedback" onclick="selectFlight('AI-004')">
+                        <div class="flight-callsign">
+                            <span class="status-indicator status-emergency"></span>
+                            AI-004 • ERROR-HANDLE
+                        </div>
+                        <div class="flight-details">
+                            ALT: FL080 • SPD: 280KT<br>
+                            DEST: RECOVERY • ETA: ASAP
+                        </div>
+                    </div>
+                    
+                    <div class="flight-info touch-feedback" onclick="selectFlight('AI-005')">
+                        <div class="flight-callsign">
+                            <span class="status-indicator status-clearance"></span>
+                            AI-005 • QUALITY-CHECK
+                        </div>
+                        <div class="flight-details">
+                            ALT: FL200 • SPD: 420KT<br>
+                            DEST: VALIDATION • ETA: 16:20Z
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <div class="panel-title">Runway Status</div>
+                    <div style="font-size: 10px; color: var(--runway-white);">
+                        <div>RWY 09L: ACTIVE • TASK-COMPLETION</div>
+                        <div>RWY 09R: STANDBY • READY</div>
+                        <div>RWY 27L: MAINTENANCE • BLOCKED</div>
+                        <div>RWY 27R: ACTIVE • NEW-ASSIGNMENTS</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Timeline -->
+        <div class="activity-timeline">
+            <div class="timeline-header">
+                <div class="timeline-title">Tower Communication Log</div>
+                <div class="timeline-controls">
+                    <button class="control-button active touch-feedback">LIVE</button>
+                    <button class="control-button touch-feedback">HISTORY</button>
+                    <button class="control-button touch-feedback">ALERTS</button>
+                </div>
+            </div>
+            
+            <div class="timeline-feed">
+                <div class="timeline-item">
+                    <div class="timeline-time">14:23:15Z</div>
+                    <div class="timeline-event">AI-001 REQUEST DESCENT</div>
+                    <div class="timeline-details">Data processing task 89% complete, requesting priority landing sequence</div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-time">14:22:45Z</div>
+                    <div class="timeline-event">AI-004 EMERGENCY DECLARED</div>
+                    <div class="timeline-details">Exception handler activated, priority routing to recovery runway</div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-time">14:21:30Z</div>
+                    <div class="timeline-event">AI-002 CLEARED APPROACH</div>
+                    <div class="timeline-details">ML training pipeline approved for model deployment sequence</div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-time">14:20:15Z</div>
+                    <div class="timeline-event">WEATHER UPDATE</div>
+                    <div class="timeline-details">System load optimal, all agents cleared for normal operations</div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-time">14:19:45Z</div>
+                    <div class="timeline-event">AI-005 TAXI CLEARANCE</div>
+                    <div class="timeline-details">Quality validation agent moving to active runway for deployment</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Communication Panel -->
+    <div class="comm-panel">
+        <div class="panel-title">ATC Communications</div>
+        <div class="comm-display" id="commDisplay">
+            [14:23:15] TOWER: AI-001, descend and maintain FL120<br>
+            [14:23:18] AI-001: Descending FL120, AI-001<br>
+            [14:23:22] TOWER: AI-004, emergency services standing by<br>
+            [14:23:25] AI-004: Roger, continuing approach AI-004<br>
+            [14:23:30] TOWER: All stations, runway 27L closed for maintenance<br>
+        </div>
+        <input type="text" class="comm-input" placeholder="Enter ATC command..." onkeypress="handleCommInput(event)">
+    </div>
+
+    <script>
+        // Aircraft movement simulation
+        let aircraftPositions = {
+            'AI-001': { x: 35, y: 25, dx: 0.5, dy: 0.3 },
+            'AI-002': { x: 65, y: 45, dx: -0.3, dy: 0.4 },
+            'AI-003': { x: 25, y: 70, dx: 0.4, dy: -0.2 },
+            'AI-004': { x: 80, y: 60, dx: -0.6, dy: -0.1 },
+            'AI-005': { x: 50, y: 30, dx: 0.2, dy: 0.5 }
+        };
+
+        function updateAircraftPositions() {
+            Object.keys(aircraftPositions).forEach(callsign => {
+                const pos = aircraftPositions[callsign];
+                const aircraft = document.querySelector(`[data-callsign="${callsign}"]`);
+                
+                if (aircraft) {
+                    pos.x += pos.dx;
+                    pos.y += pos.dy;
+                    
+                    // Boundary checks
+                    if (pos.x <= 5 || pos.x >= 95) pos.dx *= -1;
+                    if (pos.y <= 5 || pos.y >= 95) pos.dy *= -1;
+                    
+                    aircraft.style.left = `${pos.x}%`;
+                    aircraft.style.top = `${pos.y}%`;
+                }
+            });
+        }
+
+        // Communication log updates
+        let commMessages = [
+            "[14:23:35] TOWER: AI-003, contact departure on 121.9",
+            "[14:23:40] AI-003: 121.9, good day AI-003",
+            "[14:23:45] TOWER: AI-002, cleared for takeoff runway 09R",
+            "[14:23:50] AI-002: Cleared for takeoff 09R, AI-002",
+            "[14:23:55] TOWER: AI-005, taxi to runway 27R via Alpha",
+            "[14:24:00] AI-005: Taxi 27R via Alpha, AI-005"
+        ];
+
+        let messageIndex = 0;
+
+        function updateCommDisplay() {
+            const display = document.getElementById('commDisplay');
+            if (messageIndex < commMessages.length) {
+                display.innerHTML += commMessages[messageIndex] + '<br>';
+                display.scrollTop = display.scrollHeight;
+                messageIndex++;
+            } else {
+                // Reset and add new random messages
+                messageIndex = 0;
+                generateRandomCommMessage();
+            }
+        }
+
+        function generateRandomCommMessage() {
+            const callsigns = ['AI-001', 'AI-002', 'AI-003', 'AI-004', 'AI-005'];
+            const commands = [
+                'contact ground on 121.7',
+                'cleared for approach runway 09L',
+                'hold short of runway 27R',
+                'taxi to gate via Bravo',
+                'descend and maintain FL100'
+            ];
+            
+            const time = new Date().toISOString().substr(11, 8) + 'Z';
+            const callsign = callsigns[Math.floor(Math.random() * callsigns.length)];
+            const command = commands[Math.floor(Math.random() * commands.length)];
+            
+            const display = document.getElementById('commDisplay');
+            display.innerHTML += `[${time}] TOWER: ${callsign}, ${command}<br>`;
+            display.scrollTop = display.scrollHeight;
+        }
+
+        // Timeline updates
+        function updateTimeline() {
+            const events = [
+                'REQUEST ALTITUDE CHANGE',
+                'CLEARED FOR APPROACH', 
+                'TAXI CLEARANCE ISSUED',
+                'WEATHER UPDATE',
+                'SYSTEM STATUS CHECK',
+                'PRIORITY ROUTING ASSIGNED'
+            ];
+            
+            const callsigns = ['AI-001', 'AI-002', 'AI-003', 'AI-004', 'AI-005'];
+            const timelineFeed = document.querySelector('.timeline-feed');
+            
+            // Remove oldest item if more than 8 items
+            if (timelineFeed.children.length > 8) {
+                timelineFeed.removeChild(timelineFeed.lastChild);
+            }
+            
+            // Add new item at the beginning
+            const newItem = document.createElement('div');
+            newItem.className = 'timeline-item';
+            
+            const time = new Date().toISOString().substr(11, 8) + 'Z';
+            const callsign = callsigns[Math.floor(Math.random() * callsigns.length)];
+            const event = events[Math.floor(Math.random() * events.length)];
+            
+            newItem.innerHTML = `
+                <div class="timeline-time">${time}</div>
+                <div class="timeline-event">${callsign} ${event}</div>
+                <div class="timeline-details">Automated workflow coordination update from air traffic control</div>
+            `;
+            
+            timelineFeed.insertBefore(newItem, timelineFeed.firstChild);
+        }
+
+        // Event handlers
+        function selectAircraft(callsign) {
+            // Add visual feedback
+            const aircraft = document.querySelector(`[data-callsign="${callsign}"]`);
+            aircraft.style.transform = 'translate(-50%, -50%) scale(1.5)';
+            setTimeout(() => {
+                aircraft.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 300);
+            
+            // Update communication
+            const time = new Date().toISOString().substr(11, 8) + 'Z';
+            const display = document.getElementById('commDisplay');
+            display.innerHTML += `[${time}] TOWER: ${callsign}, say altitude<br>`;
+            display.innerHTML += `[${time}] ${callsign}: FL180, ${callsign}<br>`;
+            display.scrollTop = display.scrollHeight;
+        }
+
+        function selectFlight(callsign) {
+            // Highlight corresponding aircraft
+            selectAircraft(callsign);
+        }
+
+        function handleEmergency() {
+            alert('EMERGENCY PROTOCOL ACTIVATED\n\nAll non-essential flights hold position.\nEmergency services dispatched.');
+            
+            // Add emergency message
+            const time = new Date().toISOString().substr(11, 8) + 'Z';
+            const display = document.getElementById('commDisplay');
+            display.innerHTML += `[${time}] TOWER: EMERGENCY PROTOCOL ACTIVE - ALL STATIONS STANDBY<br>`;
+            display.scrollTop = display.scrollHeight;
+        }
+
+        function handleCommInput(event) {
+            if (event.key === 'Enter') {
+                const input = event.target;
+                const command = input.value.trim();
+                
+                if (command) {
+                    const time = new Date().toISOString().substr(11, 8) + 'Z';
+                    const display = document.getElementById('commDisplay');
+                    display.innerHTML += `[${time}] TOWER: ${command}<br>`;
+                    display.scrollTop = display.scrollHeight;
+                    input.value = '';
+                }
+            }
+        }
+
+        // Initialize animations and updates
+        setInterval(updateAircraftPositions, 100);
+        setInterval(updateCommDisplay, 8000);
+        setInterval(updateTimeline, 12000);
+        
+        // Add touch feedback for mobile
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.classList.contains('touch-feedback')) {
+                e.target.style.transform = 'scale(0.95)';
+            }
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            if (e.target.classList.contains('touch-feedback')) {
+                setTimeout(() => {
+                    e.target.style.transform = 'scale(1)';
+                }, 150);
+            }
+        });
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start with some initial messages
+            setTimeout(updateCommDisplay, 1000);
+            setTimeout(updateTimeline, 2000);
+        });
+    </script>
+</body>
+</html>

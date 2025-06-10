@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoFlow - Living Ecosystem Orchestration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(145deg, #1a3d2e 0%, #2d5016 50%, #0f2419 100%);
+            color: #e8f5e8;
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        .ecosystem-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .ecosystem-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(100, 200, 120, 0.6);
+            border-radius: 50%;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+        }
+
+        /* Header Section - Ecosystem Status */
+        .ecosystem-header {
+            background: rgba(30, 60, 40, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(100, 200, 120, 0.2);
+            border-radius: 20px;
+            margin: 15px;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .ecosystem-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .ecosystem-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #64c878;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ecosystem-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #64c878, #4a9960);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .ecosystem-health {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #a8d8b8;
+        }
+
+        .health-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #64c878, #4a9960);
+            animation: breathe 3s infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .habitat-zones {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .habitat-zone {
+            background: rgba(40, 80, 50, 0.6);
+            border: 1px solid rgba(100, 200, 120, 0.3);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .habitat-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(100, 200, 120, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .habitat-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64c878;
+            margin-bottom: 5px;
+        }
+
+        .habitat-population {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e8f5e8;
+            margin-bottom: 3px;
+        }
+
+        .habitat-status {
+            font-size: 10px;
+            color: #a8d8b8;
+        }
+
+        /* Main Content - Current Task Focus */
+        .current-focus {
+            flex: 1;
+            margin: 0 15px 15px 15px;
+            background: rgba(25, 50, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(100, 200, 120, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .focus-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .focus-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #64c878;
+        }
+
+        .biodiversity-index {
+            background: rgba(100, 200, 120, 0.1);
+            border: 1px solid rgba(100, 200, 120, 0.3);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 12px;
+            color: #a8d8b8;
+        }
+
+        .organism-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .organism-card {
+            background: rgba(40, 80, 50, 0.6);
+            border: 1px solid rgba(100, 200, 120, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .organism-card:active {
+            transform: scale(0.98);
+            background: rgba(50, 90, 60, 0.8);
+        }
+
+        .organism-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .organism-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e8f5e8;
+        }
+
+        .organism-type {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            color: #2d5016;
+            font-weight: 600;
+        }
+
+        .producer { background: #64c878; }
+        .consumer { background: #78c8c8; }
+        .decomposer { background: #c8a878; }
+        .apex { background: #c87864; }
+
+        .organism-status {
+            font-size: 12px;
+            color: #a8d8b8;
+            margin-bottom: 8px;
+        }
+
+        .energy-flow {
+            width: 100%;
+            height: 4px;
+            background: rgba(100, 200, 120, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .energy-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #64c878, #4a9960);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .energy-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50px;
+            width: 50px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: energyFlow 2s infinite;
+        }
+
+        @keyframes energyFlow {
+            0% { left: -50px; }
+            100% { left: 100%; }
+        }
+
+        .symbiosis-network {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(30, 60, 40, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(100, 200, 120, 0.2);
+        }
+
+        .network-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64c878;
+            margin-bottom: 10px;
+        }
+
+        .connection-lines {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .connection-node {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #64c878;
+            background: rgba(100, 200, 120, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #64c878;
+            position: relative;
+            z-index: 2;
+        }
+
+        .connection-line {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            right: 15px;
+            height: 2px;
+            background: linear-gradient(90deg, #64c878, #4a9960);
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.5), transparent);
+            animation: dataFlow 1.5s infinite;
+        }
+
+        @keyframes dataFlow {
+            0% { left: 0; }
+            100% { left: calc(100% - 20px); }
+        }
+
+        /* Activity Timeline - Bottom Section */
+        .activity-timeline {
+            height: 180px;
+            margin: 0 15px 15px 15px;
+            background: rgba(20, 40, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(100, 200, 120, 0.2);
+            border-radius: 20px;
+            padding: 15px;
+            position: relative;
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            position: sticky;
+            top: 0;
+            background: rgba(20, 40, 30, 0.95);
+            padding-bottom: 5px;
+        }
+
+        .timeline-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #64c878;
+        }
+
+        .environmental-conditions {
+            display: flex;
+            gap: 10px;
+            font-size: 10px;
+            color: #a8d8b8;
+        }
+
+        .condition {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .condition-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #64c878;
+        }
+
+        .timeline-events {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .timeline-event {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(40, 80, 50, 0.4);
+            border-radius: 10px;
+            border-left: 3px solid #64c878;
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .event-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #64c878, #4a9960);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #2d5016;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .event-content {
+            flex: 1;
+        }
+
+        .event-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e8f5e8;
+            margin-bottom: 3px;
+        }
+
+        .event-description {
+            font-size: 11px;
+            color: #a8d8b8;
+            line-height: 1.4;
+            margin-bottom: 5px;
+        }
+
+        .event-timestamp {
+            font-size: 10px;
+            color: #78a888;
+        }
+
+        /* Conservation Alerts */
+        .conservation-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(200, 120, 100, 0.95);
+            border: 1px solid rgba(200, 120, 100, 0.5);
+            border-radius: 15px;
+            padding: 10px 15px;
+            font-size: 12px;
+            color: #fff;
+            z-index: 100;
+            animation: alertSlide 0.3s ease-out;
+            display: none;
+        }
+
+        .conservation-alert.show {
+            display: block;
+        }
+
+        @keyframes alertSlide {
+            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 375px) {
+            .habitat-zones {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .organism-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* iOS Haptic Feedback Simulation */
+        .haptic-light:active {
+            animation: hapticLight 0.1s ease-out;
+        }
+
+        .haptic-medium:active {
+            animation: hapticMedium 0.2s ease-out;
+        }
+
+        @keyframes hapticLight {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes hapticMedium {
+            0% { transform: scale(1); }
+            25% { transform: scale(0.96); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* Dark mode seasonal cycle */
+        .night-cycle {
+            background: linear-gradient(145deg, #0d1f17 0%, #1a2f0e 50%, #0a1612 100%);
+        }
+
+        .day-cycle {
+            background: linear-gradient(145deg, #1a3d2e 0%, #2d5016 50%, #0f2419 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="ecosystem-container">
+        <!-- Animated Background -->
+        <div class="ecosystem-background" id="particles"></div>
+
+        <!-- Conservation Alert -->
+        <div class="conservation-alert" id="conservationAlert">
+            🌿 Ecosystem optimization in progress - Agent migration detected
+        </div>
+
+        <!-- Ecosystem Header - Static Monitor Display -->
+        <div class="ecosystem-header">
+            <div class="ecosystem-title">
+                <div class="ecosystem-name">
+                    <div class="ecosystem-icon">🌿</div>
+                    EcoFlow Orchestration
+                </div>
+                <div class="ecosystem-health">
+                    <div class="health-indicator"></div>
+                    Thriving (98.7%)
+                </div>
+            </div>
+            
+            <div class="habitat-zones">
+                <div class="habitat-zone haptic-light">
+                    <div class="habitat-name">Data Forest</div>
+                    <div class="habitat-population">127</div>
+                    <div class="habitat-status">Active Agents</div>
+                </div>
+                <div class="habitat-zone haptic-light">
+                    <div class="habitat-name">Processing Meadow</div>
+                    <div class="habitat-population">89</div>
+                    <div class="habitat-status">Queue Length</div>
+                </div>
+                <div class="habitat-zone haptic-light">
+                    <div class="habitat-name">Cache Wetlands</div>
+                    <div class="habitat-population">2.3GB</div>
+                    <div class="habitat-status">Memory Usage</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Focus - Task Monitoring -->
+        <div class="current-focus">
+            <div class="focus-header">
+                <div class="focus-title">Current Ecosystem Activity</div>
+                <div class="biodiversity-index">Biodiversity: High</div>
+            </div>
+
+            <div class="organism-grid">
+                <div class="organism-card haptic-medium">
+                    <div class="organism-header">
+                        <div class="organism-name">Data Collector</div>
+                        <div class="organism-type producer">Producer</div>
+                    </div>
+                    <div class="organism-status">Gathering user analytics from 14 sources</div>
+                    <div class="energy-flow">
+                        <div class="energy-bar" style="width: 87%"></div>
+                    </div>
+                </div>
+                
+                <div class="organism-card haptic-medium">
+                    <div class="organism-header">
+                        <div class="organism-name">Pattern Analyzer</div>
+                        <div class="organism-type consumer">Consumer</div>
+                    </div>
+                    <div class="organism-status">Processing behavioral patterns batch #47</div>
+                    <div class="energy-flow">
+                        <div class="energy-bar" style="width: 64%"></div>
+                    </div>
+                </div>
+                
+                <div class="organism-card haptic-medium">
+                    <div class="organism-header">
+                        <div class="organism-name">Content Generator</div>
+                        <div class="organism-type apex">Apex</div>
+                    </div>
+                    <div class="organism-status">Synthesizing personalized recommendations</div>
+                    <div class="energy-flow">
+                        <div class="energy-bar" style="width: 92%"></div>
+                    </div>
+                </div>
+                
+                <div class="organism-card haptic-medium">
+                    <div class="organism-header">
+                        <div class="organism-name">Cache Cleaner</div>
+                        <div class="organism-type decomposer">Decomposer</div>
+                    </div>
+                    <div class="organism-status">Optimizing memory usage and cleanup</div>
+                    <div class="energy-flow">
+                        <div class="energy-bar" style="width: 45%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="symbiosis-network">
+                <div class="network-title">Symbiotic Relationships</div>
+                <div class="connection-lines">
+                    <div class="connection-node">🌱</div>
+                    <div class="connection-line"></div>
+                    <div class="connection-node">🦋</div>
+                    <div class="connection-line"></div>
+                    <div class="connection-node">🌳</div>
+                    <div class="connection-line"></div>
+                    <div class="connection-node">🍄</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Timeline -->
+        <div class="activity-timeline">
+            <div class="timeline-header">
+                <div class="timeline-title">Ecosystem Activity Feed</div>
+                <div class="environmental-conditions">
+                    <div class="condition">
+                        <div class="condition-indicator"></div>
+                        <span>pH: 7.2</span>
+                    </div>
+                    <div class="condition">
+                        <div class="condition-indicator"></div>
+                        <span>22°C</span>
+                    </div>
+                    <div class="condition">
+                        <div class="condition-indicator"></div>
+                        <span>High O₂</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-events" id="timelineEvents">
+                <div class="timeline-event">
+                    <div class="event-icon">🌱</div>
+                    <div class="event-content">
+                        <div class="event-title">New Species Introduction</div>
+                        <div class="event-description">ML Training Agent spawned in Processing Meadow with 8GB memory allocation</div>
+                        <div class="event-timestamp">2 minutes ago</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-event">
+                    <div class="event-icon">🦋</div>
+                    <div class="event-content">
+                        <div class="event-title">Cross-Pollination Event</div>
+                        <div class="event-description">Data exchange completed between Collector and Analyzer species - 2.4M records transferred</div>
+                        <div class="event-timestamp">5 minutes ago</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-event">
+                    <div class="event-icon">🌿</div>
+                    <div class="event-content">
+                        <div class="event-title">Nutrient Cycle Complete</div>
+                        <div class="event-description">Cache optimization reduced memory footprint by 23% - ecosystem health improved</div>
+                        <div class="event-timestamp">8 minutes ago</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-event">
+                    <div class="event-icon">🦅</div>
+                    <div class="event-content">
+                        <div class="event-title">Apex Predator Activity</div>
+                        <div class="event-description">Master orchestrator initiated load balancing across 4 habitat zones</div>
+                        <div class="event-timestamp">12 minutes ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Update energy bars with animation
+        function updateEnergyLevels() {
+            const energyBars = document.querySelectorAll('.energy-bar');
+            energyBars.forEach(bar => {
+                const currentWidth = parseInt(bar.style.width);
+                const newWidth = Math.max(20, Math.min(100, currentWidth + (Math.random() - 0.5) * 10));
+                bar.style.width = newWidth + '%';
+            });
+        }
+
+        // Add new timeline events
+        function addTimelineEvent() {
+            const events = [
+                {
+                    icon: '🌸',
+                    title: 'Bloom Event Detected',
+                    description: 'Content Generator reached peak performance - 347 recommendations per minute',
+                    timestamp: 'Just now'
+                },
+                {
+                    icon: '🍃',
+                    title: 'Seasonal Migration',
+                    description: 'Agent workload redistributed to maintain ecosystem balance',
+                    timestamp: 'Just now'
+                },
+                {
+                    icon: '🌊',
+                    title: 'Resource Flow Optimized',
+                    description: 'Data stream throughput increased by 15% through symbiotic adaptation',
+                    timestamp: 'Just now'
+                },
+                {
+                    icon: '🦋',
+                    title: 'Metamorphosis Complete',
+                    description: 'Training Agent evolved to Production Agent - new capabilities unlocked',
+                    timestamp: 'Just now'
+                }
+            ];
+
+            const randomEvent = events[Math.floor(Math.random() * events.length)];
+            const timelineEvents = document.getElementById('timelineEvents');
+            
+            const eventElement = document.createElement('div');
+            eventElement.className = 'timeline-event';
+            eventElement.innerHTML = `
+                <div class="event-icon">${randomEvent.icon}</div>
+                <div class="event-content">
+                    <div class="event-title">${randomEvent.title}</div>
+                    <div class="event-description">${randomEvent.description}</div>
+                    <div class="event-timestamp">${randomEvent.timestamp}</div>
+                </div>
+            `;
+            
+            timelineEvents.insertBefore(eventElement, timelineEvents.firstChild);
+            
+            // Remove old events (keep max 6)
+            while (timelineEvents.children.length > 6) {
+                timelineEvents.removeChild(timelineEvents.lastChild);
+            }
+        }
+
+        // Show conservation alerts
+        function showConservationAlert() {
+            const alerts = [
+                '🌿 Ecosystem optimization in progress - Agent migration detected',
+                '⚠️ High resource consumption in Data Forest - balancing initiated',
+                '🔄 Symbiotic relationship established - Performance boost detected',
+                '📊 Biodiversity index increased - New agent species discovered'
+            ];
+            
+            const alert = document.getElementById('conservationAlert');
+            const randomAlert = alerts[Math.floor(Math.random() * alerts.length)];
+            alert.textContent = randomAlert;
+            alert.classList.add('show');
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 3000);
+        }
+
+        // Update habitat populations
+        function updateHabitatStats() {
+            const habitats = document.querySelectorAll('.habitat-population');
+            const values = ['127', '89', '2.3GB'];
+            
+            habitats.forEach((habitat, index) => {
+                const baseValue = parseInt(values[index]) || parseFloat(values[index]);
+                let newValue;
+                
+                if (index === 2) { // Memory usage
+                    newValue = (baseValue + (Math.random() - 0.5) * 0.4).toFixed(1) + 'GB';
+                } else {
+                    newValue = Math.max(1, Math.floor(baseValue + (Math.random() - 0.5) * 20));
+                }
+                
+                habitat.textContent = newValue;
+            });
+        }
+
+        // Simulate day/night cycle
+        function simulateDayNightCycle() {
+            const body = document.body;
+            const hour = new Date().getHours();
+            
+            if (hour >= 6 && hour < 18) {
+                body.className = 'day-cycle';
+            } else {
+                body.className = 'night-cycle';
+            }
+        }
+
+        // Add haptic feedback simulation for iOS
+        function addHapticFeedback() {
+            document.querySelectorAll('.haptic-light, .haptic-medium').forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    // Simulate iOS haptic feedback
+                    if (navigator.vibrate) {
+                        if (this.classList.contains('haptic-light')) {
+                            navigator.vibrate(10);
+                        } else if (this.classList.contains('haptic-medium')) {
+                            navigator.vibrate([10, 10, 10]);
+                        }
+                    }
+                });
+            });
+        }
+
+        // Initialize the ecosystem
+        function initializeEcosystem() {
+            createParticles();
+            simulateDayNightCycle();
+            addHapticFeedback();
+            
+            // Start periodic updates
+            setInterval(updateEnergyLevels, 3000);
+            setInterval(addTimelineEvent, 8000);
+            setInterval(showConservationAlert, 15000);
+            setInterval(updateHabitatStats, 5000);
+            
+            // Show initial alert
+            setTimeout(showConservationAlert, 2000);
+        }
+
+        // Start the ecosystem when page loads
+        document.addEventListener('DOMContentLoaded', initializeEcosystem);
+
+        // Handle page visibility changes for performance
+        document.addEventListener('visibilitychange', function() {
+            const particles = document.querySelectorAll('.particle');
+            if (document.hidden) {
+                particles.forEach(p => p.style.animationPlayState = 'paused');
+            } else {
+                particles.forEach(p => p.style.animationPlayState = 'running');
+            }
+        });
+
+        // Touch interaction enhancements for iOS
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.closest('.organism-card')) {
+                e.target.closest('.organism-card').style.transform = 'scale(0.98)';
+            }
+        });
+
+        document.addEventListener('touchend', function(e) {
+            if (e.target.closest('.organism-card')) {
+                setTimeout(() => {
+                    e.target.closest('.organism-card').style.transform = 'scale(1)';
+                }, 150);
+            }
+        });
+
+        // Prevent default zoom behavior on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(e) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>

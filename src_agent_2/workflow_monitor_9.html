@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swarm Intelligence Workflow Monitor</title>
+    <style>
+        :root {
+            --hive-amber: #ffb347;
+            --collective-blue: #4169e1;
+            --emergence-purple: #8a2be2;
+            --queen-gold: #ffd700;
+            --drone-white: #f0f8ff;
+            --dark-hive: #1a0f0a;
+            --cell-bg: #2a1a0f;
+            --pheromone-trail: #ff6b35;
+            --consensus-green: #32cd32;
+            --swarm-red: #dc143c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-hive);
+            color: var(--drone-white);
+            overflow: hidden;
+            height: 100vh;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .swarm-interface {
+            display: grid;
+            grid-template-rows: 60px 1fr 180px;
+            height: 100vh;
+            background: radial-gradient(circle at center, #2a1a0f 0%, #1a0f0a 100%);
+        }
+
+        /* Hive Control Header */
+        .hive-header {
+            background: linear-gradient(90deg, var(--cell-bg), #3a2a1f);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 2px solid var(--hive-amber);
+            box-shadow: 0 2px 15px rgba(255, 179, 71, 0.4);
+        }
+
+        .colony-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--hive-amber);
+            text-shadow: 0 0 10px var(--hive-amber);
+        }
+
+        .hive-metrics {
+            display: flex;
+            gap: 25px;
+            font-size: 12px;
+            color: var(--collective-blue);
+        }
+
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            color: var(--queen-gold);
+        }
+
+        .consensus-button {
+            background: linear-gradient(45deg, var(--emergence-purple), var(--collective-blue));
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            animation: consensus-pulse 3s infinite;
+            text-transform: uppercase;
+            font-size: 10px;
+        }
+
+        @keyframes consensus-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        /* Main Swarm Display */
+        .swarm-section {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+            padding: 20px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .swarm-display {
+            position: relative;
+            background: radial-gradient(circle at center, #2a1a0f 0%, #1a0f0a 70%, #0a0505 100%);
+            border: 3px solid var(--hive-amber);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 
+                inset 0 0 50px rgba(255, 179, 71, 0.2),
+                0 0 30px rgba(255, 179, 71, 0.3);
+        }
+
+        .hexagon-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.2;
+            background-image: 
+                radial-gradient(circle at 25% 25%, var(--hive-amber) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, var(--hive-amber) 2px, transparent 2px);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+        }
+
+        .pheromone-trail {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .trail-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--pheromone-trail), transparent);
+            border-radius: 1px;
+            animation: pheromone-flow 4s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes pheromone-flow {
+            0% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 0.8; transform: scaleX(1); }
+            100% { opacity: 0; transform: scaleX(0); }
+        }
+
+        .agent-swarm {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--collective-blue);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .agent-swarm::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--collective-blue);
+            border-radius: 50%;
+            top: -5px;
+            left: -5px;
+            opacity: 0.4;
+            animation: agent-pulse 2s infinite;
+        }
+
+        @keyframes agent-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(1.3); opacity: 0.8; }
+        }
+
+        .agent-swarm.queen {
+            background: var(--queen-gold);
+            width: 16px;
+            height: 16px;
+            box-shadow: 0 0 15px var(--queen-gold);
+            animation: queen-influence 3s infinite;
+        }
+
+        .agent-swarm.queen::before {
+            border-color: var(--queen-gold);
+            width: 30px;
+            height: 30px;
+            top: -7px;
+            left: -7px;
+        }
+
+        @keyframes queen-influence {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        .agent-swarm.scout {
+            background: var(--emergence-purple);
+            animation: scout-search 5s linear infinite;
+        }
+
+        @keyframes scout-search {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .agent-swarm.worker {
+            background: var(--collective-blue);
+        }
+
+        .agent-swarm.forager {
+            background: var(--consensus-green);
+            animation: forager-collect 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes forager-collect {
+            0% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .agent-swarm.emergency {
+            background: var(--swarm-red);
+            animation: emergency-alert 0.8s infinite;
+        }
+
+        @keyframes emergency-alert {
+            0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.4); }
+        }
+
+        .flocking-vector {
+            position: absolute;
+            width: 20px;
+            height: 2px;
+            background: var(--emergence-purple);
+            transform-origin: left center;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* Swarm Control Panel */
+        .swarm-control {
+            background: var(--cell-bg);
+            border: 2px solid var(--hive-amber);
+            border-radius: 15px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: var(--hive-amber);
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '⬡';
+            color: var(--queen-gold);
+        }
+
+        .agent-info {
+            background: rgba(65, 105, 225, 0.1);
+            border: 1px solid var(--collective-blue);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .agent-info:hover {
+            background: rgba(65, 105, 225, 0.2);
+            transform: translateX(5px);
+        }
+
+        .agent-info::before {
+            content: '';
+            position: absolute;
+            left: -3px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: var(--collective-blue);
+            border-radius: 2px;
+        }
+
+        .agent-info.queen::before { background: var(--queen-gold); }
+        .agent-info.scout::before { background: var(--emergence-purple); }
+        .agent-info.forager::before { background: var(--consensus-green); }
+        .agent-info.emergency::before { background: var(--swarm-red); }
+
+        .agent-id {
+            color: var(--collective-blue);
+            font-weight: bold;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .agent-details {
+            font-size: 10px;
+            color: var(--drone-white);
+            opacity: 0.9;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .behavior-indicator {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: behavior-blink 2s infinite;
+        }
+
+        @keyframes behavior-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .behavior-separation { background: var(--pheromone-trail); }
+        .behavior-alignment { background: var(--collective-blue); }
+        .behavior-cohesion { background: var(--consensus-green); }
+        .behavior-exploration { background: var(--emergence-purple); }
+
+        .emergence-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .metric-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--hive-amber);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 9px;
+            color: var(--hive-amber);
+            text-transform: uppercase;
+        }
+
+        .metric-number {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--queen-gold);
+            margin-top: 4px;
+        }
+
+        /* Collective Intelligence Timeline */
+        .intelligence-timeline {
+            background: linear-gradient(90deg, var(--cell-bg), #2a1a0f);
+            border-top: 2px solid var(--hive-amber);
+            padding: 15px 20px;
+            overflow-y: auto;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .timeline-title {
+            color: var(--hive-amber);
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .swarm-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-button {
+            background: rgba(138, 43, 226, 0.2);
+            border: 1px solid var(--emergence-purple);
+            color: var(--emergence-purple);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .control-button:hover {
+            background: rgba(138, 43, 226, 0.4);
+        }
+
+        .control-button.active {
+            background: var(--emergence-purple);
+            color: var(--drone-white);
+        }
+
+        .decision-feed {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .decision-item {
+            min-width: 280px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--hive-amber);
+            border-radius: 12px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .decision-item::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--hive-amber), var(--emergence-purple), var(--collective-blue));
+            border-radius: 12px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .decision-time {
+            color: var(--hive-amber);
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .decision-type {
+            color: var(--emergence-purple);
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        .decision-event {
+            color: var(--drone-white);
+            font-size: 12px;
+            margin-top: 6px;
+            line-height: 1.3;
+        }
+
+        .decision-details {
+            color: var(--collective-blue);
+            font-size: 10px;
+            margin-top: 8px;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .consensus-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .consensus-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--consensus-green), var(--queen-gold));
+            border-radius: 2px;
+            animation: consensus-grow 2s ease-out;
+        }
+
+        @keyframes consensus-grow {
+            0% { width: 0%; }
+            100% { width: var(--consensus-width, 85%); }
+        }
+
+        /* Swarm Communication Panel */
+        .swarm-comm {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--cell-bg);
+            border: 2px solid var(--hive-amber);
+            border-radius: 15px;
+            padding: 15px;
+            width: 300px;
+            z-index: 100;
+        }
+
+        .comm-display {
+            background: black;
+            border: 1px solid var(--hive-amber);
+            border-radius: 8px;
+            padding: 12px;
+            height: 120px;
+            overflow-y: auto;
+            font-size: 10px;
+            font-family: 'Courier New', monospace;
+            color: var(--hive-amber);
+            margin-bottom: 10px;
+        }
+
+        .comm-input {
+            width: 100%;
+            background: black;
+            border: 1px solid var(--collective-blue);
+            border-radius: 8px;
+            padding: 10px;
+            color: var(--collective-blue);
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+        }
+
+        .comm-input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(65, 105, 225, 0.5);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .swarm-section {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 280px;
+            }
+            
+            .swarm-control {
+                height: 280px;
+            }
+            
+            .swarm-comm {
+                bottom: 10px;
+                right: 10px;
+                width: calc(100% - 20px);
+                max-width: 320px;
+            }
+        }
+
+        /* Touch Interactions */
+        .touch-feedback {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .touch-feedback::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 179, 71, 0.4);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+
+        .touch-feedback:active::after {
+            width: 100px;
+            height: 100px;
+        }
+
+        /* Swarm Optimization Visualization */
+        .optimization-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--emergence-purple);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: particle-optimize 6s linear infinite;
+        }
+
+        @keyframes particle-optimize {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            10% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+            90% { opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="swarm-interface">
+        <!-- Hive Control Header -->
+        <div class="hive-header">
+            <div class="colony-id">HIVE-MIND-ALPHA • SWARM INTELLIGENCE</div>
+            <div class="hive-metrics">
+                <div class="metric-item">
+                    <div class="metric-value" id="activeAgents">247</div>
+                    <div>Active Agents</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="emergenceLevel">89%</div>
+                    <div>Emergence</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="consensusRate">94%</div>
+                    <div>Consensus</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="swarmCohesion">0.87</div>
+                    <div>Cohesion</div>
+                </div>
+            </div>
+            <button class="consensus-button touch-feedback" onclick="triggerConsensus()">
+                Build Consensus
+            </button>
+        </div>
+
+        <!-- Main Swarm & Control Section -->
+        <div class="swarm-section">
+            <!-- Swarm Display -->
+            <div class="swarm-display">
+                <div class="hexagon-grid"></div>
+                <div class="pheromone-trail">
+                    <div class="trail-line" style="top: 25%; left: 20%; width: 200px; transform: rotate(45deg);"></div>
+                    <div class="trail-line" style="top: 60%; left: 40%; width: 180px; transform: rotate(-30deg);"></div>
+                    <div class="trail-line" style="top: 80%; left: 10%; width: 220px; transform: rotate(15deg);"></div>
+                    <div class="trail-line" style="top: 40%; left: 60%; width: 160px; transform: rotate(75deg);"></div>
+                </div>
+                
+                <!-- Swarm Agents -->
+                <div class="agent-swarm queen" style="top: 45%; left: 50%;" data-agent="QUEEN-001" onclick="selectAgent('QUEEN-001')"></div>
+                <div class="agent-swarm scout" style="top: 25%; left: 30%;" data-agent="SCOUT-042" onclick="selectAgent('SCOUT-042')"></div>
+                <div class="agent-swarm worker" style="top: 35%; left: 65%;" data-agent="WORK-156" onclick="selectAgent('WORK-156')"></div>
+                <div class="agent-swarm forager" style="top: 70%; left: 25%;" data-agent="FORGE-098" onclick="selectAgent('FORGE-098')"></div>
+                <div class="agent-swarm worker" style="top: 55%; left: 75%;" data-agent="WORK-234" onclick="selectAgent('WORK-234')"></div>
+                <div class="agent-swarm scout" style="top: 80%; left: 60%;" data-agent="SCOUT-187" onclick="selectAgent('SCOUT-187')"></div>
+                <div class="agent-swarm emergency" style="top: 60%; left: 80%;" data-agent="ALERT-099" onclick="selectAgent('ALERT-099')"></div>
+                <div class="agent-swarm forager" style="top: 30%; left: 20%;" data-agent="FORGE-145" onclick="selectAgent('FORGE-145')"></div>
+                <div class="agent-swarm worker" style="top: 85%; left: 40%;" data-agent="WORK-301" onclick="selectAgent('WORK-301')"></div>
+                <div class="agent-swarm scout" style="top: 15%; left: 70%;" data-agent="SCOUT-267" onclick="selectAgent('SCOUT-267')"></div>
+
+                <!-- Flocking Vectors -->
+                <div class="flocking-vector" style="top: 25%; left: 30%; transform: rotate(135deg);"></div>
+                <div class="flocking-vector" style="top: 35%; left: 65%; transform: rotate(45deg);"></div>
+                <div class="flocking-vector" style="top: 70%; left: 25%; transform: rotate(90deg);"></div>
+
+                <!-- Optimization Particles -->
+                <div class="optimization-particle" style="top: 20%; left: 80%; animation-delay: 0s;"></div>
+                <div class="optimization-particle" style="top: 75%; left: 15%; animation-delay: 1s;"></div>
+                <div class="optimization-particle" style="top: 50%; left: 90%; animation-delay: 2s;"></div>
+                <div class="optimization-particle" style="top: 90%; left: 70%; animation-delay: 3s;"></div>
+            </div>
+
+            <!-- Swarm Control Panel -->
+            <div class="swarm-control">
+                <div class="control-section">
+                    <div class="section-title">Active Collective</div>
+                    <div class="agent-info queen touch-feedback" onclick="selectSwarmAgent('QUEEN-001')">
+                        <div class="agent-id">
+                            <span class="behavior-indicator behavior-alignment"></span>
+                            QUEEN-001 • ORCHESTRATOR
+                        </div>
+                        <div class="agent-details">
+                            Influence: 92% • Followers: 246<br>
+                            Behavior: Central coordination hub<br>
+                            Task: Global optimization strategy
+                        </div>
+                    </div>
+                    
+                    <div class="agent-info scout touch-feedback" onclick="selectSwarmAgent('SCOUT-042')">
+                        <div class="agent-id">
+                            <span class="behavior-indicator behavior-exploration"></span>
+                            SCOUT-042 • EXPLORER
+                        </div>
+                        <div class="agent-details">
+                            Range: 850m • Discovery: 3 new paths<br>
+                            Behavior: Boundary expansion<br>
+                            Task: Resource identification
+                        </div>
+                    </div>
+                    
+                    <div class="agent-info forager touch-feedback" onclick="selectSwarmAgent('FORGE-098')">
+                        <div class="agent-id">
+                            <span class="behavior-indicator behavior-cohesion"></span>
+                            FORGE-098 • COLLECTOR
+                        </div>
+                        <div class="agent-details">
+                            Efficiency: 96% • Load: 78/100<br>
+                            Behavior: Resource gathering<br>
+                            Task: Data aggregation pipeline
+                        </div>
+                    </div>
+                    
+                    <div class="agent-info emergency touch-feedback" onclick="selectSwarmAgent('ALERT-099')">
+                        <div class="agent-id">
+                            <span class="behavior-indicator behavior-separation"></span>
+                            ALERT-099 • EMERGENCY
+                        </div>
+                        <div class="agent-details">
+                            Priority: CRITICAL • Response: ACTIVE<br>
+                            Behavior: Anomaly isolation<br>
+                            Task: Exception handling protocol
+                        </div>
+                    </div>
+                    
+                    <div class="agent-info worker touch-feedback" onclick="selectSwarmAgent('WORK-156')">
+                        <div class="agent-id">
+                            <span class="behavior-indicator behavior-alignment"></span>
+                            WORK-156 • PROCESSOR
+                        </div>
+                        <div class="agent-details">
+                            Throughput: 450/min • Queue: 12<br>
+                            Behavior: Task specialization<br>
+                            Task: Workflow execution engine
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <div class="section-title">Emergence Metrics</div>
+                    <div class="emergence-metrics">
+                        <div class="metric-card">
+                            <div class="metric-label">Complexity</div>
+                            <div class="metric-number" id="complexityScore">8.7</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Adaptation</div>
+                            <div class="metric-number" id="adaptationRate">94%</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Efficiency</div>
+                            <div class="metric-number" id="swarmEfficiency">96%</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Synergy</div>
+                            <div class="metric-number" id="synergyLevel">0.91</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collective Intelligence Timeline -->
+        <div class="intelligence-timeline">
+            <div class="timeline-header">
+                <div class="timeline-title">Collective Decision Log</div>
+                <div class="swarm-controls">
+                    <button class="control-button active touch-feedback">LIVE</button>
+                    <button class="control-button touch-feedback">CONSENSUS</button>
+                    <button class="control-button touch-feedback">OPTIMIZE</button>
+                </div>
+            </div>
+            
+            <div class="decision-feed">
+                <div class="decision-item">
+                    <div class="decision-time">14:23:45.892</div>
+                    <div class="decision-type">Flocking Consensus</div>
+                    <div class="decision-event">Swarm alignment achieved through collective behavior</div>
+                    <div class="decision-details">247 agents converged on optimal path using separation, alignment, and cohesion rules</div>
+                    <div class="consensus-bar">
+                        <div class="consensus-fill" style="--consensus-width: 94%;"></div>
+                    </div>
+                </div>
+                
+                <div class="decision-item">
+                    <div class="decision-time">14:22:17.341</div>
+                    <div class="decision-type">Emergent Solution</div>
+                    <div class="decision-event">Optimization discovered through self-organization</div>
+                    <div class="decision-details">Scout agents identified new efficiency pattern, adopted by 89% of collective</div>
+                    <div class="consensus-bar">
+                        <div class="consensus-fill" style="--consensus-width: 89%;"></div>
+                    </div>
+                </div>
+                
+                <div class="decision-item">
+                    <div class="decision-time">14:21:33.078</div>
+                    <div class="decision-type">Queen Directive</div>
+                    <div class="decision-event">Central coordination signal propagated</div>
+                    <div class="decision-details">Queen agent broadcasted priority shift, swarm reorganization in 2.3 seconds</div>
+                    <div class="consensus-bar">
+                        <div class="consensus-fill" style="--consensus-width: 98%;"></div>
+                    </div>
+                </div>
+                
+                <div class="decision-item">
+                    <div class="decision-time">14:20:56.445</div>
+                    <div class="decision-type">Anomaly Response</div>
+                    <div class="decision-event">Collective defense mechanism activated</div>
+                    <div class="decision-details">Emergency agent isolated threat, worker agents implemented containment protocol</div>
+                    <div class="consensus-bar">
+                        <div class="consensus-fill" style="--consensus-width: 76%;"></div>
+                    </div>
+                </div>
+                
+                <div class="decision-item">
+                    <div class="decision-time">14:19:42.156</div>
+                    <div class="decision-type">Resource Allocation</div>
+                    <div class="decision-event">Forager consensus on distribution strategy</div>
+                    <div class="decision-details">Collective intelligence optimized resource distribution across 15 processing nodes</div>
+                    <div class="consensus-bar">
+                        <div class="consensus-fill" style="--consensus-width: 91%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Swarm Communication Panel -->
+    <div class="swarm-comm">
+        <div class="section-title">Hive Communications</div>
+        <div class="comm-display" id="swarmCommDisplay">
+            [14:23:45] QUEEN-001: Broadcasting optimization signal<br>
+            [14:23:46] SCOUT-042: New path discovered, sharing coordinates<br>
+            [14:23:47] COLLECTIVE: Consensus building, 89% agreement<br>
+            [14:23:48] FORGE-098: Resource collection efficiency improved<br>
+            [14:23:49] WORK-156: Task allocation updated, throughput +15%<br>
+            [14:23:50] ALERT-099: Anomaly contained, normal operations resumed<br>
+        </div>
+        <input type="text" class="comm-input" placeholder="Send swarm directive..." onkeypress="handleSwarmInput(event)">
+    </div>
+
+    <script>
+        // Swarm agent positions and movement patterns
+        let swarmAgents = {
+            'QUEEN-001': { x: 50, y: 45, dx: 0, dy: 0, influence: 92 },
+            'SCOUT-042': { x: 30, y: 25, dx: 0.8, dy: 0.6, range: 850 },
+            'WORK-156': { x: 65, y: 35, dx: 0.3, dy: 0.4, throughput: 450 },
+            'FORGE-098': { x: 25, y: 70, dx: 0.5, dy: -0.3, efficiency: 96 },
+            'WORK-234': { x: 75, y: 55, dx: -0.4, dy: 0.2, throughput: 380 },
+            'SCOUT-187': { x: 60, y: 80, dx: 0.7, dy: -0.5, range: 720 },
+            'ALERT-099': { x: 80, y: 60, dx: -0.9, dy: -0.2, priority: 'CRITICAL' },
+            'FORGE-145': { x: 20, y: 30, dx: 0.6, dy: 0.5, efficiency: 88 },
+            'WORK-301': { x: 40, y: 85, dx: 0.2, dy: -0.6, throughput: 420 },
+            'SCOUT-267': { x: 70, y: 15, dx: -0.5, dy: 0.8, range: 650 }
+        };
+
+        // Flocking behavior implementation
+        function updateSwarmBehavior() {
+            const queenAgent = swarmAgents['QUEEN-001'];
+            
+            Object.keys(swarmAgents).forEach(agentId => {
+                const agent = swarmAgents[agentId];
+                const element = document.querySelector(`[data-agent="${agentId}"]`);
+                
+                if (element && agentId !== 'QUEEN-001') {
+                    // Flocking rules: separation, alignment, cohesion
+                    let separationX = 0, separationY = 0;
+                    let alignmentX = 0, alignmentY = 0;
+                    let cohesionX = 0, cohesionY = 0;
+                    let neighborCount = 0;
+                    
+                    // Calculate flocking forces
+                    Object.keys(swarmAgents).forEach(otherId => {
+                        if (otherId !== agentId) {
+                            const other = swarmAgents[otherId];
+                            const distance = Math.sqrt(
+                                Math.pow(agent.x - other.x, 2) + 
+                                Math.pow(agent.y - other.y, 2)
+                            );
+                            
+                            if (distance < 15) { // Neighbor threshold
+                                neighborCount++;
+                                
+                                // Separation - avoid crowding
+                                separationX += (agent.x - other.x) / distance;
+                                separationY += (agent.y - other.y) / distance;
+                                
+                                // Alignment - steer towards average heading
+                                alignmentX += other.dx;
+                                alignmentY += other.dy;
+                                
+                                // Cohesion - steer towards average position
+                                cohesionX += other.x;
+                                cohesionY += other.y;
+                            }
+                        }
+                    });
+                    
+                    if (neighborCount > 0) {
+                        // Normalize flocking forces
+                        separationX /= neighborCount;
+                        separationY /= neighborCount;
+                        alignmentX /= neighborCount;
+                        alignmentY /= neighborCount;
+                        cohesionX = (cohesionX / neighborCount) - agent.x;
+                        cohesionY = (cohesionY / neighborCount) - agent.y;
+                        
+                        // Apply weights and update velocity
+                        agent.dx += separationX * 0.1 + alignmentX * 0.05 + cohesionX * 0.02;
+                        agent.dy += separationY * 0.1 + alignmentY * 0.05 + cohesionY * 0.02;
+                        
+                        // Add attraction to queen
+                        const queenAttractionX = (queenAgent.x - agent.x) * 0.01;
+                        const queenAttractionY = (queenAgent.y - agent.y) * 0.01;
+                        agent.dx += queenAttractionX;
+                        agent.dy += queenAttractionY;
+                    }
+                    
+                    // Limit velocity
+                    const speed = Math.sqrt(agent.dx * agent.dx + agent.dy * agent.dy);
+                    if (speed > 1) {
+                        agent.dx = (agent.dx / speed) * 1;
+                        agent.dy = (agent.dy / speed) * 1;
+                    }
+                    
+                    // Update position
+                    agent.x += agent.dx;
+                    agent.y += agent.dy;
+                    
+                    // Boundary conditions
+                    if (agent.x <= 5 || agent.x >= 95) agent.dx *= -0.8;
+                    if (agent.y <= 5 || agent.y >= 95) agent.dy *= -0.8;
+                    agent.x = Math.max(5, Math.min(95, agent.x));
+                    agent.y = Math.max(5, Math.min(95, agent.y));
+                    
+                    // Apply position to DOM element
+                    element.style.left = `${agent.x}%`;
+                    element.style.top = `${agent.y}%`;
+                }
+            });
+        }
+
+        // Emergence metrics calculation
+        function updateEmergenceMetrics() {
+            // Calculate swarm complexity
+            const complexity = 8.0 + Math.random() * 1.0;
+            document.getElementById('complexityScore').textContent = complexity.toFixed(1);
+            
+            // Calculate adaptation rate
+            const adaptation = 90 + Math.random() * 8;
+            document.getElementById('adaptationRate').textContent = Math.round(adaptation) + '%';
+            
+            // Calculate swarm efficiency
+            const efficiency = 92 + Math.random() * 6;
+            document.getElementById('swarmEfficiency').textContent = Math.round(efficiency) + '%';
+            
+            // Calculate synergy level
+            const synergy = 0.85 + Math.random() * 0.10;
+            document.getElementById('synergyLevel').textContent = synergy.toFixed(2);
+            
+            // Update header metrics
+            const activeAgents = 240 + Math.floor(Math.random() * 15);
+            document.getElementById('activeAgents').textContent = activeAgents;
+            
+            const emergence = 85 + Math.floor(Math.random() * 10);
+            document.getElementById('emergenceLevel').textContent = emergence + '%';
+            
+            const consensus = 90 + Math.floor(Math.random() * 8);
+            document.getElementById('consensusRate').textContent = consensus + '%';
+            
+            const cohesion = 0.80 + Math.random() * 0.15;
+            document.getElementById('swarmCohesion').textContent = cohesion.toFixed(2);
+        }
+
+        // Swarm communication updates
+        let swarmMessages = [
+            "SCOUT-042: Boundary expansion complete, 3 new paths mapped",
+            "FORGE-098: Resource collection optimized, efficiency at 98%",
+            "WORK-156: Task processing accelerated, queue cleared",
+            "QUEEN-001: Global optimization signal broadcast",
+            "COLLECTIVE: Consensus achieved, implementing new strategy",
+            "ALERT-099: Anomaly detection system fully operational",
+            "SCOUT-187: Exploration radius extended to 900m",
+            "FORGE-145: Load balancing improved across all nodes",
+            "WORK-234: Workflow synchronization optimized",
+            "SCOUT-267: Pattern recognition enhanced, accuracy +12%"
+        ];
+
+        let messageIndex = 0;
+
+        function updateSwarmComm() {
+            const display = document.getElementById('swarmCommDisplay');
+            if (messageIndex < swarmMessages.length) {
+                const time = new Date().toISOString().substr(11, 8).replace(/:/g, ':');
+                display.innerHTML += `[${time}] ${swarmMessages[messageIndex]}<br>`;
+                display.scrollTop = display.scrollHeight;
+                messageIndex++;
+            } else {
+                messageIndex = 0;
+                generateSwarmMessage();
+            }
+        }
+
+        function generateSwarmMessage() {
+            const agents = ['QUEEN-001', 'SCOUT-042', 'WORK-156', 'FORGE-098', 'ALERT-099'];
+            const actions = [
+                'Signal propagation optimized',
+                'Consensus building initiated',
+                'Resource allocation balanced',
+                'Anomaly detection enhanced',
+                'Collective intelligence improved',
+                'Swarm coordination synchronized'
+            ];
+            
+            const time = new Date().toISOString().substr(11, 8).replace(/:/g, ':');
+            const agent = agents[Math.floor(Math.random() * agents.length)];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            
+            const display = document.getElementById('swarmCommDisplay');
+            display.innerHTML += `[${time}] ${agent}: ${action}<br>`;
+            display.scrollTop = display.scrollHeight;
+        }
+
+        // Decision timeline updates
+        function updateDecisionTimeline() {
+            const decisionTypes = [
+                'Emergent Behavior',
+                'Collective Consensus', 
+                'Swarm Optimization',
+                'Adaptive Response',
+                'Intelligence Synthesis',
+                'Distributed Decision'
+            ];
+            
+            const events = [
+                'Self-organization pattern emerged from agent interactions',
+                'Collective intelligence discovered optimal solution path',
+                'Swarm adaptation to environmental changes completed',
+                'Distributed consensus reached through pheromone signaling',
+                'Emergence complexity increased through agent cooperation',
+                'Flocking behavior optimized workflow efficiency'
+            ];
+            
+            const timelineFeed = document.querySelector('.decision-feed');
+            
+            // Remove oldest decision if more than 6 items
+            if (timelineFeed.children.length > 6) {
+                timelineFeed.removeChild(timelineFeed.lastChild);
+            }
+            
+            // Add new decision at the beginning
+            const newDecision = document.createElement('div');
+            newDecision.className = 'decision-item';
+            
+            const time = new Date().toISOString().substr(11, 12);
+            const decisionType = decisionTypes[Math.floor(Math.random() * decisionTypes.length)];
+            const event = events[Math.floor(Math.random() * events.length)];
+            const consensusWidth = 75 + Math.floor(Math.random() * 23);
+            
+            newDecision.innerHTML = `
+                <div class="decision-time">${time}</div>
+                <div class="decision-type">${decisionType}</div>
+                <div class="decision-event">${event}</div>
+                <div class="decision-details">Swarm intelligence coordinated ${150 + Math.floor(Math.random() * 100)} agents using collective behavior algorithms</div>
+                <div class="consensus-bar">
+                    <div class="consensus-fill" style="--consensus-width: ${consensusWidth}%;"></div>
+                </div>
+            `;
+            
+            timelineFeed.insertBefore(newDecision, timelineFeed.firstChild);
+        }
+
+        // Event handlers
+        function selectAgent(agentId) {
+            const agent = document.querySelector(`[data-agent="${agentId}"]`);
+            agent.style.transform = 'translate(-50%, -50%) scale(1.8)';
+            setTimeout(() => {
+                agent.style.transform = agent.classList.contains('queen') ? 
+                    'translate(-50%, -50%) scale(1)' : 'translate(-50%, -50%) scale(1)';
+            }, 400);
+            
+            // Update communication
+            const time = new Date().toISOString().substr(11, 8).replace(/:/g, ':');
+            const display = document.getElementById('swarmCommDisplay');
+            display.innerHTML += `[${time}] ${agentId}: Agent selected, broadcasting status<br>`;
+            display.scrollTop = display.scrollHeight;
+        }
+
+        function selectSwarmAgent(agentId) {
+            selectAgent(agentId);
+        }
+
+        function triggerConsensus() {
+            // Animate all agents towards queen
+            const queenPos = swarmAgents['QUEEN-001'];
+            Object.keys(swarmAgents).forEach(agentId => {
+                if (agentId !== 'QUEEN-001') {
+                    const agent = swarmAgents[agentId];
+                    agent.dx = (queenPos.x - agent.x) * 0.05;
+                    agent.dy = (queenPos.y - agent.y) * 0.05;
+                }
+            });
+            
+            // Add consensus message
+            const time = new Date().toISOString().substr(11, 8).replace(/:/g, ':');
+            const display = document.getElementById('swarmCommDisplay');
+            display.innerHTML += `[${time}] COLLECTIVE: Consensus protocol initiated, swarm converging<br>`;
+            display.scrollTop = display.scrollHeight;
+        }
+
+        function handleSwarmInput(event) {
+            if (event.key === 'Enter') {
+                const input = event.target;
+                const directive = input.value.trim();
+                
+                if (directive) {
+                    const time = new Date().toISOString().substr(11, 8).replace(/:/g, ':');
+                    const display = document.getElementById('swarmCommDisplay');
+                    display.innerHTML += `[${time}] HIVE-CONTROL: ${directive}<br>`;
+                    display.scrollTop = display.scrollHeight;
+                    input.value = '';
+                    
+                    // Simulate swarm response
+                    setTimeout(() => {
+                        display.innerHTML += `[${time}] COLLECTIVE: Directive received, implementing across swarm<br>`;
+                        display.scrollTop = display.scrollHeight;
+                    }, 1000);
+                }
+            }
+        }
+
+        // Initialize swarm intelligence system
+        setInterval(updateSwarmBehavior, 150);
+        setInterval(updateEmergenceMetrics, 5000);
+        setInterval(updateSwarmComm, 7000);
+        setInterval(updateDecisionTimeline, 10000);
+        
+        // Touch feedback for mobile
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.classList.contains('touch-feedback')) {
+                e.target.style.transform = 'scale(0.95)';
+            }
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            if (e.target.classList.contains('touch-feedback')) {
+                setTimeout(() => {
+                    e.target.style.transform = 'scale(1)';
+                }, 150);
+            }
+        });
+
+        // Initialize swarm systems
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start with some initial swarm activity
+            setTimeout(updateSwarmComm, 1000);
+            setTimeout(updateDecisionTimeline, 2000);
+            setTimeout(updateEmergenceMetrics, 500);
+            
+            // Add random pheromone trail updates
+            setInterval(() => {
+                const trails = document.querySelectorAll('.trail-line');
+                trails.forEach(trail => {
+                    const randomDelay = Math.random() * 2;
+                    trail.style.animationDelay = randomDelay + 's';
+                });
+            }, 8000);
+            
+            // Add particle optimization updates
+            setInterval(() => {
+                const particles = document.querySelectorAll('.optimization-particle');
+                particles.forEach(particle => {
+                    const newTop = 10 + Math.random() * 80;
+                    const newLeft = 10 + Math.random() * 80;
+                    particle.style.top = newTop + '%';
+                    particle.style.left = newLeft + '%';
+                });
+            }, 6000);
+        });
+    </script>
+</body>
+</html>

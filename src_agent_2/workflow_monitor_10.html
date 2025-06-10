@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maritime Operations Command - Fleet Orchestration Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #0a1929 0%, #1a2332 30%, #234a65 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+            position: relative;
+        }
+
+        /* Maritime Background Effects */
+        .ocean-waves {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 50% 120%, rgba(13, 71, 161, 0.3) 0%, transparent 50%),
+                linear-gradient(180deg, rgba(0, 51, 102, 0.1) 0%, rgba(0, 77, 153, 0.2) 100%);
+            animation: oceanFlow 20s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes oceanFlow {
+            0%, 100% { transform: translateX(0) scale(1); opacity: 0.3; }
+            50% { transform: translateX(-10px) scale(1.02); opacity: 0.5; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        /* Maritime Command Header */
+        .command-header {
+            background: linear-gradient(135deg, #0d47a1 0%, #1565c0 50%, #1976d2 100%);
+            padding: 16px 20px 12px;
+            border-bottom: 2px solid #2196f3;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .command-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            animation: radarSweep 3s ease-in-out infinite;
+        }
+
+        @keyframes radarSweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .fleet-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .command-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffd700;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .fleet-coordinates {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #81c784;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(129, 199, 132, 0.3);
+        }
+
+        .navigation-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+        }
+
+        .nav-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: navigationPulse 2s ease-in-out infinite;
+        }
+
+        .nav-indicator.operational { background: #4caf50; }
+        .nav-indicator.warning { background: #ff9800; }
+        .nav-indicator.critical { background: #f44336; }
+
+        @keyframes navigationPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        /* Main Content Areas */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 16px;
+            overflow: hidden;
+        }
+
+        /* Fleet Monitor Section */
+        .fleet-monitor {
+            background: linear-gradient(135deg, rgba(13, 71, 161, 0.4) 0%, rgba(21, 101, 192, 0.3) 100%);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            height: 240px;
+        }
+
+        .monitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .monitor-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radar-icon {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #4caf50;
+            border-radius: 50%;
+            position: relative;
+            animation: radarRotate 2s linear infinite;
+        }
+
+        .radar-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 1px;
+            height: 8px;
+            background: #4caf50;
+            transform: translate(-50%, -50%);
+            transform-origin: bottom;
+        }
+
+        @keyframes radarRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .formation-status {
+            font-size: 12px;
+            color: #81c784;
+            background: rgba(76, 175, 80, 0.2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .fleet-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            height: calc(100% - 50px);
+        }
+
+        .vessel-card {
+            background: linear-gradient(135deg, rgba(25, 118, 210, 0.3) 0%, rgba(30, 136, 229, 0.2) 100%);
+            border: 1px solid rgba(33, 150, 243, 0.4);
+            border-radius: 12px;
+            padding: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .vessel-card:active {
+            transform: scale(0.98);
+            background: linear-gradient(135deg, rgba(25, 118, 210, 0.5) 0%, rgba(30, 136, 229, 0.4) 100%);
+        }
+
+        .vessel-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #64b5f6, transparent);
+            animation: vesselScan 4s ease-in-out infinite;
+        }
+
+        @keyframes vesselScan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .vessel-type {
+            font-size: 10px;
+            color: #90caf9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .vessel-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .vessel-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+        }
+
+        .status-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            animation: statusPulse 1.5s ease-in-out infinite;
+        }
+
+        .status-indicator.ready { background: #4caf50; }
+        .status-indicator.active { background: #2196f3; }
+        .status-indicator.maintenance { background: #ff9800; }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Current Mission Section */
+        .mission-control {
+            background: linear-gradient(135deg, rgba(21, 101, 192, 0.4) 0%, rgba(25, 118, 210, 0.3) 100%);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(20px);
+            height: 180px;
+        }
+
+        .mission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .mission-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .compass-icon {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ff9800;
+            border-radius: 50%;
+            position: relative;
+            animation: compassSpin 8s linear infinite;
+        }
+
+        .compass-icon::before,
+        .compass-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 8px;
+            background: #ff9800;
+            transform: translate(-50%, -50%);
+        }
+
+        .compass-icon::after {
+            transform: translate(-50%, -50%) rotate(90deg);
+        }
+
+        @keyframes compassSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .mission-priority {
+            font-size: 11px;
+            color: #ff5722;
+            background: rgba(255, 87, 34, 0.2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 87, 34, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mission-details {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .mission-objective {
+            font-size: 14px;
+            color: #ffffff;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .mission-progress {
+            margin-bottom: 8px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #90caf9;
+            margin-bottom: 4px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+            border-radius: 3px;
+            animation: progressFlow 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -20px;
+            width: 20px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: progressShimmer 1.5s ease-in-out infinite;
+        }
+
+        @keyframes progressFlow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes progressShimmer {
+            0% { left: -20px; }
+            100% { left: 100%; }
+        }
+
+        .mission-eta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #81c784;
+        }
+
+        /* Activity Timeline Section */
+        .activity-timeline {
+            background: linear-gradient(135deg, rgba(25, 118, 210, 0.4) 0%, rgba(21, 101, 192, 0.3) 100%);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(20px);
+            flex: 1;
+            min-height: 200px;
+            overflow: hidden;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .timeline-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signal-icon {
+            width: 16px;
+            height: 16px;
+            position: relative;
+        }
+
+        .signal-bar {
+            position: absolute;
+            bottom: 0;
+            width: 2px;
+            background: #4caf50;
+            border-radius: 1px;
+        }
+
+        .signal-bar:nth-child(1) { left: 0; height: 4px; animation: signalPulse 1s ease-in-out infinite 0s; }
+        .signal-bar:nth-child(2) { left: 4px; height: 8px; animation: signalPulse 1s ease-in-out infinite 0.2s; }
+        .signal-bar:nth-child(3) { left: 8px; height: 12px; animation: signalPulse 1s ease-in-out infinite 0.4s; }
+        .signal-bar:nth-child(4) { left: 12px; height: 16px; animation: signalPulse 1s ease-in-out infinite 0.6s; }
+
+        @keyframes signalPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .timeline-filter {
+            font-size: 11px;
+            color: #90caf9;
+            background: rgba(144, 202, 249, 0.2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(144, 202, 249, 0.3);
+        }
+
+        .timeline-content {
+            height: calc(100% - 50px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            border-left: 3px solid #2196f3;
+            position: relative;
+            animation: timelineSlide 0.5s ease-out;
+        }
+
+        @keyframes timelineSlide {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .timeline-item.priority-high {
+            border-left-color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+        }
+
+        .timeline-item.priority-medium {
+            border-left-color: #ff9800;
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .timeline-timestamp {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: #81c784;
+            min-width: 40px;
+            text-align: right;
+            padding-top: 2px;
+        }
+
+        .timeline-details {
+            flex: 1;
+        }
+
+        .timeline-action {
+            font-size: 13px;
+            color: #ffffff;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .timeline-agent {
+            font-size: 11px;
+            color: #90caf9;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .agent-badge {
+            padding: 2px 6px;
+            background: rgba(33, 150, 243, 0.3);
+            border-radius: 4px;
+            border: 1px solid rgba(33, 150, 243, 0.5);
+        }
+
+        /* Weather Conditions Overlay */
+        .weather-overlay {
+            position: absolute;
+            top: 80px;
+            right: 16px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 12px;
+            padding: 12px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: weatherFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes weatherFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .weather-title {
+            font-size: 11px;
+            color: #90caf9;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .weather-condition {
+            font-size: 12px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .weather-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4caf50;
+            animation: weatherPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes weatherPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        /* Touch Interaction Feedback */
+        .touch-feedback {
+            position: absolute;
+            pointer-events: none;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(33, 150, 243, 0.3) 0%, transparent 70%);
+            transform: scale(0);
+            animation: rippleEffect 0.6s ease-out;
+        }
+
+        @keyframes rippleEffect {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        /* Maritime Typography */
+        .maritime-code {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* Responsive Design for iOS */
+        @media (max-height: 700px) {
+            .fleet-monitor { height: 200px; }
+            .mission-control { height: 140px; }
+        }
+
+        @media (max-height: 600px) {
+            .main-content { gap: 8px; padding: 12px; }
+            .fleet-monitor { height: 160px; }
+            .mission-control { height: 120px; }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .container {
+                background: linear-gradient(135deg, #0a1929 0%, #1a2332 30%, #234a65 100%);
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ocean-waves"></div>
+    
+    <div class="container">
+        <!-- Maritime Command Header -->
+        <header class="command-header">
+            <div class="fleet-status">
+                <h1 class="command-title">FLEET COMMAND CENTER</h1>
+                <div class="fleet-coordinates maritime-code">
+                    LAT: 34°05'N LON: 118°15'W
+                </div>
+            </div>
+            <div class="navigation-stats">
+                <div class="nav-stat">
+                    <div class="nav-indicator operational"></div>
+                    <span>NAVIGATION</span>
+                </div>
+                <div class="nav-stat">
+                    <div class="nav-indicator operational"></div>
+                    <span>COMMS</span>
+                </div>
+                <div class="nav-stat">
+                    <div class="nav-indicator warning"></div>
+                    <span>WEATHER</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Fleet Monitor Section -->
+            <section class="fleet-monitor">
+                <div class="monitor-header">
+                    <h2 class="monitor-title">
+                        <div class="radar-icon"></div>
+                        FLEET STATUS
+                    </h2>
+                    <div class="formation-status">
+                        Formation: Diamond Pattern
+                    </div>
+                </div>
+                <div class="fleet-grid">
+                    <div class="vessel-card" onclick="selectVessel(this, 'carrier')">
+                        <div class="vessel-type">Aircraft Carrier</div>
+                        <div class="vessel-name">USS ENTERPRISE</div>
+                        <div class="vessel-status">
+                            <span>Command & Control</span>
+                            <div class="status-indicator active"></div>
+                        </div>
+                    </div>
+                    <div class="vessel-card" onclick="selectVessel(this, 'destroyer')">
+                        <div class="vessel-type">Destroyer</div>
+                        <div class="vessel-name">USS ARLEIGH</div>
+                        <div class="vessel-status">
+                            <span>Air Defense</span>
+                            <div class="status-indicator ready"></div>
+                        </div>
+                    </div>
+                    <div class="vessel-card" onclick="selectVessel(this, 'submarine')">
+                        <div class="vessel-type">Nuclear Submarine</div>
+                        <div class="vessel-name">USS VIRGINIA</div>
+                        <div class="vessel-status">
+                            <span>Reconnaissance</span>
+                            <div class="status-indicator active"></div>
+                        </div>
+                    </div>
+                    <div class="vessel-card" onclick="selectVessel(this, 'cruiser')">
+                        <div class="vessel-type">Guided Cruiser</div>
+                        <div class="vessel-name">USS TICONDEROGA</div>
+                        <div class="vessel-status">
+                            <span>Electronic Warfare</span>
+                            <div class="status-indicator ready"></div>
+                        </div>
+                    </div>
+                    <div class="vessel-card" onclick="selectVessel(this, 'frigate')">
+                        <div class="vessel-type">Frigate</div>
+                        <div class="vessel-name">USS FREEDOM</div>
+                        <div class="vessel-status">
+                            <span>Patrol & Escort</span>
+                            <div class="status-indicator maintenance"></div>
+                        </div>
+                    </div>
+                    <div class="vessel-card" onclick="selectVessel(this, 'supply')">
+                        <div class="vessel-type">Supply Ship</div>
+                        <div class="vessel-name">USNS SUPPLY</div>
+                        <div class="vessel-status">
+                            <span>Logistics Support</span>
+                            <div class="status-indicator ready"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Current Mission Section -->
+            <section class="mission-control">
+                <div class="mission-header">
+                    <h2 class="mission-title">
+                        <div class="compass-icon"></div>
+                        CURRENT MISSION
+                    </h2>
+                    <div class="mission-priority">HIGH PRIORITY</div>
+                </div>
+                <div class="mission-details">
+                    <div class="mission-objective">
+                        Operation Deep Blue: Multi-agent reconnaissance and data collection in contested waters. Coordinate fleet movements while maintaining communication security.
+                    </div>
+                    <div class="mission-progress">
+                        <div class="progress-label">
+                            <span>Mission Progress</span>
+                            <span>73%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 73%"></div>
+                        </div>
+                    </div>
+                    <div class="mission-eta">
+                        <span class="maritime-code">ETA: 2.3 HOURS</span>
+                        <span class="maritime-code">DIST: 47 NM</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Activity Timeline Section -->
+            <section class="activity-timeline">
+                <div class="timeline-header">
+                    <h2 class="timeline-title">
+                        <div class="signal-icon">
+                            <div class="signal-bar"></div>
+                            <div class="signal-bar"></div>
+                            <div class="signal-bar"></div>
+                            <div class="signal-bar"></div>
+                        </div>
+                        COMMAND LOG
+                    </h2>
+                    <div class="timeline-filter">LAST 4 HOURS</div>
+                </div>
+                <div class="timeline-content" id="timelineContent">
+                    <div class="timeline-item priority-high">
+                        <div class="timeline-timestamp maritime-code">14:23</div>
+                        <div class="timeline-details">
+                            <div class="timeline-action">Weather warning received: Storm system approaching from NW</div>
+                            <div class="timeline-agent">
+                                <span class="agent-badge">WEATHER-AGENT</span>
+                                Meteorological Analysis
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-timestamp maritime-code">14:18</div>
+                        <div class="timeline-details">
+                            <div class="timeline-action">Formation adjustment completed - Diamond pattern established</div>
+                            <div class="timeline-agent">
+                                <span class="agent-badge">NAV-CONTROL</span>
+                                Fleet Coordination
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-item priority-medium">
+                        <div class="timeline-timestamp maritime-code">14:12</div>
+                        <div class="timeline-details">
+                            <div class="timeline-action">USS FREEDOM reporting maintenance requirements - requesting dock priority</div>
+                            <div class="timeline-agent">
+                                <span class="agent-badge">LOGISTICS</span>
+                                Resource Management
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-timestamp maritime-code">14:05</div>
+                        <div class="timeline-details">
+                            <div class="timeline-action">Sonar contact classified as friendly - USS VIRGINIA acknowledged</div>
+                            <div class="timeline-agent">
+                                <span class="agent-badge">SONAR-SYS</span>
+                                Underwater Detection
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-timestamp maritime-code">13:58</div>
+                        <div class="timeline-details">
+                            <div class="timeline-action">Communication test successful - All vessels responding</div>
+                            <div class="timeline-agent">
+                                <span class="agent-badge">COMMS</span>
+                                Signal Operations
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-item priority-medium">
+                        <div class="timeline-timestamp maritime-code">13:47</div>
+                        <div class="timeline-details">
+                            <div class="timeline-action">Fuel consumption analysis - USS SUPPLY dispatched for refueling ops</div>
+                            <div class="timeline-agent">
+                                <span class="agent-badge">FUEL-MGT</span>
+                                Supply Chain
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Weather Conditions Overlay -->
+        <div class="weather-overlay">
+            <div class="weather-title">Sea Conditions</div>
+            <div class="weather-condition">
+                <div class="weather-icon" style="background: #ff9800;"></div>
+                <span>Moderate Seas</span>
+            </div>
+            <div class="weather-condition">
+                <div class="weather-icon" style="background: #2196f3;"></div>
+                <span>15 kt Winds</span>
+            </div>
+            <div class="weather-condition">
+                <div class="weather-icon" style="background: #9e9e9e;"></div>
+                <span>Visibility 8 NM</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Maritime Operations JavaScript
+        let selectedVessel = null;
+        let missionProgress = 73;
+        let timelineItems = [];
+
+        // Touch interaction feedback
+        function createRipple(event) {
+            const ripple = document.createElement('div');
+            ripple.classList.add('touch-feedback');
+            
+            const rect = event.currentTarget.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = event.clientX - rect.left - size / 2;
+            const y = event.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            
+            event.currentTarget.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        }
+
+        // Vessel selection with haptic feedback
+        function selectVessel(element, vesselType) {
+            createRipple(event);
+            
+            // Remove previous selection
+            if (selectedVessel) {
+                selectedVessel.style.background = '';
+                selectedVessel.style.borderColor = '';
+            }
+            
+            // Select new vessel
+            selectedVessel = element;
+            element.style.background = 'linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 193, 7, 0.2) 100%)';
+            element.style.borderColor = '#ffd700';
+            
+            // Haptic feedback (iOS Safari)
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            // Update mission details based on vessel
+            updateMissionForVessel(vesselType);
+        }
+
+        // Update mission based on selected vessel
+        function updateMissionForVessel(vesselType) {
+            const missionDetails = {
+                carrier: {
+                    objective: "Command and Control Operations: Coordinate air operations and maintain fleet communications.",
+                    progress: 78,
+                    eta: "1.8 HOURS"
+                },
+                destroyer: {
+                    objective: "Air Defense Mission: Provide area air defense and escort high-value assets.",
+                    progress: 85,
+                    eta: "2.1 HOURS"
+                },
+                submarine: {
+                    objective: "Stealth Reconnaissance: Gather intelligence while maintaining operational secrecy.",
+                    progress: 92,
+                    eta: "0.7 HOURS"
+                },
+                cruiser: {
+                    objective: "Electronic Warfare Operations: Provide communication jamming and cyber defense.",
+                    progress: 67,
+                    eta: "3.2 HOURS"
+                },
+                frigate: {
+                    objective: "Patrol and Escort Duties: Maintain perimeter security and escort operations.",
+                    progress: 45,
+                    eta: "4.1 HOURS"
+                },
+                supply: {
+                    objective: "Logistics Support Mission: Resupply operations and maintenance support.",
+                    progress: 73,
+                    eta: "2.3 HOURS"
+                }
+            };
+            
+            const mission = missionDetails[vesselType] || missionDetails.supply;
+            
+            // Update mission display with animation
+            const objectiveEl = document.querySelector('.mission-objective');
+            const progressEl = document.querySelector('.progress-fill');
+            const progressLabel = document.querySelector('.progress-label span:last-child');
+            const etaEl = document.querySelector('.mission-eta span:first-child');
+            
+            objectiveEl.style.opacity = '0.5';
+            setTimeout(() => {
+                objectiveEl.textContent = mission.objective;
+                objectiveEl.style.opacity = '1';
+                
+                progressEl.style.width = mission.progress + '%';
+                progressLabel.textContent = mission.progress + '%';
+                etaEl.textContent = `ETA: ${mission.eta}`;
+            }, 200);
+        }
+
+        // Add new timeline items
+        function addTimelineItem(timestamp, action, agent, priority = '') {
+            const timelineContent = document.getElementById('timelineContent');
+            const newItem = document.createElement('div');
+            newItem.className = `timeline-item ${priority}`;
+            
+            newItem.innerHTML = `
+                <div class="timeline-timestamp maritime-code">${timestamp}</div>
+                <div class="timeline-details">
+                    <div class="timeline-action">${action}</div>
+                    <div class="timeline-agent">
+                        <span class="agent-badge">${agent.code}</span>
+                        ${agent.name}
+                    </div>
+                </div>
+            `;
+            
+            timelineContent.insertBefore(newItem, timelineContent.firstChild);
+            
+            // Limit timeline items to prevent memory issues
+            const items = timelineContent.querySelectorAll('.timeline-item');
+            if (items.length > 20) {
+                items[items.length - 1].remove();
+            }
+        }
+
+        // Simulate real-time updates
+        function simulateFleetOperations() {
+            const operations = [
+                {
+                    action: "Course correction executed - Maintaining formation integrity",
+                    agent: { code: "NAV-CONTROL", name: "Fleet Navigation" },
+                    priority: ""
+                },
+                {
+                    action: "Radar sweep completed - No hostile contacts detected",
+                    agent: { code: "RADAR-SYS", name: "Surface Search" },
+                    priority: ""
+                },
+                {
+                    action: "Communication relay established with shore command",
+                    agent: { code: "COMMS", name: "Signal Operations" },
+                    priority: ""
+                },
+                {
+                    action: "Weather update: Conditions improving, seas calming",
+                    agent: { code: "WEATHER-AGENT", name: "Meteorological Analysis" },
+                    priority: "priority-medium"
+                },
+                {
+                    action: "Fuel levels optimized - All vessels report green status",
+                    agent: { code: "FUEL-MGT", name: "Supply Chain" },
+                    priority: ""
+                },
+                {
+                    action: "Emergency drill commenced - All hands to stations",
+                    agent: { code: "DRILL-CMD", name: "Training Operations" },
+                    priority: "priority-high"
+                }
+            ];
+            
+            let operationIndex = 0;
+            
+            setInterval(() => {
+                const now = new Date();
+                const timestamp = now.toTimeString().substr(0, 5);
+                const operation = operations[operationIndex % operations.length];
+                
+                addTimelineItem(timestamp, operation.action, operation.agent, operation.priority);
+                operationIndex++;
+                
+                // Update mission progress randomly
+                if (Math.random() < 0.3) {
+                    missionProgress = Math.min(100, missionProgress + Math.floor(Math.random() * 3));
+                    const progressEl = document.querySelector('.progress-fill');
+                    const progressLabel = document.querySelector('.progress-label span:last-child');
+                    progressEl.style.width = missionProgress + '%';
+                    progressLabel.textContent = missionProgress + '%';
+                }
+            }, 8000 + Math.random() * 12000); // Random interval between 8-20 seconds
+        }
+
+        // Update coordinates simulation
+        function updateCoordinates() {
+            const coordsEl = document.querySelector('.fleet-coordinates');
+            let lat = 34.05;
+            let lon = -118.15;
+            
+            setInterval(() => {
+                lat += (Math.random() - 0.5) * 0.01;
+                lon += (Math.random() - 0.5) * 0.01;
+                
+                const latDir = lat >= 0 ? 'N' : 'S';
+                const lonDir = lon >= 0 ? 'E' : 'W';
+                
+                coordsEl.textContent = `LAT: ${Math.abs(lat).toFixed(2)}°${latDir} LON: ${Math.abs(lon).toFixed(2)}°${lonDir}`;
+            }, 15000);
+        }
+
+        // Weather conditions update
+        function updateWeatherConditions() {
+            const conditions = [
+                { condition: "Calm Seas", icon: "#4caf50" },
+                { condition: "Moderate Seas", icon: "#ff9800" },
+                { condition: "Rough Seas", icon: "#f44336" },
+                { condition: "Heavy Seas", icon: "#9c27b0" }
+            ];
+            
+            const winds = ["5 kt Winds", "10 kt Winds", "15 kt Winds", "20 kt Winds", "25 kt Winds"];
+            const visibility = ["Visibility 2 NM", "Visibility 5 NM", "Visibility 8 NM", "Visibility 12 NM", "Visibility 15+ NM"];
+            
+            setInterval(() => {
+                const weatherConditions = document.querySelectorAll('.weather-condition');
+                const randomCondition = conditions[Math.floor(Math.random() * conditions.length)];
+                const randomWind = winds[Math.floor(Math.random() * winds.length)];
+                const randomVisibility = visibility[Math.floor(Math.random() * visibility.length)];
+                
+                weatherConditions[0].querySelector('span').textContent = randomCondition.condition;
+                weatherConditions[0].querySelector('.weather-icon').style.background = randomCondition.icon;
+                weatherConditions[1].querySelector('span').textContent = randomWind;
+                weatherConditions[2].querySelector('span').textContent = randomVisibility;
+            }, 30000);
+        }
+
+        // Add touch event listeners for all interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            const interactiveElements = document.querySelectorAll('.vessel-card, .nav-stat, .mission-priority, .timeline-filter');
+            
+            interactiveElements.forEach(element => {
+                element.addEventListener('touchstart', createRipple);
+            });
+            
+            // Start simulations
+            simulateFleetOperations();
+            updateCoordinates();
+            updateWeatherConditions();
+            
+            // Auto-scroll timeline
+            const timelineContent = document.getElementById('timelineContent');
+            setInterval(() => {
+                if (timelineContent.scrollTop === 0) {
+                    timelineContent.scrollTop = timelineContent.scrollHeight;
+                } else {
+                    timelineContent.scrollTop = 0;
+                }
+            }, 25000);
+        });
+
+        // Haptic feedback for iOS
+        function hapticFeedback(type = 'light') {
+            if (window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function') {
+                // iOS 13+ haptic feedback
+                if (navigator.vibrate) {
+                    switch(type) {
+                        case 'light': navigator.vibrate(10); break;
+                        case 'medium': navigator.vibrate(50); break;
+                        case 'heavy': navigator.vibrate(100); break;
+                    }
+                }
+            }
+        }
+
+        // Handle orientation changes
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                // Recalculate layouts if needed
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }, 100);
+        });
+
+        // Initialize viewport height for iOS
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    </script>
+</body>
+</html>

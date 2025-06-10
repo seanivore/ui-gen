@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Mission Control - Workflow Orchestration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0f1c 0%, #1a2332 50%, #0f1419 100%);
+            color: #e0e6ed;
+            overflow-x: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Background Grid Pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 150, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 150, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        /* Header Section */
+        .mission-header {
+            background: linear-gradient(90deg, #1a2332 0%, #2a3442 100%);
+            border-bottom: 2px solid #00ff96;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 255, 150, 0.2);
+        }
+
+        .mission-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ff96;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .mission-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff96;
+            box-shadow: 0 0 10px #00ff96;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .mission-time {
+            font-size: 14px;
+            color: #9ca3af;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Static Monitor Display */
+        .monitor-section {
+            background: linear-gradient(135deg, #1e2832 0%, #2a3442 100%);
+            border: 1px solid #3a4553;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .monitor-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff96, transparent);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            color: #00ff96;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .title-icon {
+            width: 20px;
+            height: 20px;
+            background: #00ff96;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #0a0f1c;
+            font-weight: bold;
+        }
+
+        /* Agent Status Grid */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .agent-card {
+            background: linear-gradient(135deg, #2a3442 0%, #1e2832 100%);
+            border: 1px solid #3a4553;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .agent-card:active {
+            transform: scale(0.98);
+            background: linear-gradient(135deg, #3a4553 0%, #2a3442 100%);
+        }
+
+        .agent-card.active {
+            border-color: #00ff96;
+            box-shadow: 0 0 15px rgba(0, 255, 150, 0.3);
+        }
+
+        .agent-card.warning {
+            border-color: #fbbf24;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .agent-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #e0e6ed;
+        }
+
+        .agent-status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .agent-status-badge.operational {
+            background: rgba(0, 255, 150, 0.2);
+            color: #00ff96;
+        }
+
+        .agent-status-badge.processing {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .agent-status-badge.standby {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .agent-metrics {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        /* Current Task Focus */
+        .task-focus {
+            background: linear-gradient(135deg, #1e2832 0%, #2a3442 100%);
+            border: 1px solid #3a4553;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .task-focus::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .mission-phase {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .phase-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            box-shadow: 0 0 10px #3b82f6;
+            animation: pulse 1.5s infinite;
+        }
+
+        .phase-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #3b82f6;
+            text-transform: uppercase;
+        }
+
+        .countdown-display {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .countdown-time {
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+
+        .countdown-label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 5px;
+        }
+
+        .progress-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .progress-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .progress-label {
+            color: #e0e6ed;
+        }
+
+        .progress-value {
+            color: #00ff96;
+            font-family: 'Courier New', monospace;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #1e2832;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff96, #3b82f6);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 20px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3));
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-20px); }
+            100% { transform: translateX(20px); }
+        }
+
+        /* Activity Timeline */
+        .timeline-section {
+            flex: 1;
+            background: linear-gradient(135deg, #1e2832 0%, #2a3442 100%);
+            border: 1px solid #3a4553;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .timeline-feed {
+            height: calc(100% - 50px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #3a4553 transparent;
+        }
+
+        .timeline-feed::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .timeline-feed::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .timeline-feed::-webkit-scrollbar-thumb {
+            background: #3a4553;
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: rgba(42, 52, 66, 0.3);
+            border-radius: 8px;
+            border-left: 3px solid #00ff96;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .timeline-item:active {
+            transform: translateX(4px);
+            background: rgba(42, 52, 66, 0.5);
+        }
+
+        .timeline-item.warning {
+            border-left-color: #fbbf24;
+        }
+
+        .timeline-item.error {
+            border-left-color: #ef4444;
+        }
+
+        .timeline-timestamp {
+            color: #9ca3af;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+            min-width: 50px;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-size: 13px;
+            color: #e0e6ed;
+            margin-bottom: 4px;
+        }
+
+        .timeline-description {
+            font-size: 11px;
+            color: #9ca3af;
+            line-height: 1.4;
+        }
+
+        /* Communication Panel */
+        .comm-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #2a3442 0%, #1e2832 100%);
+            border: 1px solid #00ff96;
+            border-radius: 25px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(0, 255, 150, 0.3);
+            z-index: 100;
+        }
+
+        .comm-icon {
+            width: 24px;
+            height: 24px;
+            background: #00ff96;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0a0f1c;
+            font-size: 14px;
+            animation: pulse 2s infinite;
+        }
+
+        .comm-text {
+            flex: 1;
+            font-size: 14px;
+            color: #e0e6ed;
+        }
+
+        .comm-button {
+            background: rgba(0, 255, 150, 0.2);
+            border: 1px solid #00ff96;
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #00ff96;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .comm-button:active {
+            transform: scale(0.95);
+            background: rgba(0, 255, 150, 0.3);
+        }
+
+        /* Haptic Feedback Simulation */
+        @keyframes haptic {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .haptic-feedback {
+            animation: haptic 0.1s ease;
+        }
+
+        /* Emergency Alert */
+        .alert-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 200;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .alert-banner.show {
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 375px) {
+            .agent-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .countdown-time {
+                font-size: 20px;
+            }
+            
+            .main-content {
+                padding: 15px;
+                gap: 12px;
+            }
+        }
+
+        @media (orientation: landscape) {
+            .main-content {
+                flex-direction: row;
+                align-items: stretch;
+            }
+            
+            .monitor-section,
+            .task-focus {
+                flex: 1;
+            }
+            
+            .timeline-section {
+                flex: 1.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Emergency Alert Banner -->
+    <div class="alert-banner" id="alertBanner">
+        ⚠️ MISSION CRITICAL: Agent 3 requires immediate attention
+    </div>
+
+    <div class="container">
+        <!-- Mission Header -->
+        <div class="mission-header">
+            <div class="mission-title">Mission Control</div>
+            <div class="mission-status">
+                <div class="status-indicator"></div>
+                <div class="mission-time" id="missionTime">T+ 00:42:15</div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Static Monitor Display -->
+            <div class="monitor-section">
+                <div class="section-title">
+                    <div class="title-icon">🛰️</div>
+                    Agent Fleet Status
+                </div>
+                <div class="agent-grid">
+                    <div class="agent-card active" data-agent="navigator">
+                        <div class="agent-header">
+                            <div class="agent-name">Navigator AI</div>
+                            <div class="agent-status-badge operational">Operational</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <span>CPU: 68%</span>
+                            <span>Tasks: 12/15</span>
+                        </div>
+                    </div>
+                    <div class="agent-card" data-agent="analyst">
+                        <div class="agent-header">
+                            <div class="agent-name">Data Analyst</div>
+                            <div class="agent-status-badge processing">Processing</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <span>CPU: 91%</span>
+                            <span>Tasks: 8/10</span>
+                        </div>
+                    </div>
+                    <div class="agent-card warning" data-agent="synthesizer">
+                        <div class="agent-header">
+                            <div class="agent-name">Synthesizer</div>
+                            <div class="agent-status-badge standby">Standby</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <span>CPU: 23%</span>
+                            <span>Tasks: 3/8</span>
+                        </div>
+                    </div>
+                    <div class="agent-card" data-agent="executor">
+                        <div class="agent-header">
+                            <div class="agent-name">Task Executor</div>
+                            <div class="agent-status-badge operational">Operational</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <span>CPU: 76%</span>
+                            <span>Tasks: 15/20</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Task Focus -->
+            <div class="task-focus">
+                <div class="section-title">
+                    <div class="title-icon">🎯</div>
+                    Mission Phase Control
+                </div>
+                <div class="mission-phase">
+                    <div class="phase-indicator"></div>
+                    <div class="phase-text">Orbit Stabilization</div>
+                </div>
+                <div class="countdown-display">
+                    <div class="countdown-time" id="countdown">T- 00:15:42</div>
+                    <div class="countdown-label">Next Phase Transition</div>
+                </div>
+                <div class="progress-bars">
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span class="progress-label">Overall Mission Progress</span>
+                            <span class="progress-value">67%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 67%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span class="progress-label">Current Phase</span>
+                            <span class="progress-value">89%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 89%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span class="progress-label">System Health</span>
+                            <span class="progress-value">94%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 94%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Timeline Feed -->
+            <div class="timeline-section">
+                <div class="section-title">
+                    <div class="title-icon">📡</div>
+                    Mission Control Log
+                </div>
+                <div class="timeline-feed" id="timelineFeed">
+                    <div class="timeline-item">
+                        <div class="timeline-timestamp">14:42</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Navigator AI: Course correction complete</div>
+                            <div class="timeline-description">Orbital trajectory adjusted by 0.3 degrees, maintaining optimal path</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item warning">
+                        <div class="timeline-timestamp">14:38</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">System Alert: Synthesizer entering standby mode</div>
+                            <div class="timeline-description">Temporary resource reallocation to primary mission tasks</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-timestamp">14:35</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Data Analyst: Processing telemetry batch #247</div>
+                            <div class="timeline-description">Analyzing 2.3TB of sensor data from orbital sensors</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-timestamp">14:31</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Task Executor: Deployment sequence initiated</div>
+                            <div class="timeline-description">Beginning automated deployment of mission packages</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-timestamp">14:28</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Houston: Mission parameters updated</div>
+                            <div class="timeline-description">Ground control has uploaded new orbital parameters</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-timestamp">14:25</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Navigator AI: Solar panel optimization complete</div>
+                            <div class="timeline-description">Power efficiency increased by 12% through orientation adjustment</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Communication Panel -->
+        <div class="comm-panel">
+            <div class="comm-icon">📞</div>
+            <div class="comm-text">Houston, we have nominal status on all systems</div>
+            <button class="comm-button" onclick="sendResponse()">Roger</button>
+        </div>
+    </div>
+
+    <script>
+        // Mission Timer
+        let missionStartTime = Date.now() - (42 * 60 + 15) * 1000;
+        let countdownTarget = Date.now() + (15 * 60 + 42) * 1000;
+
+        function updateTimers() {
+            const now = Date.now();
+            
+            // Mission elapsed time
+            const elapsed = now - missionStartTime;
+            const hours = Math.floor(elapsed / 3600000);
+            const minutes = Math.floor((elapsed % 3600000) / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            
+            document.getElementById('missionTime').textContent = 
+                `T+ ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Countdown timer
+            const remaining = countdownTarget - now;
+            if (remaining > 0) {
+                const countMinutes = Math.floor(remaining / 60000);
+                const countSeconds = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('countdown').textContent = 
+                    `T- ${Math.floor(countMinutes / 60).toString().padStart(2, '0')}:${(countMinutes % 60).toString().padStart(2, '0')}:${countSeconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        // Agent interaction with haptic feedback simulation
+        document.querySelectorAll('.agent-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove active class from all cards
+                document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
+                // Add active class to clicked card
+                this.classList.add('active');
+                
+                // Haptic feedback simulation
+                this.classList.add('haptic-feedback');
+                setTimeout(() => this.classList.remove('haptic-feedback'), 100);
+                
+                // Update communication panel
+                const agentName = this.querySelector('.agent-name').textContent;
+                document.querySelector('.comm-text').textContent = 
+                    `${agentName} selected for detailed monitoring`;
+            });
+        });
+
+        // Timeline item interactions
+        document.querySelectorAll('.timeline-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.classList.add('haptic-feedback');
+                setTimeout(() => this.classList.remove('haptic-feedback'), 100);
+            });
+        });
+
+        // Communication response function
+        function sendResponse() {
+            const button = document.querySelector('.comm-button');
+            button.classList.add('haptic-feedback');
+            setTimeout(() => button.classList.remove('haptic-feedback'), 100);
+            
+            // Add new timeline entry
+            const timelineFeed = document.getElementById('timelineFeed');
+            const now = new Date();
+            const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            const newEntry = document.createElement('div');
+            newEntry.className = 'timeline-item';
+            newEntry.innerHTML = `
+                <div class="timeline-timestamp">${timeString}</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Ground Control: Message acknowledged</div>
+                    <div class="timeline-description">Mission Control has confirmed receipt of status update</div>
+                </div>
+            `;
+            
+            timelineFeed.insertBefore(newEntry, timelineFeed.firstChild);
+            
+            // Update communication panel
+            document.querySelector('.comm-text').textContent = 
+                'All systems continue nominal operation';
+        }
+
+        // Simulate real-time updates
+        function simulateUpdates() {
+            // Randomly update progress bars
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const currentWidth = parseInt(bar.style.width);
+                const change = Math.random() * 4 - 2; // -2 to +2
+                const newWidth = Math.max(0, Math.min(100, currentWidth + change));
+                bar.style.width = newWidth + '%';
+                
+                // Update corresponding percentage display
+                const progressItem = bar.closest('.progress-item');
+                const valueDisplay = progressItem.querySelector('.progress-value');
+                valueDisplay.textContent = Math.round(newWidth) + '%';
+            });
+            
+            // Occasionally show emergency alert
+            if (Math.random() < 0.1) {
+                const alertBanner = document.getElementById('alertBanner');
+                alertBanner.classList.add('show');
+                setTimeout(() => alertBanner.classList.remove('show'), 5000);
+            }
+        }
+
+        // Add new timeline entries periodically
+        function addTimelineEntry() {
+            const entries = [
+                { title: 'Navigator AI: Orbital velocity adjusted', desc: 'Minor course correction to maintain optimal trajectory' },
+                { title: 'Data Analyst: Sensor calibration complete', desc: 'All instruments now operating within nominal parameters' },
+                { title: 'Task Executor: Routine maintenance cycle', desc: 'Automated systems check completed successfully' },
+                { title: 'Houston: Weather update received', desc: 'Launch conditions remain favorable for next phase' },
+                { title: 'System: Power management optimization', desc: 'Battery efficiency improved through dynamic load balancing' }
+            ];
+            
+            const randomEntry = entries[Math.floor(Math.random() * entries.length)];
+            const timelineFeed = document.getElementById('timelineFeed');
+            const now = new Date();
+            const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            const newEntry = document.createElement('div');
+            newEntry.className = 'timeline-item';
+            newEntry.innerHTML = `
+                <div class="timeline-timestamp">${timeString}</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">${randomEntry.title}</div>
+                    <div class="timeline-description">${randomEntry.desc}</div>
+                </div>
+            `;
+            
+            timelineFeed.insertBefore(newEntry, timelineFeed.firstChild);
+            
+            // Remove old entries to prevent infinite growth
+            const items = timelineFeed.querySelectorAll('.timeline-item');
+            if (items.length > 10) {
+                items[items.length - 1].remove();
+            }
+        }
+
+        // Initialize timers and updates
+        setInterval(updateTimers, 1000);
+        setInterval(simulateUpdates, 5000);
+        setInterval(addTimelineEntry, 15000);
+        
+        // Initial call
+        updateTimers();
+
+        // Prevent zoom on iOS
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+
+        // Add touch event optimization for iOS
+        document.addEventListener('touchstart', function(){}, {passive: true});
+    </script>
+</body>
+</html>

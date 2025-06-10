@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Response Command Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Emergency Color Palette */
+        :root {
+            --alert-red: #ff2d55;
+            --emergency-blue: #007aff;
+            --rescue-orange: #ff9500;
+            --safety-green: #30d158;
+            --critical-bg: rgba(255, 45, 85, 0.1);
+            --high-bg: rgba(255, 149, 0, 0.1);
+            --medium-bg: rgba(255, 214, 10, 0.1);
+            --low-bg: rgba(48, 209, 88, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            padding: env(safe-area-inset-top, 20px) 16px env(safe-area-inset-bottom, 20px);
+            max-width: 428px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Emergency Header */
+        .emergency-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emergency-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--alert-red), var(--rescue-orange), var(--emergency-blue), var(--safety-green));
+            animation: emergency-pulse 2s infinite;
+        }
+
+        @keyframes emergency-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .incident-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .incident-code {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--alert-red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--alert-red);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .alert-level {
+            background: var(--alert-red);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .command-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .metric-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Current Operations Section */
+        .current-operations {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            flex: 1;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--emergency-blue);
+        }
+
+        .priority-filter {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--emergency-blue);
+            color: white;
+            border-color: var(--emergency-blue);
+        }
+
+        .operations-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .operation-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .operation-card:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .operation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .operation-type {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .fire { color: var(--alert-red); }
+        .medical { color: var(--safety-green); }
+        .police { color: var(--emergency-blue); }
+        .rescue { color: var(--rescue-orange); }
+
+        .priority-badge {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .critical {
+            background: var(--critical-bg);
+            color: var(--alert-red);
+            border: 1px solid var(--alert-red);
+        }
+
+        .high {
+            background: var(--high-bg);
+            color: var(--rescue-orange);
+            border: 1px solid var(--rescue-orange);
+        }
+
+        .medium {
+            background: var(--medium-bg);
+            color: #ffd60a;
+            border: 1px solid #ffd60a;
+        }
+
+        .low {
+            background: var(--low-bg);
+            color: var(--safety-green);
+            border: 1px solid var(--safety-green);
+        }
+
+        .operation-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .operation-location {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+        }
+
+        .agent-deployment {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .deployed-agents {
+            display: flex;
+            gap: 4px;
+        }
+
+        .agent-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            border: 2px solid;
+        }
+
+        .fire-agent {
+            background: var(--critical-bg);
+            color: var(--alert-red);
+            border-color: var(--alert-red);
+        }
+
+        .medical-agent {
+            background: var(--low-bg);
+            color: var(--safety-green);
+            border-color: var(--safety-green);
+        }
+
+        .police-agent {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--emergency-blue);
+            border-color: var(--emergency-blue);
+        }
+
+        .rescue-agent {
+            background: var(--high-bg);
+            color: var(--rescue-orange);
+            border-color: var(--rescue-orange);
+        }
+
+        .operation-progress {
+            margin-top: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Activity Timeline */
+        .activity-timeline {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slide-in 0.5s ease;
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes slide-in {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .timeline-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .timeline-description {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4px;
+        }
+
+        .timeline-time {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Commander Controls */
+        .commander-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .primary-btn {
+            background: var(--emergency-blue);
+            color: white;
+        }
+
+        .alert-btn {
+            background: var(--alert-red);
+            color: white;
+        }
+
+        .success-btn {
+            background: var(--safety-green);
+            color: white;
+        }
+
+        /* Haptic Feedback */
+        .haptic {
+            animation: haptic-feedback 0.1s ease;
+        }
+
+        @keyframes haptic-feedback {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        /* Emergency Flash Animation */
+        .emergency-flash {
+            animation: emergency-flash 0.5s ease;
+        }
+
+        @keyframes emergency-flash {
+            0% { background: var(--glass-bg); }
+            50% { background: var(--critical-bg); }
+            100% { background: var(--glass-bg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 375px) {
+            .container {
+                padding: 16px 12px;
+            }
+            
+            .command-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .metric-card {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Emergency Response Header -->
+        <div class="emergency-header">
+            <div class="incident-status">
+                <div class="incident-code">
+                    <span class="status-indicator"></span>
+                    ICS-2024-001
+                </div>
+                <div class="alert-level">ACTIVE</div>
+            </div>
+            
+            <div class="command-metrics">
+                <div class="metric-card">
+                    <div class="metric-value fire">12</div>
+                    <div class="metric-label">Active Units</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value rescue">4</div>
+                    <div class="metric-label">In Transit</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value medical">3</div>
+                    <div class="metric-label">On Scene</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value police">98%</div>
+                    <div class="metric-label">Capacity</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Operations -->
+        <div class="current-operations">
+            <div class="section-header">
+                <div class="section-title">Current Operations</div>
+                <div class="priority-filter">
+                    <button class="filter-btn active" data-priority="all">ALL</button>
+                    <button class="filter-btn" data-priority="critical">CRIT</button>
+                    <button class="filter-btn" data-priority="high">HIGH</button>
+                </div>
+            </div>
+
+            <div class="operations-grid">
+                <div class="operation-card critical-operation" data-priority="critical">
+                    <div class="operation-header">
+                        <div class="operation-type fire">STRUCTURE FIRE</div>
+                        <div class="priority-badge critical">CRITICAL</div>
+                    </div>
+                    <div class="operation-title">High-rise Apartment Complex</div>
+                    <div class="operation-location">📍 1247 Elm Street, Downtown</div>
+                    
+                    <div class="agent-deployment">
+                        <div class="deployed-agents">
+                            <div class="agent-icon fire-agent">F1</div>
+                            <div class="agent-icon fire-agent">F2</div>
+                            <div class="agent-icon medical-agent">M1</div>
+                            <div class="agent-icon police-agent">P1</div>
+                        </div>
+                    </div>
+                    
+                    <div class="operation-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%; background: var(--alert-red);"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>Evacuation 65%</span>
+                            <span>ETA: 12 min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="operation-card high-operation" data-priority="high">
+                    <div class="operation-header">
+                        <div class="operation-type medical">MEDICAL EMERGENCY</div>
+                        <div class="priority-badge high">HIGH</div>
+                    </div>
+                    <div class="operation-title">Multi-Vehicle Collision</div>
+                    <div class="operation-location">📍 I-95 Northbound Mile 45</div>
+                    
+                    <div class="agent-deployment">
+                        <div class="deployed-agents">
+                            <div class="agent-icon medical-agent">M2</div>
+                            <div class="agent-icon medical-agent">M3</div>
+                            <div class="agent-icon police-agent">P2</div>
+                            <div class="agent-icon rescue-agent">R1</div>
+                        </div>
+                    </div>
+                    
+                    <div class="operation-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%; background: var(--rescue-orange);"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>Triage 45%</span>
+                            <span>ETA: 8 min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="operation-card medium-operation" data-priority="medium">
+                    <div class="operation-header">
+                        <div class="operation-type rescue">WATER RESCUE</div>
+                        <div class="priority-badge medium">MEDIUM</div>
+                    </div>
+                    <div class="operation-title">Swift Water Recovery</div>
+                    <div class="operation-location">📍 River Park, Sector 7</div>
+                    
+                    <div class="agent-deployment">
+                        <div class="deployed-agents">
+                            <div class="agent-icon rescue-agent">R2</div>
+                            <div class="agent-icon medical-agent">M4</div>
+                            <div class="agent-icon police-agent">P3</div>
+                        </div>
+                    </div>
+                    
+                    <div class="operation-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%; background: #ffd60a;"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>Search 80%</span>
+                            <span>ETA: 15 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Timeline -->
+        <div class="activity-timeline">
+            <div class="section-title" style="margin-bottom: 12px;">Command Timeline</div>
+            
+            <div class="timeline-item">
+                <div class="timeline-icon fire-agent">🚨</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">CRITICAL: Structure Fire Escalated</div>
+                    <div class="timeline-description">Fire Unit F1 reports multiple floors involved. Requesting additional resources.</div>
+                    <div class="timeline-time">2 minutes ago</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon medical-agent">🚑</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Medical Team M3 On Scene</div>
+                    <div class="timeline-description">Triage setup complete at I-95 collision site. 4 patients identified.</div>
+                    <div class="timeline-time">5 minutes ago</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon police-agent">🚔</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Traffic Control Established</div>
+                    <div class="timeline-description">Police Unit P2 has secured perimeter and diverted traffic flow.</div>
+                    <div class="timeline-time">8 minutes ago</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon rescue-agent">⛑️</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Water Rescue Team Deployed</div>
+                    <div class="timeline-description">Rescue Unit R2 initiating swift water search pattern in Sector 7.</div>
+                    <div class="timeline-time">12 minutes ago</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon" style="background: var(--emergency-blue); color: white;">📡</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Command Center Activated</div>
+                    <div class="timeline-description">Incident Command System fully operational. All units reporting.</div>
+                    <div class="timeline-time">18 minutes ago</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commander Controls -->
+        <div class="commander-controls">
+            <button class="control-btn alert-btn" id="escalateBtn">
+                🚨 ESCALATE
+            </button>
+            <button class="control-btn primary-btn" id="deployBtn">
+                🎯 DEPLOY
+            </button>
+            <button class="control-btn success-btn" id="clearBtn">
+                ✅ CLEAR
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Emergency Response Command Center Logic
+        class EmergencyCommandCenter {
+            constructor() {
+                this.currentIncidents = [];
+                this.deployedUnits = [];
+                this.timeline = [];
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.startRealTimeUpdates();
+                this.initializeHapticFeedback();
+                this.simulateEmergencyActivity();
+            }
+
+            setupEventListeners() {
+                // Priority filter buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.filterOperations(e.target.dataset.priority);
+                        this.addHapticFeedback(e.target);
+                    });
+                });
+
+                // Operation cards
+                document.querySelectorAll('.operation-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        this.selectOperation(card);
+                        this.addHapticFeedback(card);
+                    });
+                });
+
+                // Command buttons
+                document.getElementById('escalateBtn').addEventListener('click', (e) => {
+                    this.escalateEmergency();
+                    this.addHapticFeedback(e.target);
+                });
+
+                document.getElementById('deployBtn').addEventListener('click', (e) => {
+                    this.deployAdditionalUnits();
+                    this.addHapticFeedback(e.target);
+                });
+
+                document.getElementById('clearBtn').addEventListener('click', (e) => {
+                    this.clearOperation();
+                    this.addHapticFeedback(e.target);
+                });
+            }
+
+            filterOperations(priority) {
+                // Update active filter button
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.priority === priority);
+                });
+
+                // Show/hide operation cards
+                document.querySelectorAll('.operation-card').forEach(card => {
+                    if (priority === 'all' || card.dataset.priority === priority) {
+                        card.style.display = 'block';
+                        card.style.animation = 'slide-in 0.3s ease';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            selectOperation(card) {
+                // Remove previous selection
+                document.querySelectorAll('.operation-card').forEach(c => {
+                    c.style.borderColor = 'var(--glass-border)';
+                });
+
+                // Highlight selected operation
+                card.style.borderColor = 'var(--emergency-blue)';
+                card.style.boxShadow = '0 0 20px rgba(0, 122, 255, 0.3)';
+
+                // Add selection animation
+                card.classList.add('haptic');
+                setTimeout(() => card.classList.remove('haptic'), 100);
+            }
+
+            escalateEmergency() {
+                // Emergency flash animation
+                document.querySelector('.emergency-header').classList.add('emergency-flash');
+                setTimeout(() => {
+                    document.querySelector('.emergency-header').classList.remove('emergency-flash');
+                }, 500);
+
+                // Update metrics
+                this.updateMetrics();
+                
+                // Add timeline entry
+                this.addTimelineEntry('🚨', 'ESCALATION: Additional Resources Requested', 'Command has requested backup units for critical operations.', 'emergency');
+
+                // Simulate escalation effects
+                setTimeout(() => {
+                    this.simulateUnitDeployment();
+                }, 1000);
+            }
+
+            deployAdditionalUnits() {
+                const availableUnits = ['F3', 'M5', 'P4', 'R3'];
+                const randomUnit = availableUnits[Math.floor(Math.random() * availableUnits.length)];
+                
+                this.addTimelineEntry('🎯', `Unit ${randomUnit} Deployed`, `${randomUnit} has been dispatched to assist with active operations.`, 'deployment');
+                
+                // Update progress on random operation
+                this.updateOperationProgress();
+            }
+
+            clearOperation() {
+                // Find first operation and mark as cleared
+                const operations = document.querySelectorAll('.operation-card');
+                if (operations.length > 0) {
+                    const firstOp = operations[0];
+                    firstOp.style.opacity = '0.5';
+                    firstOp.style.borderColor = 'var(--safety-green)';
+                    
+                    this.addTimelineEntry('✅', 'Operation Cleared', 'Emergency response completed successfully. Units returning to base.', 'success');
+                    
+                    // Remove operation after animation
+                    setTimeout(() => {
+                        firstOp.style.display = 'none';
+                    }, 2000);
+                }
+            }
+
+            updateMetrics() {
+                const metrics = document.querySelectorAll('.metric-value');
+                metrics.forEach(metric => {
+                    const currentValue = parseInt(metric.textContent) || 0;
+                    if (metric.classList.contains('fire')) {
+                        metric.textContent = Math.min(currentValue + Math.floor(Math.random() * 3) + 1, 20);
+                    } else if (metric.classList.contains('rescue')) {
+                        metric.textContent = Math.min(currentValue + Math.floor(Math.random() * 2) + 1, 8);
+                    }
+                });
+            }
+
+            updateOperationProgress() {
+                const progressBars = document.querySelectorAll('.progress-fill');
+                progressBars.forEach(bar => {
+                    const currentWidth = parseInt(bar.style.width) || 0;
+                    const newWidth = Math.min(currentWidth + Math.floor(Math.random() * 15) + 5, 100);
+                    bar.style.width = `${newWidth}%`;
+                    
+                    // Update ETA
+                    const eta = bar.parentNode.nextElementSibling.querySelector('span:last-child');
+                    if (eta) {
+                        const minutes = Math.max(1, Math.floor(Math.random() * 20));
+                        eta.textContent = `ETA: ${minutes} min`;
+                    }
+                });
+            }
+
+            addTimelineEntry(icon, title, description, type) {
+                const timeline = document.querySelector('.activity-timeline');
+                const newEntry = document.createElement('div');
+                newEntry.className = 'timeline-item';
+                
+                let iconClass = 'timeline-icon';
+                switch(type) {
+                    case 'emergency':
+                        iconClass += ' fire-agent';
+                        break;
+                    case 'deployment':
+                        iconClass += ' police-agent';
+                        break;
+                    case 'success':
+                        iconClass += ' medical-agent';
+                        break;
+                    default:
+                        iconClass += ' rescue-agent';
+                }
+                
+                newEntry.innerHTML = `
+                    <div class="${iconClass}">${icon}</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">${title}</div>
+                        <div class="timeline-description">${description}</div>
+                        <div class="timeline-time">Just now</div>
+                    </div>
+                `;
+                
+                // Insert at top of timeline
+                const firstChild = timeline.querySelector('.timeline-item');
+                if (firstChild) {
+                    timeline.insertBefore(newEntry, firstChild);
+                } else {
+                    timeline.appendChild(newEntry);
+                }
+
+                // Remove oldest entries if too many
+                const entries = timeline.querySelectorAll('.timeline-item');
+                if (entries.length > 8) {
+                    entries[entries.length - 1].remove();
+                }
+            }
+
+            simulateUnitDeployment() {
+                const operations = document.querySelectorAll('.operation-card');
+                operations.forEach(op => {
+                    const agentContainer = op.querySelector('.deployed-agents');
+                    if (agentContainer && Math.random() > 0.7) {
+                        const unitTypes = ['fire-agent', 'medical-agent', 'police-agent', 'rescue-agent'];
+                        const unitLabels = ['F', 'M', 'P', 'R'];
+                        const randomType = Math.floor(Math.random() * unitTypes.length);
+                        
+                        const newAgent = document.createElement('div');
+                        newAgent.className = `agent-icon ${unitTypes[randomType]}`;
+                        newAgent.textContent = `${unitLabels[randomType]}${Math.floor(Math.random() * 9) + 1}`;
+                        
+                        agentContainer.appendChild(newAgent);
+                        
+                        // Animate new agent
+                        newAgent.style.transform = 'scale(0)';
+                        setTimeout(() => {
+                            newAgent.style.transform = 'scale(1)';
+                            newAgent.style.transition = 'transform 0.3s ease';
+                        }, 100);
+                    }
+                });
+            }
+
+            simulateEmergencyActivity() {
+                // Simulate ongoing emergency updates
+                setInterval(() => {
+                    if (Math.random() > 0.8) {
+                        const activities = [
+                            { icon: '📡', title: 'Communication Update', desc: 'All units maintaining radio contact with command center.' },
+                            { icon: '🚁', title: 'Air Support Requested', desc: 'Helicopter unit dispatched for aerial reconnaissance and support.' },
+                            { icon: '⚡', title: 'Power Grid Status', desc: 'Utility company coordinating power restoration in affected areas.' },
+                            { icon: '🚧', title: 'Road Closure Update', desc: 'Additional road diversions implemented to facilitate emergency access.' }
+                        ];
+                        
+                        const activity = activities[Math.floor(Math.random() * activities.length)];
+                        this.addTimelineEntry(activity.icon, activity.title, activity.desc, 'update');
+                    }
+                    
+                    // Update progress bars occasionally
+                    if (Math.random() > 0.7) {
+                        this.updateOperationProgress();
+                    }
+                }, 8000);
+            }
+
+            startRealTimeUpdates() {
+                // Update timestamps
+                setInterval(() => {
+                    document.querySelectorAll('.timeline-time').forEach((time, index) => {
+                        if (time.textContent === 'Just now') {
+                            time.textContent = '1 minute ago';
+                        } else if (time.textContent.includes('minute')) {
+                            const minutes = parseInt(time.textContent) + 1;
+                            time.textContent = `${minutes} minutes ago`;
+                        }
+                    });
+                }, 60000);
+
+                // Pulse emergency indicators
+                setInterval(() => {
+                    const indicators = document.querySelectorAll('.status-indicator');
+                    indicators.forEach(indicator => {
+                        indicator.style.animation = 'none';
+                        setTimeout(() => {
+                            indicator.style.animation = 'blink 1s infinite';
+                        }, 50);
+                    });
+                }, 3000);
+            }
+
+            initializeHapticFeedback() {
+                // Add haptic feedback class for iOS
+                if ('vibrate' in navigator) {
+                    this.hapticEnabled = true;
+                }
+            }
+
+            addHapticFeedback(element) {
+                // Visual haptic feedback
+                element.classList.add('haptic');
+                setTimeout(() => element.classList.remove('haptic'), 100);
+
+                // Vibration haptic feedback (if supported)
+                if (this.hapticEnabled) {
+                    navigator.vibrate(50);
+                }
+            }
+        }
+
+        // Initialize Emergency Command Center
+        document.addEventListener('DOMContentLoaded', () => {
+            new EmergencyCommandCenter();
+        });
+
+        // iOS-specific enhancements
+        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+            document.addEventListener('touchstart', function() {}, false);
+            
+            // Prevent default touch behaviors
+            document.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+        }
+    </script>
+</body>
+</html>

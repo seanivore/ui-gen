@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Grid Management - Workflow Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0f0f23 100%);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Power Grid Background Animation */
+        .grid-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .grid-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, #00bcd4 1px, transparent 1px),
+                linear-gradient(0deg, #00bcd4 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 188, 212, 0.3);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #00bcd4;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .grid-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(45deg, #00bcd4, #ffeb3b);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            animation: powerPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes powerPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 5px rgba(0, 188, 212, 0.5); }
+            50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(0, 188, 212, 0.8); }
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #4caf50;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            animation: statusBlink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes statusBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Grid Topology Section */
+        .grid-topology {
+            flex: 1;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(0, 188, 212, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topology-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .topology-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #00bcd4;
+        }
+
+        .grid-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #ffeb3b;
+        }
+
+        .stat-label {
+            color: #888;
+        }
+
+        /* Power Grid Visualization */
+        .power-grid {
+            position: relative;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 188, 212, 0.3);
+            overflow: hidden;
+        }
+
+        .grid-node {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .generator {
+            background: linear-gradient(45deg, #4caf50, #8bc34a);
+            color: #000;
+            top: 20px;
+            left: 30px;
+            animation: generatorPulse 3s ease-in-out infinite;
+        }
+
+        .transformer {
+            background: linear-gradient(45deg, #ff9800, #ffc107);
+            color: #000;
+            top: 80px;
+            left: 150px;
+            animation: transformerHum 2s ease-in-out infinite;
+        }
+
+        .load-center {
+            background: linear-gradient(45deg, #f44336, #e91e63);
+            color: #fff;
+            top: 140px;
+            right: 30px;
+            animation: loadFlicker 1.5s ease-in-out infinite;
+        }
+
+        @keyframes generatorPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes transformerHum {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(2deg); }
+            75% { transform: rotate(-2deg); }
+        }
+
+        @keyframes loadFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Power Flow Lines */
+        .power-flow {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #00bcd4, #ffeb3b, #00bcd4);
+            background-size: 20px 2px;
+            animation: powerFlow 2s linear infinite;
+        }
+
+        .flow-1 {
+            top: 40px;
+            left: 70px;
+            width: 80px;
+            transform: rotate(15deg);
+        }
+
+        .flow-2 {
+            top: 100px;
+            left: 190px;
+            width: 120px;
+            transform: rotate(-25deg);
+        }
+
+        @keyframes powerFlow {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+
+        /* Load Balancing Section */
+        .load-balancing {
+            flex: 1;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(0, 188, 212, 0.2);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #00bcd4;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .balancing-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .metric-card {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid rgba(0, 188, 212, 0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00bcd4, transparent);
+            animation: metricScan 3s ease-in-out infinite;
+        }
+
+        @keyframes metricScan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffeb3b;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #aaa;
+            text-transform: uppercase;
+        }
+
+        .metric-unit {
+            font-size: 10px;
+            color: #888;
+        }
+
+        /* Agent Load Bars */
+        .agent-loads {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .agent-load {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            border: 1px solid rgba(0, 188, 212, 0.1);
+        }
+
+        .agent-name {
+            min-width: 80px;
+            font-size: 12px;
+            color: #00bcd4;
+            font-weight: 500;
+        }
+
+        .load-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .load-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .load-normal { background: linear-gradient(90deg, #4caf50, #8bc34a); }
+        .load-medium { background: linear-gradient(90deg, #ff9800, #ffc107); }
+        .load-high { background: linear-gradient(90deg, #f44336, #e91e63); }
+
+        .load-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: loadShimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes loadShimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .load-value {
+            min-width: 35px;
+            font-size: 11px;
+            color: #ffeb3b;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* Activity Timeline */
+        .activity-timeline {
+            flex: 1;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            overflow-y: auto;
+        }
+
+        .timeline-container {
+            position: relative;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 188, 212, 0.1);
+            position: relative;
+            animation: timelineSlide 0.5s ease-out;
+        }
+
+        @keyframes timelineSlide {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .timeline-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .icon-optimization { background: linear-gradient(45deg, #4caf50, #8bc34a); color: #000; }
+        .icon-balancing { background: linear-gradient(45deg, #ff9800, #ffc107); color: #000; }
+        .icon-maintenance { background: linear-gradient(45deg, #2196f3, #00bcd4); color: #fff; }
+        .icon-alert { background: linear-gradient(45deg, #f44336, #e91e63); color: #fff; }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .timeline-description {
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+
+        .timeline-timestamp {
+            font-size: 10px;
+            color: #666;
+        }
+
+        /* Control Buttons */
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 188, 212, 0.3);
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00bcd4, #0097a7);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: rgba(0, 188, 212, 0.2);
+            color: #00bcd4;
+            border: 1px solid rgba(0, 188, 212, 0.5);
+        }
+
+        .btn-emergency {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: #fff;
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .control-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+
+        .control-btn:active::after {
+            width: 100px;
+            height: 100px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 375px) {
+            .header h1 {
+                font-size: 16px;
+            }
+            
+            .grid-stats {
+                gap: 10px;
+            }
+            
+            .balancing-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .control-btn {
+                padding: 10px;
+                font-size: 11px;
+            }
+        }
+
+        /* Haptic Feedback Animation */
+        .haptic-feedback {
+            animation: hapticPulse 0.1s ease-out;
+        }
+
+        @keyframes hapticPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-background">
+        <div class="grid-lines"></div>
+    </div>
+
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <div class="grid-icon">⚡</div>
+                Grid Control
+            </h1>
+            <div class="system-status">
+                <div class="status-indicator"></div>
+                <span>System Nominal</span>
+            </div>
+        </div>
+
+        <!-- Grid Topology Section -->
+        <div class="grid-topology">
+            <div class="topology-header">
+                <div class="topology-title">Power Grid Topology</div>
+                <div class="grid-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">2.4</div>
+                        <div class="stat-label">GW</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">60.0</div>
+                        <div class="stat-label">Hz</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">98.2</div>
+                        <div class="stat-label">%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="power-grid">
+                <div class="grid-node generator">G1</div>
+                <div class="grid-node transformer">T1</div>
+                <div class="grid-node load-center">L1</div>
+                
+                <div class="power-flow flow-1"></div>
+                <div class="power-flow flow-2"></div>
+            </div>
+        </div>
+
+        <!-- Load Balancing Section -->
+        <div class="load-balancing">
+            <div class="section-title">
+                ⚖️ Load Balancing Control
+            </div>
+            
+            <div class="balancing-metrics">
+                <div class="metric-card">
+                    <div class="metric-value">847</div>
+                    <div class="metric-label">Frequency</div>
+                    <div class="metric-unit">mHz</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">98.7</div>
+                    <div class="metric-label">Voltage</div>
+                    <div class="metric-unit">%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0.95</div>
+                    <div class="metric-label">Power Factor</div>
+                    <div class="metric-unit">pf</div>
+                </div>
+            </div>
+
+            <div class="agent-loads">
+                <div class="agent-load">
+                    <div class="agent-name">Gen-Alpha</div>
+                    <div class="load-bar">
+                        <div class="load-fill load-normal" style="width: 65%"></div>
+                    </div>
+                    <div class="load-value">65%</div>
+                </div>
+                <div class="agent-load">
+                    <div class="agent-name">Dist-Beta</div>
+                    <div class="load-bar">
+                        <div class="load-fill load-medium" style="width: 82%"></div>
+                    </div>
+                    <div class="load-value">82%</div>
+                </div>
+                <div class="agent-load">
+                    <div class="agent-name">Load-Gamma</div>
+                    <div class="load-bar">
+                        <div class="load-fill load-high" style="width: 94%"></div>
+                    </div>
+                    <div class="load-value">94%</div>
+                </div>
+                <div class="agent-load">
+                    <div class="agent-name">Ctrl-Delta</div>
+                    <div class="load-bar">
+                        <div class="load-fill load-normal" style="width: 58%"></div>
+                    </div>
+                    <div class="load-value">58%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Timeline -->
+        <div class="activity-timeline">
+            <div class="section-title">
+                📊 Grid Activity Feed
+            </div>
+            
+            <div class="timeline-container">
+                <div class="timeline-item">
+                    <div class="timeline-icon icon-optimization">⚡</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Load Optimization Complete</div>
+                        <div class="timeline-description">Agent Gen-Alpha adjusted output to 65% capacity</div>
+                        <div class="timeline-timestamp">2 minutes ago</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon icon-balancing">⚖️</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Reactive Power Balancing</div>
+                        <div class="timeline-description">Transformer T1 compensating for load variations</div>
+                        <div class="timeline-timestamp">5 minutes ago</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon icon-maintenance">🔧</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Preventive Maintenance Alert</div>
+                        <div class="timeline-description">Schedule maintenance for Load-Gamma in 48 hours</div>
+                        <div class="timeline-timestamp">12 minutes ago</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon icon-alert">⚠️</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Voltage Fluctuation Detected</div>
+                        <div class="timeline-description">Automatic voltage regulator engaged</div>
+                        <div class="timeline-timestamp">18 minutes ago</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon icon-optimization">⚡</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Peak Demand Management</div>
+                        <div class="timeline-description">Load shedding initiated for non-critical systems</div>
+                        <div class="timeline-timestamp">25 minutes ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <button class="control-btn btn-primary" onclick="handleOptimize()">
+                Optimize Grid
+            </button>
+            <button class="control-btn btn-secondary" onclick="handleBalance()">
+                Balance Load
+            </button>
+            <button class="control-btn btn-emergency" onclick="handleEmergency()">
+                Emergency Stop
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Simulated real-time data updates
+        let isOptimizing = false;
+        let currentLoad = 75;
+        
+        // Update metrics periodically
+        setInterval(updateMetrics, 2000);
+        
+        function updateMetrics() {
+            // Update frequency
+            const frequency = (60.0 + (Math.random() - 0.5) * 0.2).toFixed(1);
+            document.querySelector('.grid-stats .stat-value').textContent = frequency;
+            
+            // Update load percentages
+            const loadBars = document.querySelectorAll('.load-fill');
+            loadBars.forEach((bar, index) => {
+                const currentWidth = parseInt(bar.style.width);
+                const variation = (Math.random() - 0.5) * 10;
+                const newWidth = Math.max(30, Math.min(100, currentWidth + variation));
+                bar.style.width = newWidth + '%';
+                
+                // Update load class based on percentage
+                bar.className = 'load-fill ' + (
+                    newWidth > 85 ? 'load-high' : 
+                    newWidth > 70 ? 'load-medium' : 
+                    'load-normal'
+                );
+                
+                // Update load value
+                const valueElement = bar.parentElement.nextElementSibling;
+                valueElement.textContent = Math.round(newWidth) + '%';
+            });
+            
+            // Update power metrics
+            const powerValue = (2.4 + (Math.random() - 0.5) * 0.3).toFixed(1);
+            const voltageValue = (98.7 + (Math.random() - 0.5) * 2).toFixed(1);
+            const powerFactorValue = (0.95 + (Math.random() - 0.5) * 0.05).toFixed(2);
+            
+            const metricValues = document.querySelectorAll('.metric-value');
+            if (metricValues.length >= 3) {
+                metricValues[0].textContent = powerValue;
+                metricValues[1].textContent = voltageValue;
+                metricValues[2].textContent = powerFactorValue;
+            }
+        }
+        
+        // Add new timeline items periodically
+        setInterval(addTimelineItem, 15000);
+        
+        function addTimelineItem() {
+            const activities = [
+                { type: 'optimization', icon: '⚡', title: 'Grid Optimization Cycle', desc: 'Automatic load balancing in progress' },
+                { type: 'balancing', icon: '⚖️', title: 'Reactive Power Adjustment', desc: 'Capacitor bank switching completed' },
+                { type: 'maintenance', icon: '🔧', title: 'System Health Check', desc: 'All systems operating within parameters' },
+                { type: 'alert', icon: '⚠️', title: 'Minor Voltage Dip', desc: 'Quickly corrected by automatic controls' }
+            ];
+            
+            const activity = activities[Math.floor(Math.random() * activities.length)];
+            const timelineContainer = document.querySelector('.timeline-container');
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'timeline-item';
+            newItem.innerHTML = `
+                <div class="timeline-icon icon-${activity.type}">${activity.icon}</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">${activity.title}</div>
+                    <div class="timeline-description">${activity.desc}</div>
+                    <div class="timeline-timestamp">Just now</div>
+                </div>
+            `;
+            
+            timelineContainer.insertBefore(newItem, timelineContainer.firstChild);
+            
+            // Remove old items if too many
+            const items = timelineContainer.querySelectorAll('.timeline-item');
+            if (items.length > 8) {
+                timelineContainer.removeChild(items[items.length - 1]);
+            }
+        }
+        
+        // Control button handlers
+        function handleOptimize() {
+            const button = event.target;
+            button.classList.add('haptic-feedback');
+            
+            // Simulate optimization
+            isOptimizing = true;
+            button.textContent = 'Optimizing...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Optimize Grid';
+                button.disabled = false;
+                button.classList.remove('haptic-feedback');
+                isOptimizing = false;
+                
+                // Add success timeline item
+                addCustomTimelineItem('optimization', '⚡', 'Grid Optimization Complete', 'All agents balanced for optimal efficiency');
+            }, 3000);
+        }
+        
+        function handleBalance() {
+            const button = event.target;
+            button.classList.add('haptic-feedback');
+            
+            // Simulate load balancing
+            button.textContent = 'Balancing...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Balance Load';
+                button.disabled = false;
+                button.classList.remove('haptic-feedback');
+                
+                // Add success timeline item
+                addCustomTimelineItem('balancing', '⚖️', 'Load Balancing Complete', 'Power distribution optimized across all agents');
+            }, 2000);
+        }
+        
+        function handleEmergency() {
+            const button = event.target;
+            button.classList.add('haptic-feedback');
+            
+            // Simulate emergency stop
+            button.textContent = 'STOPPING...';
+            button.style.background = 'linear-gradient(45deg, #ff5722, #d32f2f)';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Emergency Stop';
+                button.style.background = 'linear-gradient(45deg, #f44336, #d32f2f)';
+                button.disabled = false;
+                button.classList.remove('haptic-feedback');
+                
+                // Add emergency timeline item
+                addCustomTimelineItem('alert', '⚠️', 'Emergency Stop Activated', 'All grid operations halted safely');
+            }, 1500);
+        }
+        
+        function addCustomTimelineItem(type, icon, title, description) {
+            const timelineContainer = document.querySelector('.timeline-container');
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'timeline-item';
+            newItem.innerHTML = `
+                <div class="timeline-icon icon-${type}">${icon}</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">${title}</div>
+                    <div class="timeline-description">${description}</div>
+                    <div class="timeline-timestamp">Just now</div>
+                </div>
+            `;
+            
+            timelineContainer.insertBefore(newItem, timelineContainer.firstChild);
+        }
+        
+        // Touch interaction enhancements
+        document.querySelectorAll('.control-btn').forEach(btn => {
+            btn.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.95)';
+            });
+            
+            btn.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+        
+        // Grid node interactions
+        document.querySelectorAll('.grid-node').forEach(node => {
+            node.addEventListener('click', function() {
+                this.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+                
+                // Show node details
+                const nodeType = this.textContent;
+                const nodeInfo = {
+                    'G1': 'Generator 1: 850MW Coal Plant',
+                    'T1': 'Transformer 1: 500kV/230kV Substation',
+                    'L1': 'Load Center 1: Industrial District'
+                };
+                
+                addCustomTimelineItem('maintenance', '🔍', `${nodeType} Selected`, nodeInfo[nodeType] || 'Node information unavailable');
+            });
+        });
+        
+        // Initialize with some timeline items
+        setTimeout(() => {
+            addCustomTimelineItem('optimization', '⚡', 'System Initialized', 'Energy grid management system online and ready');
+        }, 1000);
+    </script>
+</body>
+</html>

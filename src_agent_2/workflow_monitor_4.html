@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Neural Workflow Orchestrator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neural-pink: #f4a6cd;
+            --brain-tissue: #e8b5d1;
+            --electric-blue: #4a9eff;
+            --synaptic-gold: #ffd700;
+            --neural-dark: #2a1a3e;
+            --dendrite-gray: #6b7280;
+            --firing-orange: #ff6b47;
+            --ios-bg: #000000;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--neural-dark) 0%, #1a1b2e 50%, var(--ios-bg) 100%);
+            color: white;
+            overflow-x: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Neural Network Background */
+        .neural-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .neuron {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, var(--neural-pink) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .synapse {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--electric-blue), transparent);
+            animation: fire 2s ease-in-out infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.5); opacity: 1; }
+        }
+
+        @keyframes fire {
+            0% { transform: scaleX(0); opacity: 0; }
+            50% { transform: scaleX(1); opacity: 1; }
+            100% { transform: scaleX(0); opacity: 0; }
+        }
+
+        /* Main Container */
+        .workflow-container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Header */
+        .neural-header {
+            background: rgba(42, 26, 62, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-bottom: 1px solid rgba(74, 158, 255, 0.3);
+            position: relative;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--neural-pink), var(--electric-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .brainwave-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .wave {
+            width: 40px;
+            height: 20px;
+            border: 2px solid;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wave.alpha { border-color: var(--synaptic-gold); }
+        .wave.beta { border-color: var(--electric-blue); }
+        .wave.theta { border-color: var(--neural-pink); }
+
+        .wave::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: currentColor;
+            animation: brainwave 2s ease-in-out infinite;
+        }
+
+        .wave.alpha::before { animation-duration: 1.5s; }
+        .wave.beta::before { animation-duration: 0.8s; }
+        .wave.theta::before { animation-duration: 2.5s; }
+
+        @keyframes brainwave {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Brain Hemispheres */
+        .brain-hemispheres {
+            flex: 1;
+            display: flex;
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hemisphere {
+            flex: 1;
+            padding: 20px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .hemisphere.left {
+            background: linear-gradient(135deg, rgba(244, 166, 205, 0.15) 0%, transparent 100%);
+            border-right: 1px solid rgba(244, 166, 205, 0.3);
+        }
+
+        .hemisphere.right {
+            background: linear-gradient(225deg, rgba(74, 158, 255, 0.15) 0%, transparent 100%);
+        }
+
+        .hemisphere-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hemisphere-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .left .hemisphere-icon {
+            background: var(--neural-pink);
+            color: var(--neural-dark);
+        }
+
+        .right .hemisphere-icon {
+            background: var(--electric-blue);
+            color: white;
+        }
+
+        /* Agent Neurons */
+        .agent-neuron {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .agent-neuron:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .agent-neuron::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: scan 3s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .neuron-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .neuron-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .firing-rate {
+            background: var(--synaptic-gold);
+            color: var(--neural-dark);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .neuron-status {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+        }
+
+        .connection-strength {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .strength-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neural-pink), var(--electric-blue));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .synapse-count {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Cognitive Load Monitor */
+        .cognitive-load {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(42, 26, 62, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(74, 158, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .load-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--synaptic-gold);
+        }
+
+        .load-meters {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .load-meter {
+            text-align: center;
+        }
+
+        .load-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .load-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--electric-blue) 0deg,
+                var(--electric-blue) var(--percentage, 120deg),
+                rgba(255, 255, 255, 0.1) var(--percentage, 120deg),
+                rgba(255, 255, 255, 0.1) 360deg
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            position: relative;
+        }
+
+        .load-circle::before {
+            content: '';
+            width: 46px;
+            height: 46px;
+            background: var(--neural-dark);
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .load-value {
+            font-size: 14px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Neural Pathway Visualization */
+        .pathway-flow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(180deg, var(--synaptic-gold), transparent);
+            transform: translate(-50%, -50%);
+            animation: flow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes flow {
+            0% { opacity: 0; transform: translate(-50%, -50%) translateY(-20px); }
+            50% { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+            100% { opacity: 0; transform: translate(-50%, -50%) translateY(20px); }
+        }
+
+        /* Memory Formation Indicator */
+        .memory-formation {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border: 2px solid var(--neural-pink);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(244, 166, 205, 0.1);
+            backdrop-filter: blur(10px);
+            animation: memory-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes memory-pulse {
+            0%, 100% { transform: scale(1); border-color: var(--neural-pink); }
+            25% { transform: scale(1.1); border-color: var(--synaptic-gold); }
+            50% { transform: scale(1.2); border-color: var(--electric-blue); }
+            75% { transform: scale(1.1); border-color: var(--synaptic-gold); }
+        }
+
+        .memory-icon {
+            font-size: 24px;
+        }
+
+        /* Attention Mechanism */
+        .attention-focus {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid var(--synaptic-gold);
+            border-radius: 12px;
+            padding: 12px;
+            backdrop-filter: blur(10px);
+            animation: attention-blink 2s ease-in-out infinite;
+        }
+
+        @keyframes attention-blink {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .attention-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--synaptic-gold);
+        }
+
+        /* iOS Safe Area */
+        .safe-area-top {
+            height: env(safe-area-inset-top);
+            background: var(--neural-dark);
+        }
+
+        .safe-area-bottom {
+            height: env(safe-area-inset-bottom);
+            background: var(--neural-dark);
+        }
+
+        /* Haptic Feedback Simulation */
+        .haptic-feedback {
+            animation: haptic 0.1s ease-out;
+        }
+
+        @keyframes haptic {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="safe-area-top"></div>
+    
+    <!-- Neural Network Background -->
+    <div class="neural-background" id="neuralBg"></div>
+    
+    <!-- Attention Mechanism -->
+    <div class="attention-focus">
+        <div class="attention-text">FOCUS: Task Coordination</div>
+    </div>
+    
+    <!-- Memory Formation -->
+    <div class="memory-formation">
+        <div class="memory-icon">🧠</div>
+    </div>
+    
+    <!-- Main Workflow Container -->
+    <div class="workflow-container">
+        <!-- Neural Header -->
+        <div class="neural-header">
+            <div class="header-title">Neural Workflow Orchestrator</div>
+            <div class="brainwave-indicator">
+                <div class="wave alpha" title="Alpha: Relaxed Focus"></div>
+                <div class="wave beta" title="Beta: Active Processing"></div>
+                <div class="wave theta" title="Theta: Creative Insight"></div>
+            </div>
+        </div>
+        
+        <!-- Brain Hemispheres -->
+        <div class="brain-hemispheres">
+            <!-- Left Hemisphere: Analytical Processing -->
+            <div class="hemisphere left">
+                <div class="hemisphere-title">
+                    <div class="hemisphere-icon">L</div>
+                    Analytical Processing
+                </div>
+                
+                <div class="agent-neuron" onclick="activateNeuron(this)">
+                    <div class="neuron-header">
+                        <div class="neuron-name">Data Processor</div>
+                        <div class="firing-rate">47 Hz</div>
+                    </div>
+                    <div class="neuron-status">Processing financial metrics</div>
+                    <div class="connection-strength">
+                        <div class="strength-bar" style="width: 85%"></div>
+                    </div>
+                    <div class="synapse-count">
+                        <span>Inputs: 12</span>
+                        <span>Outputs: 8</span>
+                    </div>
+                    <div class="pathway-flow"></div>
+                </div>
+                
+                <div class="agent-neuron" onclick="activateNeuron(this)">
+                    <div class="neuron-header">
+                        <div class="neuron-name">Logic Validator</div>
+                        <div class="firing-rate">32 Hz</div>
+                    </div>
+                    <div class="neuron-status">Validating rule compliance</div>
+                    <div class="connection-strength">
+                        <div class="strength-bar" style="width: 72%"></div>
+                    </div>
+                    <div class="synapse-count">
+                        <span>Inputs: 8</span>
+                        <span>Outputs: 5</span>
+                    </div>
+                    <div class="pathway-flow"></div>
+                </div>
+                
+                <div class="agent-neuron" onclick="activateNeuron(this)">
+                    <div class="neuron-header">
+                        <div class="neuron-name">Pattern Matcher</div>
+                        <div class="firing-rate">58 Hz</div>
+                    </div>
+                    <div class="neuron-status">Identifying data patterns</div>
+                    <div class="connection-strength">
+                        <div class="strength-bar" style="width: 91%"></div>
+                    </div>
+                    <div class="synapse-count">
+                        <span>Inputs: 15</span>
+                        <span>Outputs: 11</span>
+                    </div>
+                    <div class="pathway-flow"></div>
+                </div>
+            </div>
+            
+            <!-- Right Hemisphere: Creative Processing -->
+            <div class="hemisphere right">
+                <div class="hemisphere-title">
+                    <div class="hemisphere-icon">R</div>
+                    Creative Processing
+                </div>
+                
+                <div class="agent-neuron" onclick="activateNeuron(this)">
+                    <div class="neuron-header">
+                        <div class="neuron-name">Content Generator</div>
+                        <div class="firing-rate">41 Hz</div>
+                    </div>
+                    <div class="neuron-status">Generating creative content</div>
+                    <div class="connection-strength">
+                        <div class="strength-bar" style="width: 78%"></div>
+                    </div>
+                    <div class="synapse-count">
+                        <span>Inputs: 9</span>
+                        <span>Outputs: 12</span>
+                    </div>
+                    <div class="pathway-flow"></div>
+                </div>
+                
+                <div class="agent-neuron" onclick="activateNeuron(this)">
+                    <div class="neuron-header">
+                        <div class="neuron-name">Design Synthesizer</div>
+                        <div class="firing-rate">36 Hz</div>
+                    </div>
+                    <div class="neuron-status">Synthesizing visual elements</div>
+                    <div class="connection-strength">
+                        <div class="strength-bar" style="width: 66%"></div>
+                    </div>
+                    <div class="synapse-count">
+                        <span>Inputs: 7</span>
+                        <span>Outputs: 9</span>
+                    </div>
+                    <div class="pathway-flow"></div>
+                </div>
+                
+                <div class="agent-neuron" onclick="activateNeuron(this)">
+                    <div class="neuron-header">
+                        <div class="neuron-name">Innovation Engine</div>
+                        <div class="firing-rate">62 Hz</div>
+                    </div>
+                    <div class="neuron-status">Exploring new possibilities</div>
+                    <div class="connection-strength">
+                        <div class="strength-bar" style="width: 94%"></div>
+                    </div>
+                    <div class="synapse-count">
+                        <span>Inputs: 13</span>
+                        <span>Outputs: 16</span>
+                    </div>
+                    <div class="pathway-flow"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cognitive Load Monitor -->
+    <div class="cognitive-load">
+        <div class="load-title">Cognitive Load Monitor</div>
+        <div class="load-meters">
+            <div class="load-meter">
+                <div class="load-label">Processing</div>
+                <div class="load-circle" style="--percentage: 252deg">
+                    <div class="load-value">70%</div>
+                </div>
+            </div>
+            <div class="load-meter">
+                <div class="load-label">Memory</div>
+                <div class="load-circle" style="--percentage: 180deg">
+                    <div class="load-value">50%</div>
+                </div>
+            </div>
+            <div class="load-meter">
+                <div class="load-label">Attention</div>
+                <div class="load-circle" style="--percentage: 306deg">
+                    <div class="load-value">85%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="safe-area-bottom"></div>
+
+    <script>
+        // Neural Network Background Generation
+        function createNeuralBackground() {
+            const bg = document.getElementById('neuralBg');
+            const neurons = 20;
+            const synapses = 15;
+            
+            // Create neurons
+            for (let i = 0; i < neurons; i++) {
+                const neuron = document.createElement('div');
+                neuron.className = 'neuron';
+                neuron.style.left = Math.random() * 100 + '%';
+                neuron.style.top = Math.random() * 100 + '%';
+                neuron.style.animationDelay = Math.random() * 3 + 's';
+                bg.appendChild(neuron);
+            }
+            
+            // Create synapses
+            for (let i = 0; i < synapses; i++) {
+                const synapse = document.createElement('div');
+                synapse.className = 'synapse';
+                synapse.style.left = Math.random() * 100 + '%';
+                synapse.style.top = Math.random() * 100 + '%';
+                synapse.style.width = (Math.random() * 200 + 50) + 'px';
+                synapse.style.transform = `rotate(${Math.random() * 360}deg)`;
+                synapse.style.animationDelay = Math.random() * 2 + 's';
+                bg.appendChild(synapse);
+            }
+        }
+        
+        // Neuron Activation with Haptic Feedback
+        function activateNeuron(element) {
+            // Add haptic feedback class
+            element.classList.add('haptic-feedback');
+            
+            // Simulate neural firing
+            const firingRate = element.querySelector('.firing-rate');
+            const currentRate = parseInt(firingRate.textContent);
+            const newRate = currentRate + Math.floor(Math.random() * 20) - 10;
+            firingRate.textContent = Math.max(10, newRate) + ' Hz';
+            
+            // Update connection strength
+            const strengthBar = element.querySelector('.strength-bar');
+            const currentWidth = parseInt(strengthBar.style.width);
+            const newWidth = Math.min(100, Math.max(20, currentWidth + Math.floor(Math.random() * 20) - 10));
+            strengthBar.style.width = newWidth + '%';
+            
+            // Remove haptic class after animation
+            setTimeout(() => {
+                element.classList.remove('haptic-feedback');
+            }, 100);
+            
+            // Update memory formation
+            updateMemoryFormation();
+        }
+        
+        // Memory Formation Animation
+        function updateMemoryFormation() {
+            const memory = document.querySelector('.memory-formation');
+            memory.style.animation = 'none';
+            setTimeout(() => {
+                memory.style.animation = 'memory-pulse 4s ease-in-out infinite';
+            }, 10);
+        }
+        
+        // Real-time Cognitive Load Updates
+        function updateCognitiveLoad() {
+            const loadCircles = document.querySelectorAll('.load-circle');
+            const loadValues = document.querySelectorAll('.load-value');
+            
+            loadCircles.forEach((circle, index) => {
+                const currentValue = parseInt(loadValues[index].textContent);
+                const variance = Math.floor(Math.random() * 10) - 5;
+                const newValue = Math.min(100, Math.max(0, currentValue + variance));
+                const newPercentage = (newValue / 100) * 360;
+                
+                circle.style.setProperty('--percentage', newPercentage + 'deg');
+                loadValues[index].textContent = newValue + '%';
+            });
+        }
+        
+        // Brainwave Pattern Updates
+        function updateBrainwaves() {
+            const waves = document.querySelectorAll('.wave');
+            waves.forEach(wave => {
+                const currentDuration = parseFloat(getComputedStyle(wave, '::before').animationDuration);
+                const variance = (Math.random() - 0.5) * 0.4;
+                const newDuration = Math.max(0.5, currentDuration + variance);
+                wave.style.setProperty('--wave-duration', newDuration + 's');
+            });
+        }
+        
+        // Attention Focus Updates
+        function updateAttentionFocus() {
+            const focusTexts = [
+                'FOCUS: Task Coordination',
+                'FOCUS: Data Processing',
+                'FOCUS: Pattern Recognition',
+                'FOCUS: Creative Synthesis',
+                'FOCUS: Memory Consolidation',
+                'FOCUS: Decision Making'
+            ];
+            
+            const attentionElement = document.querySelector('.attention-text');
+            const randomFocus = focusTexts[Math.floor(Math.random() * focusTexts.length)];
+            attentionElement.textContent = randomFocus;
+        }
+        
+        // Neural Plasticity Simulation
+        function simulateNeuralPlasticity() {
+            const neurons = document.querySelectorAll('.agent-neuron');
+            neurons.forEach(neuron => {
+                const status = neuron.querySelector('.neuron-status');
+                const statuses = [
+                    'Processing information flow',
+                    'Optimizing pathways',
+                    'Strengthening connections',
+                    'Adapting to new patterns',
+                    'Consolidating memory',
+                    'Enhancing efficiency'
+                ];
+                
+                if (Math.random() < 0.3) {
+                    const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                    status.textContent = randomStatus;
+                }
+            });
+        }
+        
+        // Touch Interaction Enhancements
+        function addTouchInteractions() {
+            const neurons = document.querySelectorAll('.agent-neuron');
+            
+            neurons.forEach(neuron => {
+                let touchStartY = 0;
+                
+                neuron.addEventListener('touchstart', (e) => {
+                    touchStartY = e.touches[0].clientY;
+                    neuron.style.transform = 'scale(0.95)';
+                }, { passive: true });
+                
+                neuron.addEventListener('touchend', (e) => {
+                    neuron.style.transform = 'scale(1)';
+                    const touchEndY = e.changedTouches[0].clientY;
+                    const deltaY = touchStartY - touchEndY;
+                    
+                    // Swipe up to boost neuron activity
+                    if (deltaY > 50) {
+                        boostNeuronActivity(neuron);
+                    }
+                }, { passive: true });
+                
+                neuron.addEventListener('touchcancel', () => {
+                    neuron.style.transform = 'scale(1)';
+                }, { passive: true });
+            });
+        }
+        
+        // Boost Neuron Activity
+        function boostNeuronActivity(neuron) {
+            const firingRate = neuron.querySelector('.firing-rate');
+            const strengthBar = neuron.querySelector('.strength-bar');
+            
+            // Temporary boost effect
+            firingRate.style.background = 'var(--firing-orange)';
+            strengthBar.style.background = 'linear-gradient(90deg, var(--firing-orange), var(--synaptic-gold))';
+            
+            // Increase firing rate significantly
+            const currentRate = parseInt(firingRate.textContent);
+            firingRate.textContent = (currentRate + 25) + ' Hz';
+            
+            // Reset after boost
+            setTimeout(() => {
+                firingRate.style.background = 'var(--synaptic-gold)';
+                strengthBar.style.background = 'linear-gradient(90deg, var(--neural-pink), var(--electric-blue))';
+                firingRate.textContent = Math.max(20, currentRate + Math.floor(Math.random() * 10)) + ' Hz';
+            }, 2000);
+        }
+        
+        // Initialize Neural Network
+        function initializeNeuralNetwork() {
+            createNeuralBackground();
+            addTouchInteractions();
+            
+            // Start real-time updates
+            setInterval(updateCognitiveLoad, 3000);
+            setInterval(updateBrainwaves, 5000);
+            setInterval(updateAttentionFocus, 8000);
+            setInterval(simulateNeuralPlasticity, 12000);
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initializeNeuralNetwork);
+        
+        // iOS Viewport Handling
+        function handleViewportChange() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        
+        window.addEventListener('resize', handleViewportChange);
+        window.addEventListener('orientationchange', handleViewportChange);
+        handleViewportChange();
+    </script>
+</body>
+</html>
