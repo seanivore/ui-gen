@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -76,8 +77,15 @@
         }
 
         @keyframes emergency-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
         }
 
         /* Main Radar Display */
@@ -96,7 +104,7 @@
             border: 3px solid var(--radar-green);
             border-radius: 50%;
             overflow: hidden;
-            box-shadow: 
+            box-shadow:
                 inset 0 0 50px rgba(0, 255, 65, 0.2),
                 0 0 30px rgba(0, 255, 65, 0.3);
         }
@@ -114,8 +122,13 @@
         }
 
         @keyframes radar-sweep {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
         }
 
         .radar-grid {
@@ -222,13 +235,29 @@
         }
 
         @keyframes priority-blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         @keyframes emergency-blink {
-            0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.2); }
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
         }
 
         .flight-path {
@@ -237,12 +266,14 @@
             stroke-width: 1;
             fill: none;
             opacity: 0.6;
-            stroke-dasharray: 5,5;
+            stroke-dasharray: 5, 5;
             animation: dash 2s linear infinite;
         }
 
         @keyframes dash {
-            to { stroke-dashoffset: -10; }
+            to {
+                stroke-dashoffset: -10;
+            }
         }
 
         /* Control Panel */
@@ -302,10 +333,21 @@
             margin-right: 5px;
         }
 
-        .status-active { background: var(--radar-green); }
-        .status-priority { background: var(--warning-amber); }
-        .status-emergency { background: var(--emergency-red); }
-        .status-clearance { background: var(--clearance-blue); }
+        .status-active {
+            background: var(--radar-green);
+        }
+
+        .status-priority {
+            background: var(--warning-amber);
+        }
+
+        .status-emergency {
+            background: var(--emergency-red);
+        }
+
+        .status-clearance {
+            background: var(--clearance-blue);
+        }
 
         /* Activity Timeline */
         .activity-timeline {
@@ -436,11 +478,11 @@
                 grid-template-columns: 1fr;
                 grid-template-rows: 1fr 250px;
             }
-            
+
             .control-panel {
                 height: 250px;
             }
-            
+
             .comm-panel {
                 bottom: 10px;
                 right: 10px;
@@ -474,6 +516,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="atc-interface">
         <!-- Control Header -->
@@ -509,7 +552,7 @@
                     <path d="M 20% 80% Q 50% 20% 80% 60%" class="flight-path"></path>
                     <path d="M 10% 30% Q 60% 70% 90% 40%" class="flight-path"></path>
                 </svg>
-                
+
                 <!-- Aircraft Icons -->
                 <div class="aircraft status-active" style="top: 25%; left: 35%;" data-callsign="AI-001" onclick="selectAircraft('AI-001')"></div>
                 <div class="aircraft status-priority priority" style="top: 45%; left: 65%;" data-callsign="AI-002" onclick="selectAircraft('AI-002')"></div>
@@ -532,7 +575,7 @@
                             DEST: ANALYTICS • ETA: 14:30Z
                         </div>
                     </div>
-                    
+
                     <div class="flight-info touch-feedback" onclick="selectFlight('AI-002')">
                         <div class="flight-callsign">
                             <span class="status-indicator status-priority"></span>
@@ -543,7 +586,7 @@
                             DEST: MODEL-DEPLOY • ETA: 15:45Z
                         </div>
                     </div>
-                    
+
                     <div class="flight-info touch-feedback" onclick="selectFlight('AI-003')">
                         <div class="flight-callsign">
                             <span class="status-indicator status-active"></span>
@@ -554,7 +597,7 @@
                             DEST: INTEGRATION • ETA: 13:15Z
                         </div>
                     </div>
-                    
+
                     <div class="flight-info touch-feedback" onclick="selectFlight('AI-004')">
                         <div class="flight-callsign">
                             <span class="status-indicator status-emergency"></span>
@@ -565,7 +608,7 @@
                             DEST: RECOVERY • ETA: ASAP
                         </div>
                     </div>
-                    
+
                     <div class="flight-info touch-feedback" onclick="selectFlight('AI-005')">
                         <div class="flight-callsign">
                             <span class="status-indicator status-clearance"></span>
@@ -600,32 +643,32 @@
                     <button class="control-button touch-feedback">ALERTS</button>
                 </div>
             </div>
-            
+
             <div class="timeline-feed">
                 <div class="timeline-item">
                     <div class="timeline-time">14:23:15Z</div>
                     <div class="timeline-event">AI-001 REQUEST DESCENT</div>
                     <div class="timeline-details">Data processing task 89% complete, requesting priority landing sequence</div>
                 </div>
-                
+
                 <div class="timeline-item">
                     <div class="timeline-time">14:22:45Z</div>
                     <div class="timeline-event">AI-004 EMERGENCY DECLARED</div>
                     <div class="timeline-details">Exception handler activated, priority routing to recovery runway</div>
                 </div>
-                
+
                 <div class="timeline-item">
                     <div class="timeline-time">14:21:30Z</div>
                     <div class="timeline-event">AI-002 CLEARED APPROACH</div>
                     <div class="timeline-details">ML training pipeline approved for model deployment sequence</div>
                 </div>
-                
+
                 <div class="timeline-item">
                     <div class="timeline-time">14:20:15Z</div>
                     <div class="timeline-event">WEATHER UPDATE</div>
                     <div class="timeline-details">System load optimal, all agents cleared for normal operations</div>
                 </div>
-                
+
                 <div class="timeline-item">
                     <div class="timeline-time">14:19:45Z</div>
                     <div class="timeline-event">AI-005 TAXI CLEARANCE</div>
@@ -662,15 +705,15 @@
             Object.keys(aircraftPositions).forEach(callsign => {
                 const pos = aircraftPositions[callsign];
                 const aircraft = document.querySelector(`[data-callsign="${callsign}"]`);
-                
+
                 if (aircraft) {
                     pos.x += pos.dx;
                     pos.y += pos.dy;
-                    
+
                     // Boundary checks
                     if (pos.x <= 5 || pos.x >= 95) pos.dx *= -1;
                     if (pos.y <= 5 || pos.y >= 95) pos.dy *= -1;
-                    
+
                     aircraft.style.left = `${pos.x}%`;
                     aircraft.style.top = `${pos.y}%`;
                 }
@@ -711,11 +754,11 @@
                 'taxi to gate via Bravo',
                 'descend and maintain FL100'
             ];
-            
+
             const time = new Date().toISOString().substr(11, 8) + 'Z';
             const callsign = callsigns[Math.floor(Math.random() * callsigns.length)];
             const command = commands[Math.floor(Math.random() * commands.length)];
-            
+
             const display = document.getElementById('commDisplay');
             display.innerHTML += `[${time}] TOWER: ${callsign}, ${command}<br>`;
             display.scrollTop = display.scrollHeight;
@@ -725,35 +768,35 @@
         function updateTimeline() {
             const events = [
                 'REQUEST ALTITUDE CHANGE',
-                'CLEARED FOR APPROACH', 
+                'CLEARED FOR APPROACH',
                 'TAXI CLEARANCE ISSUED',
                 'WEATHER UPDATE',
                 'SYSTEM STATUS CHECK',
                 'PRIORITY ROUTING ASSIGNED'
             ];
-            
+
             const callsigns = ['AI-001', 'AI-002', 'AI-003', 'AI-004', 'AI-005'];
             const timelineFeed = document.querySelector('.timeline-feed');
-            
+
             // Remove oldest item if more than 8 items
             if (timelineFeed.children.length > 8) {
                 timelineFeed.removeChild(timelineFeed.lastChild);
             }
-            
+
             // Add new item at the beginning
             const newItem = document.createElement('div');
             newItem.className = 'timeline-item';
-            
+
             const time = new Date().toISOString().substr(11, 8) + 'Z';
             const callsign = callsigns[Math.floor(Math.random() * callsigns.length)];
             const event = events[Math.floor(Math.random() * events.length)];
-            
+
             newItem.innerHTML = `
                 <div class="timeline-time">${time}</div>
                 <div class="timeline-event">${callsign} ${event}</div>
                 <div class="timeline-details">Automated workflow coordination update from air traffic control</div>
             `;
-            
+
             timelineFeed.insertBefore(newItem, timelineFeed.firstChild);
         }
 
@@ -765,7 +808,7 @@
             setTimeout(() => {
                 aircraft.style.transform = 'translate(-50%, -50%) scale(1)';
             }, 300);
-            
+
             // Update communication
             const time = new Date().toISOString().substr(11, 8) + 'Z';
             const display = document.getElementById('commDisplay');
@@ -781,7 +824,7 @@
 
         function handleEmergency() {
             alert('EMERGENCY PROTOCOL ACTIVATED\n\nAll non-essential flights hold position.\nEmergency services dispatched.');
-            
+
             // Add emergency message
             const time = new Date().toISOString().substr(11, 8) + 'Z';
             const display = document.getElementById('commDisplay');
@@ -793,7 +836,7 @@
             if (event.key === 'Enter') {
                 const input = event.target;
                 const command = input.value.trim();
-                
+
                 if (command) {
                     const time = new Date().toISOString().substr(11, 8) + 'Z';
                     const display = document.getElementById('commDisplay');
@@ -808,15 +851,15 @@
         setInterval(updateAircraftPositions, 100);
         setInterval(updateCommDisplay, 8000);
         setInterval(updateTimeline, 12000);
-        
+
         // Add touch feedback for mobile
-        document.addEventListener('touchstart', function(e) {
+        document.addEventListener('touchstart', function (e) {
             if (e.target.classList.contains('touch-feedback')) {
                 e.target.style.transform = 'scale(0.95)';
             }
         });
-        
-        document.addEventListener('touchend', function(e) {
+
+        document.addEventListener('touchend', function (e) {
             if (e.target.classList.contains('touch-feedback')) {
                 setTimeout(() => {
                     e.target.style.transform = 'scale(1)';
@@ -825,11 +868,12 @@
         });
 
         // Initial setup
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Start with some initial messages
             setTimeout(updateCommDisplay, 1000);
             setTimeout(updateTimeline, 2000);
         });
     </script>
 </body>
+
 </html>
