@@ -70,7 +70,7 @@ claude update # refreshes index of codebase
 4. **Quality Assurance**: Ensures each iteration is unique and spec-compliant
 5. **Wave Management**: For infinite mode, manages successive waves of agents
 
-### Just use the command, define the spec, the output directory, and the number of iterations you want to generate. That's it. 
+### Just use the command with args that define the spec, output directory, and the number of iterations you want to generate. That's it. 
 
 ## **PRO TIP:** 
 
