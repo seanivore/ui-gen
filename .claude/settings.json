@@ -1,7 +1,11 @@
 {
     "permissions": {
-      "allow": ["Write", "MultiEdit", "Edit", "Bash"],
-      "deny": []
+        "allow": [
+            "Write",
+            "MultiEdit",
+            "Edit",
+            "Bash"
+        ],
+        "deny": []
     }
-  }
-  
+}

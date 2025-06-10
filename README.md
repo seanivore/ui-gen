@@ -1,53 +1,36 @@
 # Infinite Agentic Loop POC
 
-> **Watch the Tutorial**: [Infinite Agentic Loop with Claude Code](https://youtu.be/9ipM_vDwflI)
-
-An experimental project demonstrating Infinite Agentic Loop in a two prompt system using Claude Code.
-
-<img src="../_resources/ai_docs/disler/infinite-agentic-loop/images/infinite-claude-img.png" alt="Infinite Agentic Loop" style="max-width: 800px; width: 100%;">
+  - SOURCE: [IndyDevDan Youtube Tutorial](https://youtu.be/9ipM_vDwflI)
+  - VIDEO TRANSCRIPT: [Infinite Agentic Loop with Claude Code](ai_docs/VIDEO_TRANSCRIPT.md)
 
 ## Overview
 
-This project uses a custom Claude Code slash command (`/project:infinite`) to orchestrate multiple AI agents in parallel, generating evolving iterations of content based on specifications.
+- An experimental project demonstrating Infinite Agentic Loop in a two prompt system using Claude Code.
+- This project uses a custom Claude Code slash command (`/project:infinite`) 
+  - Orchestrate multiple AI agents in parallel 
+  - Generating evolving iterations of content based on specifications 
 
-## Usage
+## Quick Start 
 
-Read `.claude/settings.json` to see the permissions and commands allowed.
+1. Read `.claude/settings.json` to see the permissions and commands allowed.
+2. Start Claude Code. 
+3. Type slash command to start the infinite agentic loop. 
+4. Generate new iterations using the UI specification and four command variants.
 
-Start Claude Code: `claude`
-
-Type slash command `/project:infinite` to start the infinite agentic loop.
-
-The infinite command takes three arguments:
-```
-/project:infinite <spec_file> <output_dir> <count>
-```
-
-### 4 Command Variants
-
-#### 1. Single Generation
 ```bash
-/project:infinite specs/invent_new_ui_v3.md src 1
+claude
+/project:infinite
+/project:infinite spec_file output_dir count # Infinite command takes three arguments 
 ```
-Generate one new iteration using the UI specification.
 
-#### 2. Small Batch (5 iterations)
-```bash
-/project:infinite specs/invent_new_ui_v3.md src_new 5
-```
-Deploy 5 parallel agents to generate 5 unique iterations simultaneously.
+### Four Command Variants
 
-#### 3. Large Batch (20 iterations)  
 ```bash
-/project:infinite specs/invent_new_ui_v3.md src_new 20
+/project:infinite specs/invent_new_ui_v3.md src 1 # Single Generation of 1 iteration
+/project:infinite specs/invent_new_ui_v3.md src_new 5 # Deploy 5 agents in parallel; generate 5 UI
+/project:infinite specs/invent_new_ui_v3.md src_new 20 # 20 agents, groups of 5, optimal resource management, generate 20 UI
+/project:infinite specs/invent_new_ui_v3.md infinite_src_new/ infinite # Continuous generation, stops with context limits 
 ```
-Generate 20 iterations in coordinated batches of 5 agents for optimal resource management.
-
-#### 4. Infinite Mode
-```bash
-/project:infinite specs/invent_new_ui_v3.md infinite_src_new/ infinite
-```
-Continuous generation in waves until context limits are reached, with progressive sophistication.
 
 ## How It Works
 
@@ -57,16 +40,9 @@ Continuous generation in waves until context limits are reached, with progressiv
 4. **Quality Assurance**: Ensures each iteration is unique and spec-compliant
 5. **Wave Management**: For infinite mode, manages successive waves of agents
 
-## Directions you can take to enhance this pattern
+## Ideas for Enhancing the Pattern 
 
 - Apply this to a use case of your choice.
 - Build an MCP Server that enables reuse of the infinite agentic loop.
 - Get the `.claude/commands/infinite.md` into your `~/.claude/commands/` directory for global use.
 - Update `.claude/commands/infinite.md` to generate sets of files instead of a single file.
-
-## Master AI Coding 
-Learn to code with AI with foundational [Principles of AI Coding](https://agenticengineer.com/principled-ai-coding?y=infageloop)
-
-Follow the [IndyDevDan youtube channel](https://www.youtube.com/@indydevdan) for more AI coding tips and tricks.
-
-Use the best Agentic Coding tool: [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)
