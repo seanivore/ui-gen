@@ -31,10 +31,10 @@ claude update # refreshes index of codebase
 ### Command Variants
 
 ```bash
-/project:infinite specs/chat_ui_spec.md src_agent_1 1 # Generate a single result 
-/project:infinite specs/ios_ui_spec.md src_agent_2 5 # Deploy 5 agents in parallel; generate 5 UI
+/project:infinite specs/ui_component_spec.md src_agent_1 1 # Generate a single result 
+/project:infinite specs/ui_component_spec.md src_agent_2 5 # Deploy 5 agents in parallel; generate 5 UI
 /project:infinite specs/ui_component_spec.md src_agent_3 20 # 20 agents, groups of 5, optimal resource management, generate 20 UI
-/project:infinite specs/workflow_ios_spec.md src_agent_4 infinite # Continuous generation, stops with context limits 
+/project:infinite specs/ui_component_spec.md src_agent_4 infinite # Continuous generation, stops with context limits 
 ```
 
 ### Project Structure
@@ -48,8 +48,6 @@ claude update # refreshes index of codebase
 │   └── settings.json          <-- Claude Code Agent Permissions config
 ├── ai_docs/                   <-- Claude Code Documentation 
 ├── specs/                     <-- SPEC files defining best practices 
-│   ├── chat_ui_spec.md 
-│   ├── ios_ui_spec.md 
 │   ├── ui_component_spec.md 
 │   └── workflow_ios_spec.md 
 ├── src_agent_1/               <-- Output directories for each spec workflow 
