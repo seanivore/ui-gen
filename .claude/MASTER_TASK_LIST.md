@@ -105,3 +105,37 @@ Spec files `spec_file`:
 - /Users/seanivore/Development/infinite-ui-gen/specs/invent_new_ui_v2.md
 - /Users/seanivore/Development/infinite-ui-gen/specs/invent_new_ui_v3.md
 
+
+
+## Project Structure 
+
+```
+├── ai_docs
+│   ├── claude_code_fresh_tutorials.md
+│   └── VIDEO_TRANSCRIPT.md   <-- "Watch" the tutorial here 
+├── claude
+│   ├── commands
+│   │   ├── infinite.md   <-- I think needs be be made a command or something? see readme.md 
+│   │   └── prime.md    <-- For Claude Code 
+│   ├── MASTER_TASK_LIST.md 
+│   └── settings.json <-- telling Claude Code they don't need to ask permission 
+├── examples-from-tutorial
+│   ├── html_batch_1    <-- not as nice as the final batch 
+│   │   ├── src
+│   │   ├── src_enhanced
+│   │   └── themed_hybrid_all
+│   ├── html_batch_2    <-- only final batch and SPEC-v3 is really great 
+│   │   ├── src
+│   │   └── src_infinite    <-- Presumably the batch in the video 
+│   └── ui_screenshots
+├── mock_data.txt    <-- Maybe you are able to see he mentioned this somewhere? I have not. 
+├── README.md     <-- Most detailed overview of how to do the tutorial 
+├── src_agent_1    <-- New directories for each subagent
+├── src_agent_2
+├── src_agent_3
+├── src_agent_4
+└── specs
+    ├── invent_new_ui_v1.md
+    ├── invent_new_ui_v2.md
+    └── invent_new_ui_v3.md    <-- Presumably the best spec file used in the video 
+```
